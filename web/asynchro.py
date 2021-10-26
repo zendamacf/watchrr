@@ -25,13 +25,18 @@ def handle_task_failure(**kwargs):
 
 
 @celery.task(queue='scheduler')
-def fetch_episode_image(moviedb_id: int, season: int, episode: int):
-	moviedb.get_episode_image(moviedb_id, season, episode)
+def fetch_movie_poster(moviedb_id: int):
+	moviedb.get_movie_poster(moviedb_id)
 
 
 @celery.task(queue='scheduler')
 def fetch_show_poster(moviedb_id: int):
 	moviedb.get_tvshow_poster(moviedb_id)
+
+
+@celery.task(queue='scheduler')
+def fetch_episode_image(moviedb_id: int, season: int, episode: int):
+	moviedb.get_episode_image(moviedb_id, season, episode)
 
 
 def lpad(n, length=2):

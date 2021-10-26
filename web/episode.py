@@ -1,11 +1,6 @@
-# Standard library imports
 from datetime import datetime, time
-
-# Third party imports
 from flask import Blueprint, jsonify, Response
 import pytz
-
-# Local imports
 from web import moviedb
 from flasktools.db import fetch_query, mutate_query
 from flasktools.auth.oauth import auth_token_required
@@ -13,7 +8,7 @@ from flasktools.auth.oauth import auth_token_required
 bp = Blueprint('episode', __name__)
 
 
-@bp.route('/list', methods=['GET'])
+@bp.route('/', methods=['GET'])
 @auth_token_required
 def getlist(userid: int) -> Response:
 	from web.asynchro import fetch_episode_image
@@ -51,9 +46,10 @@ def getlist(userid: int) -> Response:
 			dt = datetime.combine(e['airdate'], time(20))
 			localized = tz.localize(dt)
 			# TODO: pull this from user config
-			e['airdate'] = localized.astimezone(pytz.timezone('Pacific/Auckland'))
+			server_tz = pytz.timezone('Pacific/Auckland')
+			e['airdate'] = localized.astimezone(server_tz).date()
 
-		e['in_past'] = e['airdate'].date() < datetime.today().date()
+		e['in_past'] = e['airdate'] < datetime.today().date()
 		# TODO: pull this from user config
 		e['airdate'] = datetime.strftime(e['airdate'], '%A %d/%m/%Y')
 

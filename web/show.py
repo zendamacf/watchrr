@@ -1,13 +1,12 @@
-# Third party imports
-from web import moviedb
 from flask import Blueprint, jsonify, Response
+from web import moviedb
 from flasktools.auth.oauth import auth_token_required
 from flasktools.db import fetch_query, mutate_query
 
 bp = Blueprint('show', __name__)
 
 
-@bp.route('/list', methods=['GET'])
+@bp.route('/', methods=['GET'])
 @auth_token_required
 def getlist(userid: int) -> Response:
 	from web.asynchro import fetch_show_poster
@@ -33,7 +32,7 @@ def getlist(userid: int) -> Response:
 	return jsonify(shows)
 
 
-@bp.route('/<int:showid>', methods=['PUT'])
+@bp.route('/<int:showid>', methods=['POST'])
 @auth_token_required
 def follow(userid: int, showid: int) -> Response:
 	mutate_query(

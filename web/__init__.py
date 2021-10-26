@@ -3,7 +3,7 @@ from datetime import datetime
 
 # Third party imports
 from flask import (
-	send_from_directory, request, session, url_for, redirect,
+	request, session, url_for, redirect,
 	jsonify, Flask, Response,
 	got_request_exception
 )
@@ -15,6 +15,7 @@ from web import moviedb, config
 from web.auth import bp as auth_bp
 from web.episode import bp as episode_bp
 from web.show import bp as show_bp
+from web.movie import bp as movie_bp
 from flasktools import (
 	handle_exception, params_to_dict, serve_static_file
 )
@@ -29,6 +30,7 @@ app.secret_key = config.SECRETKEY
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(episode_bp, url_prefix='/episode')
 app.register_blueprint(show_bp, url_prefix='/show')
+app.register_blueprint(movie_bp, url_prefix='/movie')
 
 app.jinja_env.globals.update(is_logged_in=is_logged_in)
 app.jinja_env.globals.update(static_file=serve_static_file)
@@ -64,34 +66,10 @@ def ping() -> Response:
 	return jsonify(ping='pong')
 
 
-@app.route('/favicon.ico')
-@app.route('/robots.txt')
-@app.route('/sitemap.xml')
-def static_from_root() -> Response:
-	return send_from_directory(app.static_folder, request.path[1:])
-	
-
-
 @app.route('/logout', methods=['GET'])
 def logout() -> Response:
 	session.pop('userid', None)
 	return redirect(url_for('login'))
-
-
-@app.route('/shows/watched', methods=['POST'])
-@login_required
-def shows_watched() -> Response:
-	error = None
-	params = params_to_dict(request.form)
-	episodeid = params.get('episodeid')
-	if episodeid:
-		mutate_query(
-			"SELECT mark_episode_watched(%s, %s)",
-			(session['userid'], episodeid,)
-		)
-	else:
-		error = 'Please select an episode.'
-	return jsonify(error=error)
 
 
 @app.route('/shows/search', methods=['GET'])
@@ -116,97 +94,6 @@ def shows_search() -> Response:
 	return jsonify(error=error, result=result)
 
 
-# @app.route('/shows/follow', methods=['POST'])
-# @login_required
-# def shows_follow() -> Response:
-# 	error = None
-# 	params = params_to_dict(request.form)
-# 	moviedb_id = params.get('moviedb_id')
-# 	if moviedb_id:
-# 		tvshow = fetch_query(
-# 			"SELECT id FROM tvshow WHERE moviedb_id = %s",
-# 			(moviedb_id,),
-# 			single_row=True
-# 		)
-# 		if not tvshow:
-# 			resp = moviedb.get_tvshow(moviedb_id)
-# 			tvshow = mutate_query(
-# 				"""
-# 				INSERT INTO tvshow (
-# 					name, country, moviedb_id
-# 				) VALUES (
-# 					%s, %s, %s
-# 				) RETURNING id
-# 				""",
-# 				(resp['name'], resp['country'], moviedb_id,),
-# 				returning=True
-# 			)
-# 		mutate_query(
-# 			"SELECT add_watcher_tvshow(%s, %s)",
-# 			(session['userid'], tvshow['id'],)
-# 		)
-# 		moviedb.get_tvshow_poster(moviedb_id)
-# 	else:
-# 		error = 'Please select a show.'
-# 	return jsonify(error=error)
-
-
-@app.route('/movies/list', methods=['GET'])
-@login_required
-def movies_list() -> Response:
-	movies = fetch_query(
-		"""
-		SELECT
-			m.id, m.name, m.moviedb_id,
-			COALESCE(to_char(m.releasedate, 'DD/MM/YYYY'), 'TBD') AS releasedate_str,
-			m.releasedate < current_date AS in_past
-		FROM movie m
-		WHERE follows_movie(%s, m.id)
-		ORDER BY m.releasedate NULLS LAST, m.name
-		""",
-		(session['userid'],)
-	)
-	outstanding = []
-	dates = []
-	count = 0
-	for m in movies:
-		existing_date = m['releasedate_str'] in [x['date'] for x in dates]
-		if m['in_past'] is False and not existing_date:
-			dates.append({'date': m['releasedate_str']})
-		elif m['in_past'] is True:
-			outstanding.append(m)
-		m['poster'] = moviedb.get_movie_poster(m['moviedb_id'])
-		if not m['poster']:
-			m['poster'] = serve_static_file('img/placeholder.jpg')
-		m['update_url'] = url_for('movies_update', movieid=m['id'])
-		count += 1
-	dates.append({'date': 'TBD'})
-
-	for d in dates:
-		d['movies'] = []
-		for m in movies:
-			if m['releasedate_str'] == d['date']:
-				d['movies'].append(m)
-
-	return jsonify(dates=dates, outstanding=outstanding, count=count)
-
-
-@app.route('/movies/watched', methods=['POST'])
-@login_required
-def movies_watched() -> Response:
-	error = None
-	params = params_to_dict(request.form)
-	movieid = params.get('movieid')
-	if movieid:
-		mutate_query(
-			"SELECT mark_movie_watched(%s, %s)",
-			(session['userid'], movieid,)
-		)
-	else:
-		error = 'Please select an movie.'
-	return jsonify(error=error)
-
-
 @app.route('/movies/search', methods=['GET'])
 @login_required
 def movies_search() -> Response:
@@ -229,41 +116,6 @@ def movies_search() -> Response:
 				'year': year
 			})
 	return jsonify(error=error, result=result)
-
-
-@app.route('/movies/follow', methods=['POST'])
-@login_required
-def movies_follow() -> Response:
-	error = None
-	params = params_to_dict(request.form)
-	moviedb_id = params.get('moviedb_id')
-	if moviedb_id:
-		movie = fetch_query(
-			"SELECT * FROM movie WHERE moviedb_id = %s",
-			(moviedb_id,),
-			single_row=True
-		)
-		if not movie:
-			resp = moviedb.get_movie(moviedb_id)
-			movie = mutate_query(
-				"""
-				INSERT INTO movie (
-					name, releasedate, moviedb_id
-				) VALUES (
-					%s, %s, %s
-				) RETURNING id
-				""",
-				(resp['title'], resp['release_date'], moviedb_id,),
-				returning=True
-			)
-		mutate_query(
-			"SELECT add_watcher_movie(%s, %s)",
-			(session['userid'], movie['id'],)
-		)
-		moviedb.get_movie_poster(moviedb_id)
-	else:
-		error = 'Please select a show.'
-	return jsonify(error=error)
 
 
 @app.route('/shows/update', methods=['GET'])
