@@ -20,7 +20,7 @@ from flasktools import (
 	handle_exception, params_to_dict, serve_static_file
 )
 from flasktools.auth import is_logged_in, login_required
-from flasktools.db import disconnect_database, fetch_query, mutate_query
+from flasktools.db import disconnect_database, fetch_query
 
 
 app = Flask(__name__)
