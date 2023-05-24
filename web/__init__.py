@@ -28,7 +28,7 @@ app.jinja_env.globals.update(static_file=serve_static_file)
 
 with app.app_context() as ctx:
 	if not hasattr(config, 'TESTMODE'):
-		env = 'production' if not hasattr(config, 'TESTMODE') else 'development'
+		env = 'production' if app.debug else 'development'
 		rollbar.init(
 			config.ROLLBAR_TOKEN,
 			environment=env
