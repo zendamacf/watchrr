@@ -19,11 +19,9 @@ from flasktools import (
 from flasktools.auth import is_logged_in, check_login, login_required
 from flasktools.db import disconnect_database, fetch_query, mutate_query
 
-
 app = Flask(__name__)
 
 app.secret_key = config.SECRETKEY
-
 
 app.jinja_env.globals.update(is_logged_in=is_logged_in)
 app.jinja_env.globals.update(static_file=serve_static_file)
@@ -38,6 +36,7 @@ with app.app_context() as ctx:
 
 		# send exceptions from `app` to rollbar, using flask's signal system.
 		got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
+
 
 @app.errorhandler(500)
 def internal_error(e: Exception) -> Response:
