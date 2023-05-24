@@ -22,7 +22,6 @@ from flasktools import (
 from flasktools.auth import is_logged_in, login_required
 from flasktools.db import disconnect_database, fetch_query
 
-
 app = Flask(__name__)
 
 app.secret_key = config.SECRETKEY
@@ -35,13 +34,9 @@ app.register_blueprint(movie_bp, url_prefix='/movie')
 app.jinja_env.globals.update(is_logged_in=is_logged_in)
 app.jinja_env.globals.update(static_file=serve_static_file)
 
-
-@app.before_first_request
-def init_rollbar():
+with app.app_context() as ctx:
 	if not hasattr(config, 'TESTMODE'):
-		env = 'production'
-		if request.remote_addr == '127.0.0.1':
-			env = 'development'
+		env = 'production' if app.debug else 'development'
 		rollbar.init(
 			config.ROLLBAR_TOKEN,
 			environment=env
