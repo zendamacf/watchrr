@@ -28,9 +28,7 @@ app.secret_key = config.SECRETKEY
 app.jinja_env.globals.update(is_logged_in=is_logged_in)
 app.jinja_env.globals.update(static_file=serve_static_file)
 
-
-@app.before_first_request
-def init_rollbar():
+with app.app_context() as ctx:
 	if not hasattr(config, 'TESTMODE'):
 		env = 'production' if not hasattr(config, 'TESTMODE') else 'development'
 		rollbar.init(
@@ -40,7 +38,6 @@ def init_rollbar():
 
 		# send exceptions from `app` to rollbar, using flask's signal system.
 		got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
-
 
 @app.errorhandler(500)
 def internal_error(e: Exception) -> Response:
