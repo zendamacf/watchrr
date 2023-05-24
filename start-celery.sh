@@ -1,3 +1,3 @@
 #!/bin/bash
 
-celery worker -A web.asynchro.celery --concurrency=10 -Q scheduler --purge
+celery -A web.asynchro.celery worker --concurrency=10 -Q scheduler --purge
