@@ -2,5 +2,5 @@ Flask==2.3.2
 Flask-Cors==3.0.10
 git+https://github.com/zendamacf/flasktools#egg=flasktools==2.0.1
 pytz==2023.3
-requests==2.31.0
+requests==2.32.0
 rollbar==0.16.3
