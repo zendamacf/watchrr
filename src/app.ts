@@ -4,13 +4,12 @@ import Rollbar from 'rollbar';
 
 configDotenv();
 
-new Rollbar({
+const rollbar = new Rollbar({
   accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
   captureUncaught: true,
   captureUnhandledRejections: true,
-  payload: {
-    code_version: '1.0.0',
-  },
+  environment: process.env.NODE_ENV,
+  locals: Rollbar.Locals,
 });
 
 const app = express();
@@ -19,6 +18,8 @@ const port = 3000;
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
+
+app.use(rollbar.errorHandler());
 
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
