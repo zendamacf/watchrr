@@ -11,8 +11,8 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <main className="min-h-screen bg-gray-100 dark:bg-gray-800 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 text-center">
+    <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 dark:bg-gray-800">
+      <div className="w-full max-w-md space-y-8 text-center">
         <div>
           <AlertCircleIcon className="mx-auto h-12 w-auto text-red-500" />
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-gray-100">
@@ -26,7 +26,7 @@ export default function Error({
             Try again
           </Button>
           <Link
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
             href="/"
           >
             Back to homepage
