@@ -1,5 +1,4 @@
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
@@ -13,6 +12,9 @@ export const metadata: Metadata = {
   authors: {
     name: 'Zach Lang',
     url: 'https://github.com/zendamacf/',
+  },
+  icons: {
+    icon: '/favicon.ico',
   },
 };
 
@@ -35,7 +37,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ThemeToggle />
           {children}
         </ThemeProvider>
       </body>

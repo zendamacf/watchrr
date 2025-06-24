@@ -1,3 +1,4 @@
+import { SiteHeader } from '@/components/SiteHeader';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
@@ -14,6 +15,7 @@ export default async function Home() {
   return (
     <div>
       <main>
+        <SiteHeader />
         <Image src="/next.svg" alt="Next.js logo" width={180} height={38} priority />
         <ol>
           <li>
