@@ -35,7 +35,7 @@ export default async function SignUpPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" required type="password" />
+              <Input id="password" name="password" required type="password" maxLength={72} />
             </div>
             <Button className="w-full" formAction={signup}>
               Sign Up
