@@ -8,7 +8,10 @@
     "start:dev": "next dev --turbopack",
     "format": "prettier --write .",
     "lint": "prettier --check . && next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.2",
