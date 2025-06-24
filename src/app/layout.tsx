@@ -1,3 +1,5 @@
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
+import '@mantine/core/styles.css';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
@@ -7,7 +9,7 @@ const font = Raleway({
 });
 
 export const metadata: Metadata = {
-  title: 'Watchrr',
+  title: 'watchrr',
   authors: {
     name: 'Zach Lang',
     url: 'https://github.com/zendamacf/',
@@ -25,8 +27,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={font.className}>
-      <body>{children}</body>
+    <html lang="en" className={font.className} {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript />
+      </head>
+      <body>
+        <MantineProvider>{children}</MantineProvider>
+      </body>
     </html>
   );
 }
