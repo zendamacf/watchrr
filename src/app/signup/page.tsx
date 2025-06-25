@@ -17,35 +17,29 @@ export default async function SignUpPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <Card className="w-full max-w-md">
+    <main>
+      <Card>
         <CardHeader>
-          <div className="flex flex-col items-center space-y-2">
-            <h1 className="text-3xl font-bold">Sign Up</h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              Enter your email below to create a new account.
-            </p>
+          <div>
+            <h1>Sign Up</h1>
+            <p>Enter your email below to create a new account.</p>
           </div>
         </CardHeader>
         <CardContent>
-          <form className="space-y-6">
-            <div className="space-y-2">
+          <form>
+            <div>
               <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" placeholder="m@example.com" required type="email" />
             </div>
-            <div className="space-y-2">
+            <div>
               <Label htmlFor="password">Password</Label>
               <Input id="password" name="password" required type="password" maxLength={72} />
             </div>
-            <Button className="w-full" formAction={signup}>
-              Sign Up
-            </Button>
+            <Button formAction={signup}>Sign Up</Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <Link className="text-sm underline" href="/signin">
-            Already have an account? Sign In
-          </Link>
+        <CardFooter>
+          <Link href="/signin">Already have an account? Sign In</Link>
         </CardFooter>
       </Card>
     </main>

@@ -11,26 +11,19 @@ export default function Error({
   reset: () => void;
 }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8 dark:bg-gray-800">
-      <div className="w-full max-w-md space-y-8 text-center">
+    <main>
+      <div>
         <div>
-          <AlertCircleIcon className="mx-auto h-12 w-auto text-red-500" />
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-gray-100">
-            Oops! Something went wrong.
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Error: {error.message}</p>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Digest: {error.digest}</p>
+          <AlertCircleIcon />
+          <h2>Oops! Something went wrong.</h2>
+          <p>Error: {error.message}</p>
+          <p>Digest: {error.digest}</p>
         </div>
-        <div className="space-y-2">
-          <Button className="w-full" variant="outline" onClick={() => reset()}>
+        <div>
+          <Button variant="outline" onClick={() => reset()}>
             Try again
           </Button>
-          <Link
-            className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
-            href="/"
-          >
-            Back to homepage
-          </Link>
+          <Link href="/">Back to homepage</Link>
         </div>
       </div>
     </main>
