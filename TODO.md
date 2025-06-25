@@ -1,0 +1,4 @@
+- Access Supabase via Drizzle ORM
+- Populate Supabase from original DB
+- Investigate tRPC
+- Actually migrate site
