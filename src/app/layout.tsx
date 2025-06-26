@@ -1,7 +1,13 @@
-import { ThemeProvider } from '@/components/ThemeProvider';
+import '@mantine/core/styles.css';
+
+import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
+
+const theme = createTheme({
+  /** Put your mantine theme override here */
+});
 
 const font = Raleway({
   subsets: ['latin'],
@@ -30,15 +36,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={font.className}>
+      <head>
+        <ColorSchemeScript />
+      </head>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <MantineProvider theme={theme}>{children}</MantineProvider>
       </body>
     </html>
   );

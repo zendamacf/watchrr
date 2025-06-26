@@ -20,6 +20,9 @@ npm-debug.log*
 # vercel
 .vercel
 
+# VSCode
+.vscode
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

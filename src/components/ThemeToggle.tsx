@@ -1,23 +1,25 @@
 'use client';
 
+import { Switch, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
-
-import { Button } from '@/components/ui/button';
 import { useCallback } from 'react';
 
 export function ThemeToggle() {
-  const { setTheme, resolvedTheme } = useTheme();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
 
   const toggleTheme = useCallback(() => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-  }, [resolvedTheme, setTheme]);
+    setColorScheme(computedColorScheme === 'dark' ? 'light' : 'dark');
+  }, [computedColorScheme, setColorScheme]);
 
   return (
-    <Button variant="ghost" onClick={toggleTheme}>
-      <Sun />
-      <Moon />
-      <span>Toggle theme</span>
-    </Button>
+    <Switch
+      size="md"
+      color="dark.4"
+      checked={computedColorScheme === 'light'}
+      onChange={() => toggleTheme()}
+      onLabel={<Sun size={16} color="var(--mantine-color-yellow-4)" />}
+      offLabel={<Moon size={16} color="var(--mantine-color-blue-6)" />}
+    />
   );
 }
