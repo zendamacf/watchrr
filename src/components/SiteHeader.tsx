@@ -1,7 +1,7 @@
+import { Button } from '@mantine/core';
 import Link from 'next/link';
 import { MainNav } from './MainNav';
 import { ThemeToggle } from './ThemeToggle';
-import { Button } from './ui/button';
 
 export function SiteHeader() {
   return (
@@ -11,7 +11,7 @@ export function SiteHeader() {
           <MainNav />
           <div>
             <nav>
-              <Button asChild variant="ghost" size="icon">
+              <Button variant="ghost" size="icon">
                 <Link href="https://github.com/zendamacf/watchrr" target="_blank" rel="noreferrer">
                   {/* <Icons.gitHub /> */}
                   <span>GitHub</span>

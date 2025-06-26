@@ -1,12 +1,17 @@
 import { signup } from '@/actions/auth/actions';
 import { createClient } from '@/utils/supabase/server';
-import Link from 'next/link';
+import {
+  Anchor,
+  Button,
+  Container,
+  Paper,
+  PasswordInput,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { redirect } from 'next/navigation';
-
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import classes from './page.module.css';
 
 export default async function SignUpPage() {
   const supabase = await createClient();
@@ -17,31 +22,37 @@ export default async function SignUpPage() {
   }
 
   return (
-    <main>
-      <Card>
-        <CardHeader>
-          <div>
-            <h1>Sign Up</h1>
-            <p>Enter your email below to create a new account.</p>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" placeholder="m@example.com" required type="email" />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" required type="password" maxLength={72} />
-            </div>
-            <Button formAction={signup}>Sign Up</Button>
-          </form>
-        </CardContent>
-        <CardFooter>
-          <Link href="/signin">Already have an account? Sign In</Link>
-        </CardFooter>
-      </Card>
-    </main>
+    <Container size={420} my={40}>
+      <Title ta="center" className={classes.title}>
+        Sign Up
+      </Title>
+
+      <Text className={classes.subtitle}>
+        Already have an account? <Anchor href={'/signin'}>Sign In</Anchor>
+      </Text>
+
+      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+        <form action={signup}>
+          <TextInput
+            label="Email"
+            name="email"
+            placeholder="email@example.com"
+            required
+            radius="md"
+          />
+          <PasswordInput
+            label="Password"
+            name="password"
+            placeholder="Your password"
+            required
+            mt="md"
+            radius="md"
+          />
+          <Button type="submit" fullWidth mt="xl" radius="md">
+            Sign Up
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   );
 }

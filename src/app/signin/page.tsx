@@ -1,20 +1,18 @@
 import { signin } from '@/actions/auth/actions';
 import { createClient } from '@/utils/supabase/server';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-
-import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+  Anchor,
+  Button,
+  Container,
+  Group,
+  Paper,
+  PasswordInput,
+  Text,
+  TextInput,
+  Title,
+} from '@mantine/core';
+import { redirect } from 'next/navigation';
+import classes from './page.module.css';
 
 export default async function SignInPage() {
   const supabase = await createClient();
@@ -25,38 +23,42 @@ export default async function SignInPage() {
   }
 
   return (
-    <main>
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
-          <CardAction>
-            <Link href="/signup">Sign Up</Link>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
-              </div>
-              <div>
-                <div>
-                  <Label htmlFor="password">Password</Label>
-                  <a href="#">Forgot your password?</a>
-                </div>
-                <Input id="password" type="password" required />
-                <Button formAction={signin}>Sign in</Button>
-              </div>
-            </div>
-          </form>
-          <Separator />
-          <div>
-            <Button variant="outline">Sign in with Google</Button>
-          </div>
-        </CardContent>
-      </Card>
-    </main>
+    <Container size={420} my={40}>
+      <Title ta="center" className={classes.title}>
+        Welcome back!
+      </Title>
+
+      <Text className={classes.subtitle}>
+        Do not have an account yet? <Anchor href={'/signup'}>Create account</Anchor>
+      </Text>
+
+      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+        <form action={signin}>
+          <TextInput
+            label="Email"
+            name="email"
+            placeholder="email@example.com"
+            required
+            radius="md"
+          />
+          <PasswordInput
+            label="Password"
+            name="password"
+            placeholder="Your password"
+            required
+            mt="md"
+            radius="md"
+          />
+          <Group justify="space-between" mt="lg">
+            <Anchor component="button" size="sm" href={'/forgot-password'}>
+              Forgot password?
+            </Anchor>
+          </Group>
+          <Button type={'submit'} fullWidth mt="xl" radius="md">
+            Sign in
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   );
 }
