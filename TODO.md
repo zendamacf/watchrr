@@ -1,4 +1,12 @@
-- Access Supabase via Drizzle ORM
+# TODO
+
 - Populate Supabase from original DB
-- Investigate tRPC
 - Actually migrate site
+
+# DONE
+
+- Access Supabase via Drizzle ORM
+
+# IGNORING
+
+- Investigate tRPC
