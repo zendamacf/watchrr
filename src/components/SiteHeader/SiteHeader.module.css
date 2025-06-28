@@ -28,7 +28,7 @@
 
 .active_link {
   font-weight: 700;
-  background-color: alpha(var(--accent), 0.1);
+  background-color: alpha(var(--primary), 0.1);
   /* Override dark theme */
-  color: var(--accent) !important;
+  color: var(--primary) !important;
 }
