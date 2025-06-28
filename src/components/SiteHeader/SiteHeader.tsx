@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Burger, Divider, Drawer, Group, ScrollArea } from '@mantine/core';
+import { Box, Burger, Divider, Drawer, Group, ScrollArea, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation';
@@ -53,8 +53,11 @@ function MainNav({
           ))}
         </Group>
 
-        <Group visibleFrom="sm">
+        <Group h="100%" visibleFrom="sm">
           <ThemeToggle />
+          <a href={'/auth/signout'} className={classes.link}>
+            Sign out
+          </a>
         </Group>
 
         <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
@@ -75,6 +78,7 @@ function MobileNav({
     <Drawer
       opened={drawerOpened}
       onClose={closeDrawer}
+      position={'right'}
       size="100%"
       padding="md"
       title={<Logo w={180} />}
@@ -96,9 +100,12 @@ function MobileNav({
 
         <Divider my="sm" />
 
-        <Group justify="center" grow pb="xl" px="md">
+        <Stack justify="center" px="md">
           <ThemeToggle />
-        </Group>
+          <a href={'/auth/signout'} className={classes.link} style={{ paddingLeft: 0 }}>
+            Sign out
+          </a>
+        </Stack>
       </ScrollArea>
     </Drawer>
   );
