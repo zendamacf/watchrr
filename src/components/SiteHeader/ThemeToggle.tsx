@@ -1,25 +1,30 @@
 'use client';
 
-import { Switch, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
+import { Switch, useMantineColorScheme } from '@mantine/core';
+import { useMounted } from '@mantine/hooks';
 import { Moon, Sun } from 'lucide-react';
 import { useCallback } from 'react';
 
 export function ThemeToggle() {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
-  const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
+  const { setColorScheme, colorScheme } = useMantineColorScheme({ keepTransitions: true });
+  const mounted = useMounted();
+  const isDark = colorScheme === 'dark';
 
   const toggleTheme = useCallback(() => {
-    setColorScheme(computedColorScheme === 'dark' ? 'light' : 'dark');
-  }, [computedColorScheme, setColorScheme]);
+    setColorScheme(isDark ? 'light' : 'dark');
+  }, [isDark, setColorScheme]);
+
+  if (!mounted) return <div style={{ width: 50 }}></div>;
 
   return (
     <Switch
       size="md"
       color="dark.4"
-      checked={computedColorScheme === 'light'}
+      checked={!isDark}
       onChange={() => toggleTheme()}
       onLabel={<Sun size={16} color="var(--mantine-color-yellow-4)" />}
       offLabel={<Moon size={16} color="var(--mantine-color-blue-6)" />}
+      style={{ width: 50 }}
     />
   );
 }
