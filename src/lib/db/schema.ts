@@ -15,31 +15,31 @@ import { authUsers } from 'drizzle-orm/supabase';
  */
 
 export const tvshows = pgTable('tvshows', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  moviedb_id: integer('moviedb_id').notNull(),
-  country: text('country').notNull(),
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  moviedb_id: integer().notNull(),
+  country: text().notNull(),
 });
 
 export const episodes = pgTable('episodes', {
-  id: serial('id').primaryKey(),
-  tvshow_id: integer('tvshow_id')
+  id: serial().primaryKey(),
+  tvshow_id: integer()
     .notNull()
     .references(() => tvshows.id, { onDelete: 'cascade' }),
-  season: integer('season').notNull(),
-  episode: integer('episode').notNull(),
-  name: text('name').notNull(),
-  airdate: date('airdate').notNull(),
-  moviedb_id: integer('moviedb_id').notNull(),
+  season: integer().notNull(),
+  episode: integer().notNull(),
+  name: text().notNull(),
+  airdate: date().notNull(),
+  moviedb_id: integer().notNull(),
 });
 
 export const watcher_tvshows = pgTable(
   'watcher_tvshows',
   {
-    tvshow_id: integer('tvshow_id')
+    tvshow_id: integer()
       .notNull()
       .references(() => tvshows.id, { onDelete: 'cascade' }),
-    watcher_id: uuid('watcher_id')
+    watcher_id: uuid()
       .notNull()
       .references(() => authUsers.id, { onDelete: 'restrict' }),
   },
@@ -49,34 +49,34 @@ export const watcher_tvshows = pgTable(
 export const watcher_episodes = pgTable(
   'watcher_episodes',
   {
-    episode_id: integer('episode_id')
+    episode_id: integer()
       .notNull()
       .references(() => episodes.id, { onDelete: 'cascade' }),
-    watcher_id: uuid('watcher_id')
+    watcher_id: uuid()
       .notNull()
       .references(() => authUsers.id, { onDelete: 'restrict' }),
-    watched: boolean('watched').notNull().default(false),
+    watched: boolean().notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
 );
 
 export const movies = pgTable('movies', {
-  id: serial('id').primaryKey(),
-  name: text('name').notNull(),
-  releasedate: date('releasedate'),
-  moviedb_id: integer('moviedb_id').notNull(),
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  releasedate: date(),
+  moviedb_id: integer().notNull(),
 });
 
 export const watcher_movies = pgTable(
   'watcher_movies',
   {
-    movie_id: integer('movie_id')
+    movie_id: integer()
       .notNull()
       .references(() => movies.id, { onDelete: 'cascade' }),
-    watcher_id: uuid('watcher_id')
+    watcher_id: uuid()
       .notNull()
       .references(() => authUsers.id, { onDelete: 'restrict' }),
-    watched: boolean('watched').notNull().default(false),
+    watched: boolean().notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
 );
