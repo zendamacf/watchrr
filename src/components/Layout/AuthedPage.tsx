@@ -1,9 +1,10 @@
 import { createClient } from '@/utils/supabase/server';
+import { User } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
-import { ReactNode } from 'react';
+import { ComponentType } from 'react';
 import { SiteHeader } from '../SiteHeader';
 
-export async function AuthedPage({ children }: { children: ReactNode }) {
+export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: User }> }) {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getUser();
@@ -16,7 +17,7 @@ export async function AuthedPage({ children }: { children: ReactNode }) {
     <div>
       <main>
         <SiteHeader />
-        {children}
+        <Child user={data.user} />
       </main>
     </div>
   );

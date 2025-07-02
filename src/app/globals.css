@@ -1,6 +1,7 @@
 :root {
   --primary: #00c853;
   --info: #0090ff;
+  --warning: #ff6117;
   --error: #ff0048;
 
   --mantine-primary-color-filled: var(--primary);

@@ -1,6 +1,6 @@
 import '@mantine/core/styles.css';
 
-import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={font.className}>
+    <html lang="en" {...mantineHtmlProps} className={font.className}>
       <head>
         <ColorSchemeScript />
       </head>

@@ -19,8 +19,10 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",
     "classnames": "^2.5.1",
+    "countries-and-timezones": "^3.8.0",
     "drizzle-orm": "^0.44.2",
     "lucide-react": "^0.523.0",
+    "luxon": "^3.6.1",
     "next": "15.3.4",
     "postgres": "^3.4.7",
     "react": "^19.0.0",
@@ -28,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/luxon": "^3.6.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

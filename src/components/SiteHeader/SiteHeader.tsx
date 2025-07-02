@@ -20,7 +20,7 @@ export function SiteHeader() {
 }
 
 const links = [
-  { label: 'Home', href: '/' },
+  { label: 'Episodes', href: '/episodes' },
   { label: 'Shows', href: '/shows' },
   { label: 'Movies', href: '/movies' },
 ];

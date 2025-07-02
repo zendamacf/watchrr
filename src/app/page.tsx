@@ -1,5 +1,5 @@
-import { AuthedPage } from '@/components/Layout/AuthedPage';
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
-  return <AuthedPage>YOURE LOGGED IN</AuthedPage>;
+  return redirect('/episodes');
 }
