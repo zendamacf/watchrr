@@ -38,7 +38,7 @@ export default async function SignInPage() {
           radius="md"
         />
         <Group justify="space-between" mt="lg">
-          <Anchor component="button" size="sm" href={'/forgot-password'}>
+          <Anchor size="sm" href={'/forgot-password'}>
             Forgot password?
           </Anchor>
         </Group>

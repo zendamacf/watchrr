@@ -44,7 +44,7 @@ function MainNav({
             <a
               href={link.href}
               className={classNames(classes.link, {
-                [classes.active_link]: pathname === link.href,
+                [classes.active_link!]: pathname === link.href,
               })}
               key={link.href}
             >
@@ -91,7 +91,7 @@ function MobileNav({
         {links.map((link) => (
           <a
             href={link.href}
-            className={classNames(classes.link, { [classes.active_link]: pathname === link.href })}
+            className={classNames(classes.link, { [classes.active_link!]: pathname === link.href })}
             key={link.href}
           >
             {link.label}

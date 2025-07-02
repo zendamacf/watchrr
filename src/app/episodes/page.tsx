@@ -33,9 +33,9 @@ async function EpisodeList({ user }: { user: User }) {
     const timezones = getTimezonesForCountry(r.tvshows.country);
     if (timezones?.length) {
       // Just get first, with dates we don't have to be too accurate
-      const tz = timezones[0];
+      const [tz] = timezones;
       // Convert from original timezone to user's
-      const dt = DateTime.fromSQL(r.episodes.airdate, { zone: tz.name })
+      const dt = DateTime.fromSQL(r.episodes.airdate, { zone: tz?.name })
         // Hardcode at 8PM, as moviedb doesn't store airtimes
         .set({ hour: 20 })
         // TODO: Pull this from user config
@@ -95,7 +95,7 @@ function EpisodeCard({ episode, showDate }: { episode: Episode; showDate?: boole
       >{`S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`}</Text>
       <Text>{episode.episodes.name}</Text>
       {showDate && (
-        <Text className={classNames({ [classes.pastdate]: episode.episodes.in_past })}>
+        <Text className={classNames({ [classes.pastdate!]: episode.episodes.in_past })}>
           <FormattedDate iso={iso} />
         </Text>
       )}
