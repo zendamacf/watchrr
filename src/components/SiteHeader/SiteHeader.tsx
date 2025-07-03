@@ -12,7 +12,7 @@ export function SiteHeader() {
   const [drawerOpened, { toggle, close }] = useDisclosure(false);
 
   return (
-    <Box pb={120}>
+    <Box pb={'xl'}>
       <MainNav drawerOpened={drawerOpened} toggleDrawer={toggle} />
       <MobileNav drawerOpened={drawerOpened} closeDrawer={close} />
     </Box>

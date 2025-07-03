@@ -1,0 +1,35 @@
+.past-episodes-accordion-item {
+  border-bottom: none;
+}
+
+.past-episodes-accordion-control {
+  color: white;
+  background-color: var(--info);
+  border-radius: var(--mantine-radius-default);
+
+  &[data-active] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  transition: all 0.2s ease-in-out;
+  @mixin hover {
+    background-color: light-dark(darken(var(--info), 0.15), lighten(var(--info), 0.15));
+  }
+}
+
+.past-episodes-accordion-panel {
+  padding: var(--mantine-spacing-xs);
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-default);
+
+  border-top: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.pastdate {
+  margin-top: var(--mantine-spacing-xs);
+  color: var(--warning);
+  font-size: var(--mantine-font-size-sm);
+}

@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
+import { Container } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { ComponentType } from 'react';
@@ -17,7 +18,9 @@ export async function AuthedPage({ children: Child }: { children: ComponentType<
     <div>
       <main>
         <SiteHeader />
-        <Child user={data.user} />
+        <Container fluid>
+          <Child user={data.user} />
+        </Container>
       </main>
     </div>
   );
