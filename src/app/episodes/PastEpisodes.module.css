@@ -27,9 +27,3 @@
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-
-.pastdate {
-  margin-top: var(--mantine-spacing-xs);
-  color: var(--warning);
-  font-size: var(--mantine-font-size-sm);
-}
