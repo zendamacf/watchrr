@@ -1,12 +1,14 @@
 import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
 
 import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
 
 const theme = createTheme({
-  /** Put your mantine theme override here */
+  cursorType: 'pointer',
 });
 
 const font = Raleway({
@@ -40,7 +42,10 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <Notifications />
+          {children}
+        </MantineProvider>
       </body>
     </html>
   );

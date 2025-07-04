@@ -1,6 +1,7 @@
 'use client';
 
 import { FormattedDate } from '@/components/Dates';
+import { useAlert } from '@/hooks/useAlert';
 import { ActionIcon, Card, Group, Stack, Text, Title } from '@mantine/core';
 import classNames from 'classnames';
 import { Check } from 'lucide-react';
@@ -16,14 +17,19 @@ type Props = {
 
 export const EpisodeCard = ({ episode, showDate, removeEpisode }: Props) => {
   const [loading, setLoading] = useState(false);
+  const { showError, showSuccess } = useAlert();
+
+  const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
   async function markWatched(episode_id: number) {
     setLoading(true);
     const response = await fetch(`/api/episode/${episode_id}/`, { method: 'put' });
     if (response.ok) {
       await removeEpisode(episode_id);
+      showSuccess('Nice!', `You watched ${episode.tvshows.name} ${episodeNumber}`);
+    } else {
+      showError('An error occurred', (await response.json()).message);
     }
-    // TODO: Display error
     setLoading(false);
   }
 
@@ -34,9 +40,7 @@ export const EpisodeCard = ({ episode, showDate, removeEpisode }: Props) => {
       </Title>
       <Group justify={'space-between'} align={'flex-end'}>
         <Stack gap={0}>
-          <Text
-            fw={'bold'}
-          >{`S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`}</Text>
+          <Text fw={'bold'}>{episodeNumber}</Text>
           <Text>{episode.episodes.name}</Text>
           {showDate && (
             <Text className={classNames({ [classes.pastdate!]: episode.episodes.in_past })}>

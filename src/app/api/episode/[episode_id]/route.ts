@@ -14,7 +14,7 @@ export async function PUT(
 
   const { data, error } = await supabase.auth.getUser();
   if (error || !data?.user) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   await db
@@ -27,5 +27,5 @@ export async function PUT(
       ),
     );
 
-  return new NextResponse('Success', { status: 200 });
+  return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
