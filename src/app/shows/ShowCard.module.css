@@ -1,0 +1,5 @@
+.root {
+  background-image: var(--image-url);
+  background-color: rgba(255, 255, 255, 0.6);
+  background-blend-mode: light-dark(lighten, darken);
+}

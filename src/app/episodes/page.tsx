@@ -5,7 +5,7 @@ import { User } from '@supabase/supabase-js';
 import { and, eq } from 'drizzle-orm';
 import { EpisodeList } from './EpisodeList';
 
-export default async function Episodes() {
+export default async function Page() {
   return <AuthedPage>{(props) => <Inner {...props} />}</AuthedPage>;
 }
 

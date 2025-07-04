@@ -17,7 +17,7 @@ export const EpisodeList = (props: Props) => {
   const converted = episodes.map<ISOEpisode>((r) => {
     let localDate: DateTime;
     // Convert to user timezone
-    const timezones = getTimezonesForCountry(r.tvshows.country);
+    const timezones = r.tvshows.country ? getTimezonesForCountry(r.tvshows.country) : [];
     if (timezones?.length) {
       // Just get first, with dates we don't have to be too accurate
       const [tz] = timezones;
@@ -47,21 +47,19 @@ export const EpisodeList = (props: Props) => {
   }
 
   return (
-    <div>
-      <Stack gap={'xl'}>
-        {!!pastEpisodes.length && (
-          <PastEpisodes episodes={pastEpisodes} removeEpisode={removeEpisode} />
-        )}
+    <Stack gap={'xl'}>
+      {!!pastEpisodes.length && (
+        <PastEpisodes episodes={pastEpisodes} removeEpisode={removeEpisode} />
+      )}
 
-        {Object.entries(futureDates).map(([iso, episodes]) => (
-          <Stack gap={'sm'} key={iso}>
-            <Title order={2}>
-              <FormattedDate iso={iso} />
-            </Title>
-            <GroupedEpisodes episodes={episodes} removeEpisode={removeEpisode} />
-          </Stack>
-        ))}
-      </Stack>
-    </div>
+      {Object.entries(futureDates).map(([iso, episodes]) => (
+        <Stack gap={'sm'} key={iso}>
+          <Title order={2}>
+            <FormattedDate iso={iso} />
+          </Title>
+          <GroupedEpisodes episodes={episodes} removeEpisode={removeEpisode} />
+        </Stack>
+      ))}
+    </Stack>
   );
 };
