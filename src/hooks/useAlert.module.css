@@ -1,13 +1,9 @@
 .root {
-  background-color: var(--notification-color, var(--mantine-primary-color-filled));
+  background-color: darken(var(--notification-color), light-dark(0.1, 0.3));
 
   &::before {
     background-color: var(--mantine-color-white);
   }
-}
-
-.title {
-  font-weight: var(--mantine-heading-font-weight);
 }
 
 .description,
@@ -16,7 +12,7 @@
 }
 
 .icon {
-  color: var(--notification-color);
+  color: darken(var(--notification-color), light-dark(0.1, 0.3));
   background-color: var(--mantine-color-white);
 }
 
