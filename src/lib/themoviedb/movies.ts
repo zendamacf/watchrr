@@ -16,7 +16,7 @@ type Movie = {
  */
 export const search = async (query: string): Promise<Movie[]> => {
   const data = await tmdb.search.movies({ query });
-  return data.results.map((d) => ({
+  return data.results.map<Movie>((d) => ({
     id: d.id,
     name: d.title,
     description: d.overview,

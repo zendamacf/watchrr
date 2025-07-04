@@ -5,6 +5,8 @@ type TvShow = {
   name: string;
   country: string | undefined;
   firstAirDate: Date;
+  poster: string | undefined;
+  backdrop: string | undefined;
 };
 
 /**
@@ -14,11 +16,13 @@ type TvShow = {
  */
 export const search = async (query: string): Promise<TvShow[]> => {
   const data = await tmdb.search.tvShows({ query });
-  return data.results.map((d) => ({
+  return data.results.map<TvShow>((d) => ({
     id: d.id,
     name: d.name,
     country: d.origin_country[0],
     firstAirDate: new Date(d.first_air_date),
+    poster: d.poster_path,
+    backdrop: d.backdrop_path,
   }));
 };
 
@@ -34,5 +38,7 @@ export const getTvShow = async (moviddb_id: number): Promise<TvShow> => {
     name: data.name,
     country: data.origin_country[0],
     firstAirDate: new Date(data.first_air_date),
+    poster: data.poster_path,
+    backdrop: data.backdrop_path,
   };
 };

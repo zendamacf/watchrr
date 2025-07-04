@@ -17,7 +17,7 @@ import { authUsers } from 'drizzle-orm/supabase';
 export const tvshows = pgTable('tvshows', {
   id: serial().primaryKey(),
   name: text().notNull(),
-  moviedb_id: integer().notNull(),
+  moviedb_id: integer().notNull().unique(),
   country: text(),
   poster_url: text(),
   backdrop_url: text(),
@@ -32,7 +32,7 @@ export const episodes = pgTable('episodes', {
   episode: integer().notNull(),
   name: text().notNull(),
   airdate: date().notNull(),
-  moviedb_id: integer().notNull(),
+  moviedb_id: integer().notNull().unique(),
   backdrop_url: text(),
 });
 
@@ -67,7 +67,7 @@ export const movies = pgTable('movies', {
   id: serial().primaryKey(),
   name: text().notNull(),
   releasedate: date(),
-  moviedb_id: integer().notNull(),
+  moviedb_id: integer().notNull().unique(),
   poster_url: text(),
   backdrop_url: text(),
 });

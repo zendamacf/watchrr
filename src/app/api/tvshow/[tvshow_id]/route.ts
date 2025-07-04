@@ -1,17 +1,17 @@
 import { db } from '@/lib/db';
-import { watcher_episodes } from '@/lib/db/schema';
+import { watcher_tvshows } from '@/lib/db/schema';
 import { createClient } from '@/utils/supabase/server';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Mark an episode as watched.
+ * Stop subscribing to a TV Show.
  */
-export async function PUT(
+export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ episode_id: number }> },
+  { params }: { params: Promise<{ tvshow_id: number }> },
 ) {
-  const { episode_id } = await params;
+  const { tvshow_id } = await params;
 
   const supabase = await createClient();
 
@@ -21,13 +21,9 @@ export async function PUT(
   }
 
   await db
-    .update(watcher_episodes)
-    .set({ watched: true })
+    .delete(watcher_tvshows)
     .where(
-      and(
-        eq(watcher_episodes.watcher_id, data.user.id),
-        eq(watcher_episodes.episode_id, episode_id),
-      ),
+      and(eq(watcher_tvshows.watcher_id, data.user.id), eq(watcher_tvshows.tvshow_id, tvshow_id)),
     );
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
