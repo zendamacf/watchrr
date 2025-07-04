@@ -9,6 +9,15 @@ type TvShow = {
   backdrop: string | undefined;
 };
 
+type Episode = {
+  id: number;
+  seasonNumber: number;
+  episodeNumber: number;
+  name: string;
+  airdate: Date;
+  backdrop_url: string | undefined;
+};
+
 /**
  * Search for TV shows.
  * @param query The search query
@@ -28,11 +37,11 @@ export const search = async (query: string): Promise<TvShow[]> => {
 
 /**
  * Get a TV show.
- * @param moviddb_id The TV show's ID in The Movie DB.
+ * @param moviedb_id The TV show's ID in The Movie DB.
  * @returns The TV show
  */
-export const getTvShow = async (moviddb_id: number): Promise<TvShow> => {
-  const data = await tmdb.tvShows.details(moviddb_id);
+export const getTvShow = async (moviedb_id: number): Promise<TvShow> => {
+  const data = await tmdb.tvShows.details(moviedb_id);
   return {
     id: data.id,
     name: data.name,
@@ -41,4 +50,32 @@ export const getTvShow = async (moviddb_id: number): Promise<TvShow> => {
     poster: data.poster_path,
     backdrop: data.backdrop_path,
   };
+};
+
+/**
+ * Get all episodes in a TV show.
+ * @param moviedb_id The TV show's ID in The Movie DB.
+ * @returns A list of the episodes
+ */
+export const getAllEpisodes = async (moviedb_id: number): Promise<Episode[]> => {
+  const show = await tmdb.tvShows.details(moviedb_id);
+  const allEpisodes: Episode[] = [];
+  for (const season of show.seasons) {
+    const data = await tmdb.tvSeasons.details({
+      tvShowID: moviedb_id,
+      seasonNumber: season.season_number,
+    });
+    allEpisodes.push(
+      ...data.episodes.map<Episode>((d) => ({
+        id: d.id,
+        seasonNumber: d.season_number,
+        episodeNumber: d.episode_number,
+        name: d.name,
+        airdate: new Date(d.air_date),
+        moviedb_id: d.id,
+        backdrop_url: d.still_path,
+      })),
+    );
+  }
+  return allEpisodes;
 };
