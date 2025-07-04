@@ -16,6 +16,7 @@
   "dependencies": {
     "@mantine/core": "^8.1.2",
     "@mantine/hooks": "^8.1.2",
+    "@mantine/notifications": "^8.1.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",
     "classnames": "^2.5.1",
@@ -26,7 +27,8 @@
     "next": "15.3.4",
     "postgres": "^3.4.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tmdb-ts": "^2.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
