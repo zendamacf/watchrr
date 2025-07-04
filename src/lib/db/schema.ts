@@ -21,6 +21,7 @@ export const tvshows = pgTable('tvshows', {
   country: text(),
   poster_url: text(),
   backdrop_url: text(),
+  description: text(),
 });
 
 export const episodes = pgTable('episodes', {
@@ -34,6 +35,7 @@ export const episodes = pgTable('episodes', {
   airdate: date().notNull(),
   moviedb_id: integer().notNull().unique(),
   backdrop_url: text(),
+  description: text(),
 });
 
 export const watcher_tvshows = pgTable(
@@ -70,6 +72,7 @@ export const movies = pgTable('movies', {
   moviedb_id: integer().notNull().unique(),
   poster_url: text(),
   backdrop_url: text(),
+  description: text(),
 });
 
 export const watcher_movies = pgTable(

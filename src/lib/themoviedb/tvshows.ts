@@ -3,6 +3,7 @@ import { tmdb } from './client';
 type TvShow = {
   id: number;
   name: string;
+  description: string | undefined;
   country: string | undefined;
   firstAirDate: Date;
   poster: string | undefined;
@@ -14,8 +15,9 @@ type Episode = {
   seasonNumber: number;
   episodeNumber: number;
   name: string;
+  description: string | undefined;
   airdate: Date;
-  backdrop_url: string | undefined;
+  backdrop: string | undefined;
 };
 
 /**
@@ -28,6 +30,7 @@ export const search = async (query: string): Promise<TvShow[]> => {
   return data.results.map<TvShow>((d) => ({
     id: d.id,
     name: d.name,
+    description: d.overview,
     country: d.origin_country[0],
     firstAirDate: new Date(d.first_air_date),
     poster: d.poster_path,
@@ -45,6 +48,7 @@ export const getTvShow = async (moviedb_id: number): Promise<TvShow> => {
   return {
     id: data.id,
     name: data.name,
+    description: data.overview,
     country: data.origin_country[0],
     firstAirDate: new Date(data.first_air_date),
     poster: data.poster_path,
@@ -71,9 +75,10 @@ export const getAllEpisodes = async (moviedb_id: number): Promise<Episode[]> => 
         seasonNumber: d.season_number,
         episodeNumber: d.episode_number,
         name: d.name,
+        description: d.overview,
         airdate: new Date(d.air_date),
         moviedb_id: d.id,
-        backdrop_url: d.still_path,
+        backdrop: d.still_path,
       })),
     );
   }
