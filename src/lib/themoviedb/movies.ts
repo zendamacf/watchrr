@@ -31,7 +31,7 @@ export const search = async (query: string): Promise<Movie[]> => {
  * @param moviddb_id The movie's ID in The Movie DB.
  * @returns The TV show
  */
-export const getTvShow = async (moviddb_id: number): Promise<Movie> => {
+export const getMovie = async (moviddb_id: number): Promise<Movie> => {
   const data = await tmdb.movies.details(moviddb_id);
   return {
     id: data.id,
