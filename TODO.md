@@ -3,6 +3,8 @@
 - Actually migrate site
 - Populate `watcher_episode` when `episode` is added.
 - Periodically resync movies & episodes
+- Fix show backdrop opacity
+- Use smaller image sizez due to load times
 
 # DONE
 

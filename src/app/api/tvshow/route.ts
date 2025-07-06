@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
         name: found.name,
         moviedb_id: found.id,
         country: found.country,
-        poster_url: found.poster,
-        backdrop_url: found.backdrop,
+        poster_slug: found.poster,
+        backdrop_slug: found.backdrop,
       })
       .returning({ tvshow_id: tvshows.id });
     if (!inserted) {

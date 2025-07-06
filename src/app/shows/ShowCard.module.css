@@ -1,5 +1,8 @@
 .root {
-  background-image: var(--image-url);
-  background-color: rgba(255, 255, 255, 0.6);
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), var(--image-url);
+  background-repeat: no-repeat;
+  background-position: center center;
+  color: var(--mantine-color-white);
+  background-color: rgba(255, 255, 255, 0.1);
   background-blend-mode: light-dark(lighten, darken);
 }

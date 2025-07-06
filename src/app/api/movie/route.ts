@@ -37,8 +37,8 @@ export async function POST(request: NextRequest) {
         name: found.name,
         moviedb_id: found.id,
         releasedate: DateTime.fromJSDate(found.releaseDate).toFormat('kkkk-LL-dd'),
-        poster_url: found.poster,
-        backdrop_url: found.backdrop,
+        poster_slug: found.poster,
+        backdrop_slug: found.backdrop,
       })
       .returning({ movie_id: movies.id });
     if (!inserted) {

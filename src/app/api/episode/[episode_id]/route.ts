@@ -1,7 +1,5 @@
 import { db } from '@/lib/db';
-import { watcher_episodes } from '@/lib/db/schema';
 import { createClient } from '@/utils/supabase/server';
-import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
