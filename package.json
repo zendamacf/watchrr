@@ -16,6 +16,7 @@
   "dependencies": {
     "@mantine/core": "^8.1.2",
     "@mantine/hooks": "^8.1.2",
+    "@mantine/modals": "^8.1.2",
     "@mantine/notifications": "^8.1.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",

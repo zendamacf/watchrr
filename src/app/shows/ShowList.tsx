@@ -13,9 +13,9 @@ export const ShowList = (props: Props) => {
   const removeShow = (tvshow_id: number) => setShows(shows.filter((t) => t.id !== tvshow_id));
 
   return (
-    <Group wrap={'wrap'} gap={'md'}>
+    <Group wrap={'wrap'} gap={'md'} align={'stretch'}>
       {shows.map((show) => (
-        <ShowCard key={show.id} show={show} />
+        <ShowCard key={show.id} show={show} removeShow={removeShow} />
       ))}
     </Group>
   );

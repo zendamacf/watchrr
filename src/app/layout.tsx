@@ -2,6 +2,7 @@ import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 
 import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from '@mantine/core';
+import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
@@ -95,7 +96,7 @@ export default function RootLayout({
       <body>
         <MantineProvider theme={theme}>
           <Notifications />
-          {children}
+          <ModalsProvider>{children}</ModalsProvider>
         </MantineProvider>
       </body>
     </html>

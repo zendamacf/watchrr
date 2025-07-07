@@ -24,7 +24,7 @@ export const useAlert = () => {
       showMessage({
         title,
         message,
-        color: 'var(--primary)',
+        color: 'green',
         icon: <Check />,
       });
     },
@@ -32,7 +32,7 @@ export const useAlert = () => {
       showMessage({
         title,
         message,
-        color: 'var(--error)',
+        color: 'red',
         icon: <X />,
         autoClose: 3000,
       });

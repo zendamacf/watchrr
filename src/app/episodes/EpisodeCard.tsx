@@ -2,6 +2,7 @@
 
 import { FormattedDate } from '@/components/Dates';
 import { useAlert } from '@/hooks/useAlert';
+import { getImageUrl } from '@/lib/themoviedb/images';
 import { ActionIcon, Card, Group, Stack, Text, Title } from '@mantine/core';
 import classNames from 'classnames';
 import { Check } from 'lucide-react';
@@ -34,7 +35,18 @@ export const EpisodeCard = ({ episode, showDate, removeEpisode }: Props) => {
   }
 
   return (
-    <Card key={episode.episodes.id} w={400} withBorder>
+    <Card
+      key={episode.episodes.id}
+      w={400}
+      classNames={classes}
+      style={
+        episode.tvshows.backdrop_slug
+          ? {
+              '--image-url': `url(${getImageUrl(episode.tvshows.backdrop_slug)})`,
+            }
+          : undefined
+      }
+    >
       <Title order={3} lineClamp={1}>
         {episode.tvshows.name}
       </Title>
