@@ -10,6 +10,7 @@ export const BackdropCard = ({ backdrop, children, ...props }: Props) => (
   <Card
     {...props}
     classNames={classes}
+    withBorder
     style={{
       ...props.style,
       '--image-url': backdrop ? `url(${getImageUrl(backdrop)})` : undefined,
