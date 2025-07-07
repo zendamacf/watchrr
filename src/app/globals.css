@@ -4,9 +4,6 @@
   --warning: #ff6117;
   --error: #ff0048;
 
-  --mantine-primary-color-filled: var(--primary);
-  --mantine-primary-color-filled-hover: darken(var(--primary), 0.2);
-
   --mantine-color-error: var(--error);
 
   --mantine-color-anchor: var(--info);
