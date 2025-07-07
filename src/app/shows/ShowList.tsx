@@ -1,6 +1,6 @@
 'use client';
 
-import { Group } from '@mantine/core';
+import { SimpleGrid } from '@mantine/core';
 import { useState } from 'react';
 import { Show } from './@types';
 import { ShowCard } from './ShowCard';
@@ -13,10 +13,10 @@ export const ShowList = (props: Props) => {
   const removeShow = (tvshow_id: number) => setShows(shows.filter((t) => t.id !== tvshow_id));
 
   return (
-    <Group wrap={'wrap'} gap={'md'} align={'stretch'}>
+    <SimpleGrid cols={{ xs: 1, sm: 2, md: 2, lg: 3, xl: 4 }}>
       {shows.map((show) => (
         <ShowCard key={show.id} show={show} removeShow={removeShow} />
       ))}
-    </Group>
+    </SimpleGrid>
   );
 };

@@ -2,7 +2,8 @@
 
 import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
-import { Badge, Button, Group, Stack, Text, Title } from '@mantine/core';
+import { getImageUrl } from '@/lib/themoviedb/images';
+import { ActionIcon, Badge, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { X } from 'lucide-react';
 import { useState } from 'react';
@@ -41,34 +42,40 @@ export const ShowCard = ({ show, removeShow }: Props) => {
   return (
     <BackdropCard
       h={250}
-      w={400}
       style={{
-        flexGrow: 1,
+        width: '100%',
       }}
       backdrop={show.backdrop_slug}
     >
-      <Stack h={'100%'} justify={'space-between'}>
-        <Group justify={'space-between'}>
+      <Group mah={'100%'} align={'start'}>
+        <Image
+          src={show.poster_slug ? getImageUrl(show.poster_slug) : undefined}
+          fallbackSrc={'/placeholder.jpg'}
+          alt={`Poster for ${show.name}`}
+          flex={1}
+          mah={'100%'}
+          style={{ objectFit: 'contain' }}
+        />
+        <Stack h={'100%'} justify={'space-between'} flex={2}>
           <Title order={3}>{show.name}</Title>
-          <Badge color={'blue'} variant={'outline'}>
-            {show.country}
-          </Badge>
-        </Group>
-        <Text c={'dimmed'} lineClamp={6}>
-          {show.description}
-        </Text>
-        <Group justify={'end'}>
-          <Button
-            color={'red'}
-            leftSection={<X />}
-            loaderProps={{ type: 'dots' }}
-            loading={loading}
-            onClick={() => confirmUnsubscribe(show.id)}
-          >
-            Remove
-          </Button>
-        </Group>
-      </Stack>
+          <Text c={'dimmed'} lineClamp={3}>
+            {show.description}
+          </Text>
+          <Group justify={'space-between'}>
+            <Badge color={'blue'} variant={'outline'}>
+              {show.country}
+            </Badge>
+            <ActionIcon
+              color={'red'}
+              loaderProps={{ type: 'dots' }}
+              loading={loading}
+              onClick={() => confirmUnsubscribe(show.id)}
+            >
+              <X />
+            </ActionIcon>
+          </Group>
+        </Stack>
+      </Group>
     </BackdropCard>
   );
 };
