@@ -1,13 +1,12 @@
 'use client';
 
+import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
-import { getImageUrl } from '@/lib/themoviedb/images';
-import { Badge, Button, Card, Group, Stack, Text, Title } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text, Title } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { Show } from './@types';
-import classes from './ShowCard.module.css';
 
 type Props = {
   show: Show;
@@ -40,19 +39,18 @@ export const ShowCard = ({ show, removeShow }: Props) => {
     });
 
   return (
-    <Card
+    <BackdropCard
       h={250}
       w={400}
-      classNames={classes}
       style={{
-        '--image-url': show.backdrop_slug ? `url(${getImageUrl(show.backdrop_slug)})` : undefined,
         flexGrow: 1,
       }}
+      backdrop={show.backdrop_slug}
     >
       <Stack h={'100%'} justify={'space-between'}>
         <Group justify={'space-between'}>
           <Title order={3}>{show.name}</Title>
-          <Badge color={'blue'} variant={'filled'}>
+          <Badge color={'blue'} variant={'outline'}>
             {show.country}
           </Badge>
         </Group>
@@ -71,6 +69,6 @@ export const ShowCard = ({ show, removeShow }: Props) => {
           </Button>
         </Group>
       </Stack>
-    </Card>
+    </BackdropCard>
   );
 };
