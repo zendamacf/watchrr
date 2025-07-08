@@ -12,12 +12,11 @@ import { PastEpisodes } from './PastEpisodes';
 
 export const EpisodeList = () => {
   const { isLoading, isError, data, refetch } = useQuery<Episode[]>({
-    queryKey: ['getShows'],
+    queryKey: ['getEpisodes'],
     queryFn: async () => {
       const response = await fetch('/api/episode', { method: 'get' });
-      if (response.ok) {
-        return await response.json();
-      }
+      if (response.ok) return await response.json();
+      throw new Error((await response.json()).message);
     },
   });
 

@@ -11,9 +11,8 @@ export const ShowPage = () => {
     queryKey: ['getShows'],
     queryFn: async () => {
       const response = await fetch('/api/tvshow', { method: 'get' });
-      if (response.ok) {
-        return await response.json();
-      }
+      if (response.ok) return await response.json();
+      throw new Error((await response.json()).message);
     },
   });
 
