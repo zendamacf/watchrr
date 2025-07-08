@@ -11,10 +11,10 @@ import { Show } from './@types';
 
 type Props = {
   show: Show;
-  removeShow: (tvshow_id: number) => void;
+  onRemove: (tvshow_id: number) => void;
 };
 
-export const ShowCard = ({ show, removeShow }: Props) => {
+export const ShowCard = ({ show, onRemove }: Props) => {
   const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useAlert();
 
@@ -22,7 +22,7 @@ export const ShowCard = ({ show, removeShow }: Props) => {
     setLoading(true);
     const response = await fetch(`/api/tvshow/${tvshow_id}/`, { method: 'delete' });
     if (response.ok) {
-      await removeShow(tvshow_id);
+      await onRemove(tvshow_id);
       showSuccess('All done!', `You are no longer following ${show.name}`);
     } else {
       showError('An error occurred', (await response.json()).message);
@@ -40,13 +40,7 @@ export const ShowCard = ({ show, removeShow }: Props) => {
     });
 
   return (
-    <BackdropCard
-      h={250}
-      style={{
-        width: '100%',
-      }}
-      backdrop={show.backdrop_slug}
-    >
+    <BackdropCard h={250} style={{ width: '100%' }} backdrop={show.backdrop_slug}>
       <Group mah={'100%'} align={'start'}>
         <Image
           src={show.poster_slug ? getImageUrl(show.poster_slug) : undefined}

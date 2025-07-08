@@ -1,6 +1,7 @@
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 
+import { QueryProvider } from '@/components/QueryProvider';
 import { ColorSchemeScript, createTheme, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
@@ -10,6 +11,7 @@ import './globals.css';
 
 const theme = createTheme({
   cursorType: 'pointer',
+  autoContrast: true,
   primaryColor: 'green',
   colors: {
     blue: [
@@ -96,7 +98,9 @@ export default function RootLayout({
       <body>
         <MantineProvider theme={theme}>
           <Notifications />
-          <ModalsProvider>{children}</ModalsProvider>
+          <QueryProvider>
+            <ModalsProvider>{children}</ModalsProvider>
+          </QueryProvider>
         </MantineProvider>
       </body>
     </html>

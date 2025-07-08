@@ -2,8 +2,40 @@ import { db } from '@/lib/db';
 import { tvshows, watcher_tvshows } from '@/lib/db/schema';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { createClient } from '@/utils/supabase/server';
-import { eq } from 'drizzle-orm';
+import { and, eq, exists } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
+
+/**
+ * Get all TV Shows currently subscribed to.
+ */
+export async function GET() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  const data = await db
+    .select()
+    .from(tvshows)
+    .where(
+      exists(
+        db
+          .select()
+          .from(watcher_tvshows)
+          .where(
+            and(eq(watcher_tvshows.tvshow_id, tvshows.id), eq(watcher_tvshows.watcher_id, user.id)),
+          ),
+      ),
+    )
+    .orderBy(tvshows.name);
+
+  return NextResponse.json(data, { status: 201 });
+}
 
 /**
  * Start subscribing to a TV Show.
