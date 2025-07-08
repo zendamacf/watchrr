@@ -7,7 +7,7 @@ import { EpisodeCard } from './EpisodeCard';
 export type GroupedEpisodesProps = {
   episodes: ISOEpisode[];
   showDates?: boolean;
-  removeEpisode: (episode_id: number) => void;
+  onRemove: () => void;
 };
 
 export const GroupedEpisodes = ({ episodes, ...props }: GroupedEpisodesProps) => {

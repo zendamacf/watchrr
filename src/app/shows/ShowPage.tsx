@@ -1,13 +1,12 @@
 'use client';
 
 import { ActionIcon, Affix, Alert, Center, Loader, Space } from '@mantine/core';
-import { User } from '@supabase/supabase-js';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { Show } from './@types';
 import { ShowList } from './ShowList';
 
-export const ShowPage = ({ user }: { user: User }) => {
+export const ShowPage = () => {
   const { isLoading, isError, data, refetch } = useQuery<Show[]>({
     queryKey: ['getShows'],
     queryFn: async () => {

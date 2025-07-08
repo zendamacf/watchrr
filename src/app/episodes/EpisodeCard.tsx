@@ -4,35 +4,36 @@ import { BackdropCard } from '@/components/BackdropCard';
 import { FormattedDate } from '@/components/Dates';
 import { useAlert } from '@/hooks/useAlert';
 import { ActionIcon, Group, Stack, Text, Title } from '@mantine/core';
+import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { Check } from 'lucide-react';
-import { useState } from 'react';
 import { ISOEpisode } from './@types';
 import classes from './EpisodeCard.module.css';
 
 type Props = {
   episode: ISOEpisode;
   showDate?: boolean;
-  removeEpisode: (episode_id: number) => void;
+  onRemove: (episode_id: number) => void;
 };
 
-export const EpisodeCard = ({ episode, showDate, removeEpisode }: Props) => {
-  const [loading, setLoading] = useState(false);
+export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
   const { showError, showSuccess } = useAlert();
 
   const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
-  async function markWatched(episode_id: number) {
-    setLoading(true);
-    const response = await fetch(`/api/episode/${episode_id}/`, { method: 'put' });
-    if (response.ok) {
-      await removeEpisode(episode_id);
+  const { mutate, isPending } = useMutation<unknown, Error, number>({
+    mutationFn: async (episode_id) => {
+      const response = await fetch(`/api/episode/${episode_id}/`, { method: 'put' });
+      if (!response.ok) throw new Error((await response.json()).message);
+    },
+    onSuccess: (_data, episode_id) => {
+      onRemove(episode_id);
       showSuccess('Nice!', `You watched ${episode.tvshows.name} ${episodeNumber}`);
-    } else {
-      showError('An error occurred', (await response.json()).message);
-    }
-    setLoading(false);
-  }
+    },
+    onError(error) {
+      showError('An error occurred', error.message);
+    },
+  });
 
   return (
     <BackdropCard key={episode.episodes.id} w={400} backdrop={episode.tvshows.backdrop_slug}>
@@ -51,8 +52,8 @@ export const EpisodeCard = ({ episode, showDate, removeEpisode }: Props) => {
         </Stack>
         <ActionIcon
           loaderProps={{ type: 'dots' }}
-          loading={loading}
-          onClick={() => markWatched(episode.episodes.id)}
+          loading={isPending}
+          onClick={() => mutate(episode.episodes.id)}
         >
           <Check />
         </ActionIcon>

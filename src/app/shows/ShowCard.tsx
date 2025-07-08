@@ -5,8 +5,8 @@ import { useAlert } from '@/hooks/useAlert';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import { ActionIcon, Badge, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
+import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import { useState } from 'react';
 import { Show } from './@types';
 
 type Props = {
@@ -15,20 +15,21 @@ type Props = {
 };
 
 export const ShowCard = ({ show, onRemove }: Props) => {
-  const [loading, setLoading] = useState(false);
   const { showError, showSuccess } = useAlert();
 
-  async function unsubscribe(tvshow_id: number) {
-    setLoading(true);
-    const response = await fetch(`/api/tvshow/${tvshow_id}/`, { method: 'delete' });
-    if (response.ok) {
-      await onRemove(tvshow_id);
+  const { mutate, isPending } = useMutation<unknown, Error, number>({
+    mutationFn: async (tvshow_id) => {
+      const response = await fetch(`/api/tvshow/${tvshow_id}/`, { method: 'delete' });
+      if (!response.ok) throw new Error((await response.json()).message);
+    },
+    onSuccess: (_data, tvshow_id) => {
+      onRemove(tvshow_id);
       showSuccess('All done!', `You are no longer following ${show.name}`);
-    } else {
-      showError('An error occurred', (await response.json()).message);
-    }
-    setLoading(false);
-  }
+    },
+    onError(error) {
+      showError('An error occurred', error.message);
+    },
+  });
 
   const confirmUnsubscribe = (tvshow_id: number) =>
     openConfirmModal({
@@ -36,7 +37,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
       children: <Text size="sm">Do you want to stop following {show.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
-      onConfirm: () => unsubscribe(tvshow_id),
+      onConfirm: () => mutate(tvshow_id),
     });
 
   return (
@@ -62,7 +63,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
             <ActionIcon
               color={'red'}
               loaderProps={{ type: 'dots' }}
-              loading={loading}
+              loading={isPending}
               onClick={() => confirmUnsubscribe(show.id)}
             >
               <X />
