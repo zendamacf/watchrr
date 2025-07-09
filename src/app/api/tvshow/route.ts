@@ -34,7 +34,7 @@ export async function GET() {
     )
     .orderBy(tvshows.name);
 
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json(data, { status: 200 });
 }
 
 /**

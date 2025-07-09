@@ -42,7 +42,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
 
   return (
     <BackdropCard h={250} style={{ width: '100%' }} backdrop={show.backdrop_slug}>
-      <Group mah={'100%'} align={'start'}>
+      <Group mah={'100%'} align={'center'}>
         <Image
           src={show.poster_slug ? getImageUrl(show.poster_slug) : undefined}
           fallbackSrc={'/placeholder.jpg'}
@@ -52,10 +52,12 @@ export const ShowCard = ({ show, onRemove }: Props) => {
           style={{ objectFit: 'contain' }}
         />
         <Stack h={'100%'} justify={'space-between'} flex={2}>
-          <Title order={3}>{show.name}</Title>
-          <Text c={'dimmed'} lineClamp={3}>
-            {show.description}
-          </Text>
+          <Stack gap={'xs'}>
+            <Title order={3}>{show.name}</Title>
+            <Text c={'dimmed'} lineClamp={3}>
+              {show.description}
+            </Text>
+          </Stack>
           <Group justify={'space-between'}>
             <Badge color={'blue'} variant={'outline'}>
               {show.country}

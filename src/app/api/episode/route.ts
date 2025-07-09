@@ -29,5 +29,5 @@ export async function GET() {
     .where(eq(watcher_episodes.watched, false))
     .orderBy(episodes.airdate, tvshows.name, episodes.season, episodes.episode);
 
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json(data, { status: 200 });
 }

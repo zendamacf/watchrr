@@ -2,9 +2,45 @@ import { db } from '@/lib/db';
 import { movies, watcher_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { createClient } from '@/utils/supabase/server';
-import { eq } from 'drizzle-orm';
+import { and, eq, exists } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { NextRequest, NextResponse } from 'next/server';
+
+/**
+ * Get all movies currently subscribed to.
+ */
+export async function GET() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+  if (error || !user) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  const data = await db
+    .select()
+    .from(movies)
+    .where(
+      exists(
+        db
+          .select()
+          .from(watcher_movies)
+          .where(
+            and(
+              eq(watcher_movies.movie_id, movies.id),
+              eq(watcher_movies.watcher_id, user.id),
+              eq(watcher_movies.watched, false),
+            ),
+          ),
+      ),
+    )
+    .orderBy(movies.releasedate, movies.name);
+
+  return NextResponse.json(data, { status: 200 });
+}
 
 /**
  * Start subscribing to a movie.

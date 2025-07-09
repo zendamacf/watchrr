@@ -11,7 +11,6 @@ import './globals.css';
 
 const theme = createTheme({
   cursorType: 'pointer',
-  autoContrast: true,
   primaryColor: 'green',
   colors: {
     blue: [
