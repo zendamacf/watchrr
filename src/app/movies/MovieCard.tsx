@@ -55,7 +55,8 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
       onConfirm: () => remove(movie_id),
     });
 
-  const inPast = !!movie.releasedate && DateTime.fromSQL(movie.releasedate) < DateTime.now();
+  const releaseDate = movie.releasedate ? DateTime.fromSQL(movie.releasedate) : null;
+  const inPast = !!releaseDate && releaseDate < DateTime.now();
 
   return (
     <BackdropCard h={250} style={{ width: '100%' }} backdrop={movie.backdrop_slug}>
@@ -72,7 +73,7 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
           <Stack gap={0}>
             <Title order={3}>{movie.name}</Title>
             <Text c={inPast ? 'orange' : undefined} size={'sm'}>
-              {movie.releasedate}
+              {releaseDate?.toFormat('cccc dd/LL/kkkk') ?? 'Unknown release date'}
             </Text>
             <Space h={'xs'} />
             <Text c={'dimmed'} lineClamp={3}>

@@ -1,17 +1,16 @@
 'use client';
 
 import { BackdropCard } from '@/components/BackdropCard';
-import { FormattedDate } from '@/components/Dates';
 import { useAlert } from '@/hooks/useAlert';
 import { ActionIcon, Group, Stack, Text, Title } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { Check } from 'lucide-react';
-import { ISOEpisode } from './@types';
+import { ParsedEpisode } from './@types';
 import classes from './EpisodeCard.module.css';
 
 type Props = {
-  episode: ISOEpisode;
+  episode: ParsedEpisode;
   showDate?: boolean;
   onRemove: (episode_id: number) => void;
 };
@@ -46,7 +45,7 @@ export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
           <Text>{episode.episodes.name}</Text>
           {showDate && (
             <Text className={classNames({ [classes.pastdate!]: episode.episodes.in_past })}>
-              <FormattedDate iso={episode.episodes.local_date} />
+              {episode.episodes.local_date.toFormat('cccc dd/LL/kkkk')}
             </Text>
           )}
         </Stack>

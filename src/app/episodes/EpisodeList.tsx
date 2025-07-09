@@ -1,12 +1,11 @@
 'use client';
 
-import { FormattedDate } from '@/components/Dates';
 import { Alert, Center, Loader, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { getTimezonesForCountry } from 'countries-and-timezones';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { Episode, ISOEpisode } from './@types';
+import { Episode, ParsedEpisode } from './@types';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
 
@@ -22,7 +21,7 @@ export const EpisodeList = () => {
 
   const { pastEpisodes, futureDates } = useMemo(() => {
     if (!data) return { pastEpisodes: [], futureDates: {} };
-    const converted = data.map<ISOEpisode>((r) => {
+    const converted = data.map<ParsedEpisode>((r) => {
       let localDate: DateTime;
       // Convert to user timezone
       const timezones = r.tvshows.country ? getTimezonesForCountry(r.tvshows.country) : [];
@@ -38,13 +37,13 @@ export const EpisodeList = () => {
         localDate = dt;
       } else localDate = DateTime.fromSQL(r.episodes.airdate);
       const inPast = localDate < DateTime.now();
-      return { ...r, episodes: { ...r.episodes, local_date: localDate.toISO()!, in_past: inPast } };
+      return { ...r, episodes: { ...r.episodes, local_date: localDate, in_past: inPast } };
     });
 
     const pastEpisodes = converted.filter((r) => r.episodes.in_past);
     const futureEpisodes = converted.filter((r) => !r.episodes.in_past);
-    const futureDates = futureEpisodes.reduce<Record<string, ISOEpisode[]>>((acc, curr) => {
-      const iso = curr.episodes.local_date;
+    const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
+      const iso = curr.episodes.local_date.toISO()!;
       if (!acc[iso]) acc[iso] = [];
       acc[iso].push(curr);
       return acc;
@@ -67,9 +66,7 @@ export const EpisodeList = () => {
 
       {Object.entries(futureDates).map(([iso, episodes]) => (
         <Stack gap={'sm'} key={iso}>
-          <Title order={2}>
-            <FormattedDate iso={iso} />
-          </Title>
+          <Title order={2}>{DateTime.fromISO(iso).toFormat('cccc dd/LL/kkkk')}</Title>
           <GroupedEpisodes episodes={episodes} onRemove={() => refetch()} />
         </Stack>
       ))}
