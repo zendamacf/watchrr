@@ -42,7 +42,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
 
   return (
     <BackdropCard h={250} style={{ width: '100%' }} backdrop={show.backdrop_slug}>
-      <Group mah={'100%'} align={'center'}>
+      <Group h={'100%'} align={'center'}>
         <Image
           src={show.poster_slug ? getImageUrl(show.poster_slug) : undefined}
           fallbackSrc={'/placeholder.jpg'}
