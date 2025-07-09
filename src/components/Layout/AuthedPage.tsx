@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server';
+import { guardUser } from '@/utils/auth';
 import { Container } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
@@ -6,20 +6,15 @@ import { ComponentType } from 'react';
 import { SiteHeader } from '../SiteHeader';
 
 export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: User }> }) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-
-  if (error || !data?.user) {
-    redirect('/signin');
-  }
+  const user = await guardUser();
+  if (!user) redirect('/signin');
 
   return (
     <div>
       <main>
         <SiteHeader />
         <Container fluid>
-          <Child user={data.user} />
+          <Child user={user} />
         </Container>
       </main>
     </div>

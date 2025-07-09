@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { movies, watcher_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
-import { createClient } from '@/utils/supabase/server';
+import { guardUser } from '@/utils/auth';
 import { and, eq, exists } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,15 +10,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * Get all movies currently subscribed to.
  */
 export async function GET() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const user = await guardUser();
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const data = await db
     .select()
@@ -47,16 +40,10 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   const { moviedb_id } = await request.json();
-  if (!moviedb_id) {
-    return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
-  }
+  if (!moviedb_id) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const user = await guardUser();
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   let movie_id: number;
   const [existing] = await db.select().from(movies).where(eq(movies.moviedb_id, moviedb_id));
@@ -83,7 +70,7 @@ export async function POST(request: NextRequest) {
     movie_id = inserted.movie_id;
   }
 
-  await db.insert(watcher_movies).values({ watcher_id: data.user.id, movie_id });
+  await db.insert(watcher_movies).values({ watcher_id: user.id, movie_id });
 
   return NextResponse.json({ message: 'Success' }, { status: 201 });
 }

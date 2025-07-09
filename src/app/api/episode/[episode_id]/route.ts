@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { watcher_episodes } from '@/lib/db/schema';
-import { createClient } from '@/utils/supabase/server';
+import { guardUser } from '@/utils/auth';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -13,21 +13,16 @@ export async function PUT(
 ) {
   const { episode_id } = await params;
 
-  const supabase = await createClient();
+  if (!episode_id) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const user = await guardUser();
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   await db
     .update(watcher_episodes)
     .set({ watched: true })
     .where(
-      and(
-        eq(watcher_episodes.watcher_id, data.user.id),
-        eq(watcher_episodes.episode_id, episode_id),
-      ),
+      and(eq(watcher_episodes.watcher_id, user.id), eq(watcher_episodes.episode_id, episode_id)),
     );
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });

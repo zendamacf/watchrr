@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { episodes, tvshows, watcher_episodes } from '@/lib/db/schema';
-import { createClient } from '@/utils/supabase/server';
+import { guardUser } from '@/utils/auth';
 import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
@@ -8,15 +8,8 @@ import { NextResponse } from 'next/server';
  * Get all unuwatched episodes.
  */
 export async function GET() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  if (error || !user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  }
+  const user = await guardUser();
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const data = await db
     .select()

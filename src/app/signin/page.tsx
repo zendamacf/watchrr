@@ -1,16 +1,12 @@
 import { signin } from '@/actions/auth/actions';
 import { PublicPage } from '@/components/Layout/PublicPage';
-import { createClient } from '@/utils/supabase/server';
+import { guardUser } from '@/utils/auth';
 import { Anchor, Button, Group, PasswordInput, TextInput } from '@mantine/core';
 import { redirect } from 'next/navigation';
 
 export default async function SignInPage() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-
-  if (data?.user) {
-    redirect('/');
-  }
+  const user = await guardUser();
+  if (user) redirect('/');
 
   return (
     <PublicPage
