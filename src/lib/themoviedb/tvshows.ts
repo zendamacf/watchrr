@@ -4,11 +4,11 @@ import { tmdb } from './client';
 export type TMDBTvShow = {
   id: number;
   name: string;
-  description: string | undefined;
-  country: string | undefined;
+  description: string | null;
+  country: string | null;
   firstAirDate: string;
-  poster: string | undefined;
-  backdrop: string | undefined;
+  poster: string | null;
+  backdrop: string | null;
 };
 
 export type TMDBEpisode = {
@@ -16,9 +16,9 @@ export type TMDBEpisode = {
   seasonNumber: number;
   episodeNumber: number;
   name: string;
-  description: string | undefined;
+  description: string | null;
   airdate: string;
-  backdrop: string | undefined;
+  backdrop: string | null;
 };
 
 /**
@@ -32,7 +32,7 @@ export const search = async (query: string): Promise<TMDBTvShow[]> => {
     id: d.id,
     name: d.name,
     description: d.overview,
-    country: d.origin_country[0],
+    country: d.origin_country[0] ?? null,
     firstAirDate: DateTime.fromJSDate(new Date(d.first_air_date)).toISO()!,
     poster: d.poster_path,
     backdrop: d.backdrop_path,
@@ -50,7 +50,7 @@ export const getTvShow = async (moviedb_id: number): Promise<TMDBTvShow> => {
     id: data.id,
     name: data.name,
     description: data.overview,
-    country: data.origin_country[0],
+    country: data.origin_country[0] ?? null,
     firstAirDate: DateTime.fromJSDate(new Date(data.first_air_date)).toISO()!,
     poster: data.poster_path,
     backdrop: data.backdrop_path,

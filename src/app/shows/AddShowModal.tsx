@@ -1,5 +1,5 @@
 import { useAlert } from '@/hooks/useAlert';
-import { TMDBMovie } from '@/lib/themoviedb/movies';
+import { TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import {
   ActionIcon,
   LoadingOverlay,
@@ -16,21 +16,20 @@ import {
 import { useDebouncedState } from '@mantine/hooks';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { List, Plus, Search } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { BaseMovieCard } from './BaseMovieCard';
+import { BaseShowCard } from './BaseShowCard';
 
 type Props = { onAdd: () => void } & ModalProps;
 
-export const AddMovieModal = ({ onAdd, ...props }: Props) => {
+export const AddShowModal = ({ onAdd, ...props }: Props) => {
   const [search, setSearch] = useDebouncedState('', 500);
   const { showSuccess, showError } = useAlert();
 
-  const { isFetching, data } = useQuery<TMDBMovie[]>({
-    queryKey: ['searchMovies', search],
+  const { isFetching, data } = useQuery<TMDBTvShow[]>({
+    queryKey: ['searchShows', search],
     queryFn: async () => {
       if (!search.trim()) return [];
       const params = new URLSearchParams({ q: search.trim() });
-      const response = await fetch(`/api/movie/search?${params.toString()}`, { method: 'get' });
+      const response = await fetch(`/api/tvshow/search?${params.toString()}`, { method: 'get' });
       if (response.ok) return await response.json();
       throw new Error((await response.json()).message);
     },
@@ -42,20 +41,20 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
     Error,
     { moviedb_id: number; name: string }
   >({
-    mutationFn: async (movie) => {
-      const response = await fetch('/api/movie', {
+    mutationFn: async (tvshow) => {
+      const response = await fetch('/api/tvshow', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ moviedb_id: movie.moviedb_id }),
+        body: JSON.stringify({ moviedb_id: tvshow.moviedb_id }),
       });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onSuccess: (_data, movie) => {
+    onSuccess: (_data, tvshow) => {
       onAdd();
-      showSuccess('Nice!', `You're now following ${movie.name}`);
+      showSuccess('Nice!', `You're now following ${tvshow.name}`);
     },
     onError(error) {
       showError('An error occurred', error.message);
@@ -63,7 +62,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
   });
 
   return (
-    <Modal title={'Add Movie'} {...props}>
+    <Modal title={'Add Show'} {...props}>
       <TextInput
         label="Search"
         placeholder="Search"
@@ -80,18 +79,16 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
           overlayProps={{ radius: 'sm', blur: 2 }}
         />
         <SimpleGrid cols={{ xs: 1, sm: 2 }}>
-          {data?.map((movie) => (
-            <BaseMovieCard
-              key={movie.id}
+          {data?.map((show) => (
+            <BaseShowCard
+              key={show.id}
               h={200}
-              movie={{
-                ...movie,
-                moviedb_id: movie.id,
-                poster_slug: movie.poster,
-                backdrop_slug: movie.backdrop,
-                releaseDate: DateTime.fromISO(movie.releasedate),
+              show={{
+                ...show,
+                moviedb_id: show.id,
+                poster_slug: show.poster,
+                backdrop_slug: show.backdrop,
               }}
-              releaseDate
               actions={
                 <>
                   <Popover width={'unset'}>
@@ -101,13 +98,13 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
                       </ActionIcon>
                     </PopoverTarget>
                     <PopoverDropdown>
-                      <Text>{movie.description}</Text>
+                      <Text>{show.description}</Text>
                     </PopoverDropdown>
                   </Popover>
                   <ActionIcon
                     loaderProps={{ type: 'dots' }}
                     loading={pendingAdd}
-                    onClick={() => add({ moviedb_id: movie.id, name: movie.name })}
+                    onClick={() => add({ moviedb_id: show.id, name: show.name })}
                   >
                     <Plus />
                   </ActionIcon>

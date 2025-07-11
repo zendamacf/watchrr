@@ -5,8 +5,8 @@ export type TMDBMovie = {
   id: number;
   name: string;
   description: string;
-  poster: string | undefined;
-  backdrop: string | undefined;
+  poster: string | null;
+  backdrop: string | null;
   releasedate: string;
 };
 
@@ -38,7 +38,7 @@ export const getMovie = async (moviedb_id: number): Promise<TMDBMovie> => {
     id: data.id,
     name: data.title,
     description: data.overview,
-    poster: data.poster_path,
+    poster: data.poster_path ?? null,
     backdrop: data.backdrop_path,
     releasedate: DateTime.fromJSDate(new Date(data.release_date)).toISO()!,
   };
