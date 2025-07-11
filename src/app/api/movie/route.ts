@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { movies, watcher_movies } from '@/lib/db/schema';
+import { movies, subscribed_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
 import { and, eq, exists } from 'drizzle-orm';
@@ -20,12 +20,12 @@ export async function GET() {
       exists(
         db
           .select()
-          .from(watcher_movies)
+          .from(subscribed_movies)
           .where(
             and(
-              eq(watcher_movies.movie_id, movies.id),
-              eq(watcher_movies.watcher_id, user.id),
-              eq(watcher_movies.watched, false),
+              eq(subscribed_movies.movie_id, movies.id),
+              eq(subscribed_movies.watcher_id, user.id),
+              eq(subscribed_movies.watched, false),
             ),
           ),
       ),
@@ -72,10 +72,10 @@ export async function POST(request: NextRequest) {
   }
 
   await db
-    .insert(watcher_movies)
+    .insert(subscribed_movies)
     .values({ watcher_id: user.id, movie_id })
     .onConflictDoUpdate({
-      target: [watcher_movies.movie_id, watcher_movies.watcher_id],
+      target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
       set: { watched: false },
     });
 

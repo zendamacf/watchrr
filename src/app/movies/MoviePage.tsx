@@ -1,10 +1,10 @@
 'use client';
 
+import { Movie } from '@/@types';
 import { ActionIcon, Affix, Alert, Center, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, Space } from 'lucide-react';
-import { Movie } from './@types';
 import { AddMovieModal } from './AddMovieModal';
 import { MovieList } from './MovieList';
 

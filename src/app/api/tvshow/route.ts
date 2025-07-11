@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { tvshows, watcher_tvshows } from '@/lib/db/schema';
+import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { guardUser } from '@/utils/auth';
 import { and, eq, exists } from 'drizzle-orm';
@@ -19,9 +19,12 @@ export async function GET() {
       exists(
         db
           .select()
-          .from(watcher_tvshows)
+          .from(subscribed_tvshows)
           .where(
-            and(eq(watcher_tvshows.tvshow_id, tvshows.id), eq(watcher_tvshows.watcher_id, user.id)),
+            and(
+              eq(subscribed_tvshows.tvshow_id, tvshows.id),
+              eq(subscribed_tvshows.watcher_id, user.id),
+            ),
           ),
       ),
     )
@@ -66,7 +69,10 @@ export async function POST(request: NextRequest) {
     tvshow_id = inserted.tvshow_id;
   }
 
-  await db.insert(watcher_tvshows).values({ watcher_id: user.id, tvshow_id }).onConflictDoNothing();
+  await db
+    .insert(subscribed_tvshows)
+    .values({ watcher_id: user.id, tvshow_id })
+    .onConflictDoNothing();
 
   return NextResponse.json({ message: 'Success' }, { status: 201 });
 }

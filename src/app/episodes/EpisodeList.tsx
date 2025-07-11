@@ -1,16 +1,22 @@
 'use client';
 
+import { Episode, Show } from '@/@types';
 import { Alert, Center, Loader, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { getTimezonesForCountry } from 'countries-and-timezones';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { Episode, ParsedEpisode } from './@types';
+import { ParsedEpisode } from './@types';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
 
 export const EpisodeList = () => {
-  const { isLoading, isError, data, refetch } = useQuery<Episode[]>({
+  const { isLoading, isError, data, refetch } = useQuery<
+    {
+      episodes: Episode;
+      tvshows: Show;
+    }[]
+  >({
     queryKey: ['getEpisodes'],
     queryFn: async () => {
       const response = await fetch('/api/episode', { method: 'get' });

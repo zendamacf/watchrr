@@ -1,5 +1,6 @@
 'use client';
 
+import { Show } from '@/@types';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import {
@@ -15,7 +16,6 @@ import {
   Title,
 } from '@mantine/core';
 import { ReactNode } from 'react';
-import { Show } from './@types';
 
 type Props = {
   show: Show;

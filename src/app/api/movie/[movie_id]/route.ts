@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { watcher_movies } from '@/lib/db/schema';
+import { subscribed_movies } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
 import { and, eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,9 +18,11 @@ export async function PUT(
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   await db
-    .update(watcher_movies)
+    .update(subscribed_movies)
     .set({ watched: true })
-    .where(and(eq(watcher_movies.watcher_id, user.id), eq(watcher_movies.movie_id, movie_id)));
+    .where(
+      and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, movie_id)),
+    );
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
@@ -39,8 +41,10 @@ export async function DELETE(
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   await db
-    .delete(watcher_movies)
-    .where(and(eq(watcher_movies.watcher_id, user.id), eq(watcher_movies.movie_id, movie_id)));
+    .delete(subscribed_movies)
+    .where(
+      and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, movie_id)),
+    );
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }

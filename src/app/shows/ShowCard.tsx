@@ -1,11 +1,11 @@
 'use client';
 
+import { Show } from '@/@types';
 import { useAlert } from '@/hooks/useAlert';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import { Show } from './@types';
 import { BaseShowCard } from './BaseShowCard';
 
 type Props = {

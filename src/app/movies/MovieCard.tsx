@@ -1,12 +1,12 @@
 'use client';
 
+import { Movie } from '@/@types';
 import { useAlert } from '@/hooks/useAlert';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { Movie } from './@types';
 import { BaseMovieCard } from './BaseMovieCard';
 
 type Props = {

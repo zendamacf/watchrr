@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
-import { episodes, tvshows, watcher_episodes } from '@/lib/db/schema';
+import { episodes, subscribed_tvshows, tvshows, watched_episodes } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, notExists } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
 /**
@@ -16,10 +16,22 @@ export async function GET() {
     .from(episodes)
     .innerJoin(tvshows, eq(tvshows.id, episodes.tvshow_id))
     .innerJoin(
-      watcher_episodes,
-      and(eq(watcher_episodes.episode_id, episodes.id), eq(watcher_episodes.watcher_id, user.id)),
+      subscribed_tvshows,
+      and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id)),
     )
-    .where(eq(watcher_episodes.watched, false))
+    .where(
+      notExists(
+        db
+          .select()
+          .from(watched_episodes)
+          .where(
+            and(
+              eq(watched_episodes.episode_id, episodes.id),
+              eq(watched_episodes.watcher_id, user.id),
+            ),
+          ),
+      ),
+    )
     .orderBy(episodes.airdate, tvshows.name, episodes.season, episodes.episode);
 
   return NextResponse.json(data, { status: 200 });

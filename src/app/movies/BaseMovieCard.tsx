@@ -1,5 +1,6 @@
 'use client';
 
+import { Movie } from '@/@types';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import {
@@ -16,7 +17,6 @@ import {
 } from '@mantine/core';
 import { DateTime } from 'luxon';
 import { ReactNode } from 'react';
-import { Movie } from './@types';
 
 type Props = {
   movie: Omit<Movie, 'releasedate'> & { releaseDate: DateTime | null };

@@ -38,8 +38,8 @@ export const episodes = pgTable('episodes', {
   description: text(),
 });
 
-export const watcher_tvshows = pgTable(
-  'watcher_tvshows',
+export const subscribed_tvshows = pgTable(
+  'subscribed_tvshows',
   {
     tvshow_id: integer()
       .notNull()
@@ -51,8 +51,8 @@ export const watcher_tvshows = pgTable(
   (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
 );
 
-export const watcher_episodes = pgTable(
-  'watcher_episodes',
+export const watched_episodes = pgTable(
+  'watched_episodes',
   {
     episode_id: integer()
       .notNull()
@@ -60,7 +60,6 @@ export const watcher_episodes = pgTable(
     watcher_id: uuid()
       .notNull()
       .references(() => authUsers.id, { onDelete: 'restrict' }),
-    watched: boolean().notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
 );
@@ -75,8 +74,8 @@ export const movies = pgTable('movies', {
   description: text(),
 });
 
-export const watcher_movies = pgTable(
-  'watcher_movies',
+export const subscribed_movies = pgTable(
+  'subscribed_movies',
   {
     movie_id: integer()
       .notNull()
