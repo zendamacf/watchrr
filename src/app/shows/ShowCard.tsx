@@ -1,24 +1,12 @@
 'use client';
 
-import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
-import { getImageUrl } from '@/lib/themoviedb/images';
-import {
-  ActionIcon,
-  Badge,
-  Group,
-  Image,
-  Popover,
-  PopoverDropdown,
-  PopoverTarget,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { Show } from './@types';
+import { BaseShowCard } from './BaseShowCard';
 
 type Props = {
   show: Show;
@@ -53,45 +41,19 @@ export const ShowCard = ({ show, onRemove }: Props) => {
     });
 
   return (
-    <BackdropCard h={250} style={{ width: '100%' }} backdrop={show.backdrop_slug}>
-      <Group h={'100%'} align={'center'}>
-        <Image
-          src={show.poster_slug ? getImageUrl(show.poster_slug) : undefined}
-          fallbackSrc={'/placeholder.jpg'}
-          alt={`Poster for ${show.name}`}
-          flex={1}
-          mah={'100%'}
-          style={{ objectFit: 'contain' }}
-        />
-        <Stack h={'100%'} justify={'space-between'} flex={2}>
-          <Stack gap={'xs'}>
-            <Title order={3}>{show.name}</Title>
-            <Popover width={'unset'}>
-              <PopoverTarget>
-                <Text c={'dimmed'} lineClamp={3}>
-                  {show.description}
-                </Text>
-              </PopoverTarget>
-              <PopoverDropdown>
-                <Text>{show.description}</Text>
-              </PopoverDropdown>
-            </Popover>
-          </Stack>
-          <Group justify={'space-between'}>
-            <Badge color={'blue'} variant={'outline'}>
-              {show.country}
-            </Badge>
-            <ActionIcon
-              color={'red'}
-              loaderProps={{ type: 'dots' }}
-              loading={isPending}
-              onClick={() => confirmUnsubscribe(show.id)}
-            >
-              <X />
-            </ActionIcon>
-          </Group>
-        </Stack>
-      </Group>
-    </BackdropCard>
+    <BaseShowCard
+      h={250}
+      show={show}
+      actions={
+        <ActionIcon
+          color={'red'}
+          loaderProps={{ type: 'dots' }}
+          loading={isPending}
+          onClick={() => confirmUnsubscribe(show.id)}
+        >
+          <X />
+        </ActionIcon>
+      }
+    />
   );
 };

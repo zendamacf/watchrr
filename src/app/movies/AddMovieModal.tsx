@@ -74,6 +74,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
       <Space h={'md'} />
       <div style={{ position: 'relative' }}>
         <LoadingOverlay
+          loaderProps={{ type: 'dots' }}
           visible={isFetching}
           zIndex={1000}
           overlayProps={{ radius: 'sm', blur: 2 }}
