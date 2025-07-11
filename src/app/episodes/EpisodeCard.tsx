@@ -2,6 +2,7 @@
 
 import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
+import { DateFormat } from '@/utils/dates';
 import { ActionIcon, Group, Stack, Text, Title } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
@@ -45,7 +46,7 @@ export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
           <Text>{episode.episodes.name}</Text>
           {showDate && (
             <Text className={classNames({ [classes.pastdate!]: episode.episodes.in_past })}>
-              {episode.episodes.local_date.toFormat('cccc dd/LL/kkkk')}
+              {episode.episodes.local_date.toFormat(DateFormat.DOW_DMY)}
             </Text>
           )}
         </Stack>

@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       .values({
         name: found.name,
         moviedb_id: found.id,
-        releasedate: DateTime.fromISO(found.releasedate).toFormat('kkkk-LL-dd'),
+        releasedate: DateTime.fromISO(found.releasedate).toSQLDate(),
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
       })

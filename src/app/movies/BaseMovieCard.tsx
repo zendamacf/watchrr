@@ -3,6 +3,7 @@
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import { Movie } from '@/types';
+import { DateFormat } from '@/utils/dates';
 import {
   CardProps,
   Group,
@@ -44,7 +45,7 @@ export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...pro
             <Title order={3}>{movie.name}</Title>
             {releaseDate && (
               <Text c={inPast ? 'orange' : undefined} size={'sm'}>
-                {movie.releaseDate?.toFormat('dd/LL/kkkk') ?? 'Unknown release date'}
+                {movie.releaseDate?.toFormat(DateFormat.DMY) ?? 'Unknown release date'}
               </Text>
             )}
             {releaseDate && description && <Space h={'xs'} />}

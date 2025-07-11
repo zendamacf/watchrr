@@ -1,6 +1,7 @@
 'use client';
 
 import { Episode, Show } from '@/types';
+import { DateFormat } from '@/utils/dates';
 import { Alert, Center, Loader, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { getTimezonesForCountry } from 'countries-and-timezones';
@@ -49,9 +50,9 @@ export const EpisodeList = () => {
     const pastEpisodes = converted.filter((r) => r.episodes.in_past);
     const futureEpisodes = converted.filter((r) => !r.episodes.in_past);
     const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
-      const iso = curr.episodes.local_date.toISO()!;
-      if (!acc[iso]) acc[iso] = [];
-      acc[iso].push(curr);
+      const date = curr.episodes.local_date.toFormat(DateFormat.YMD);
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(curr);
       return acc;
     }, {});
 
@@ -70,9 +71,11 @@ export const EpisodeList = () => {
     <Stack gap={'xl'}>
       {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} onRemove={() => refetch()} />}
 
-      {Object.entries(futureDates).map(([iso, episodes]) => (
-        <Stack gap={'sm'} key={iso}>
-          <Title order={2}>{DateTime.fromISO(iso).toFormat('cccc dd/LL/kkkk')}</Title>
+      {Object.entries(futureDates).map(([date, episodes]) => (
+        <Stack gap={'sm'} key={date}>
+          <Title order={2}>
+            {DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}
+          </Title>
           <GroupedEpisodes episodes={episodes} onRemove={() => refetch()} />
         </Stack>
       ))}
