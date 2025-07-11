@@ -6,8 +6,8 @@ import { ActionIcon, Group, Stack, Text, Title } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { Check } from 'lucide-react';
-import { ParsedEpisode } from './@types';
 import classes from './EpisodeCard.module.css';
+import { ParsedEpisode } from './types';
 
 type Props = {
   episode: ParsedEpisode;

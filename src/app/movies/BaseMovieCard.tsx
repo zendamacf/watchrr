@@ -1,8 +1,8 @@
 'use client';
 
-import { Movie } from '@/@types';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
+import { Movie } from '@/types';
 import {
   CardProps,
   Group,

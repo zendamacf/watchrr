@@ -1,8 +1,8 @@
 'use client';
 
-import { Show } from '@/@types';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
+import { Show } from '@/types';
 import {
   Badge,
   CardProps,

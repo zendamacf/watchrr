@@ -1,6 +1,6 @@
 'use client';
 
-import { Show } from '@/@types';
+import { Show } from '@/types';
 import { SimpleGrid } from '@mantine/core';
 import { ShowCard } from './ShowCard';
 

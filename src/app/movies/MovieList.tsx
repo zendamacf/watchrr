@@ -1,6 +1,6 @@
 'use client';
 
-import { Movie } from '@/@types';
+import { Movie } from '@/types';
 import { SimpleGrid } from '@mantine/core';
 import { MovieCard } from './MovieCard';
 

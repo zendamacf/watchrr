@@ -1,7 +1,7 @@
 'use client';
 
-import { Movie } from '@/@types';
 import { useAlert } from '@/hooks/useAlert';
+import { Movie } from '@/types';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation } from '@tanstack/react-query';

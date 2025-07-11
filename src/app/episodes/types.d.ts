@@ -1,7 +1,7 @@
-import { Episode, Show } from '@/@types';
+import { Episode, Show } from '@/types';
 import { DateTime } from 'luxon';
 
-export type ParsedEpisode = {
+type ParsedEpisode = {
   episodes: Episode & { local_date: DateTime; in_past: boolean };
   tvshows: Show;
 };

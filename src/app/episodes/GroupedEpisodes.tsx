@@ -1,8 +1,8 @@
 'use client';
 
 import { Group } from '@mantine/core';
-import { ParsedEpisode } from './@types';
 import { EpisodeCard } from './EpisodeCard';
+import { ParsedEpisode } from './types';
 
 export type GroupedEpisodesProps = {
   episodes: ParsedEpisode[];

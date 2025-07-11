@@ -1,6 +1,6 @@
 'use client';
 
-import { Movie } from '@/@types';
+import { Movie } from '@/types';
 import { ActionIcon, Affix, Alert, Center, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';

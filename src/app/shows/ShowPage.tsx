@@ -1,6 +1,6 @@
 'use client';
 
-import { Show } from '@/@types';
+import { Show } from '@/types';
 import { ActionIcon, Affix, Alert, Center, Loader, Space } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';

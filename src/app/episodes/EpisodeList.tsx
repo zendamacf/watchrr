@@ -1,14 +1,14 @@
 'use client';
 
-import { Episode, Show } from '@/@types';
+import { Episode, Show } from '@/types';
 import { Alert, Center, Loader, Stack, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { getTimezonesForCountry } from 'countries-and-timezones';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { ParsedEpisode } from './@types';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
+import { ParsedEpisode } from './types';
 
 export const EpisodeList = () => {
   const { isLoading, isError, data, refetch } = useQuery<
