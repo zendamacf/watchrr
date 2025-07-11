@@ -24,3 +24,23 @@ export async function PUT(
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
+
+/**
+ * Stop subscribing to a movie.
+ */
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ movie_id: number }> },
+) {
+  const { movie_id } = await params;
+  if (!movie_id) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
+
+  const user = await guardUser();
+  if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  await db
+    .delete(watcher_movies)
+    .where(and(eq(watcher_movies.watcher_id, user.id), eq(watcher_movies.movie_id, movie_id)));
+
+  return NextResponse.json({ message: 'Success' }, { status: 200 });
+}

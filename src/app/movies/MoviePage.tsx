@@ -1,12 +1,16 @@
 'use client';
 
 import { ActionIcon, Affix, Alert, Center, Loader } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, Space } from 'lucide-react';
 import { Movie } from './@types';
+import { AddMovieModal } from './AddMovieModal';
 import { MovieList } from './MovieList';
 
 export const MoviePage = () => {
+  const [opened, { open, close }] = useDisclosure(false);
+
   const { isLoading, isError, data, refetch } = useQuery<Movie[]>({
     queryKey: ['getMovies'],
     queryFn: async () => {
@@ -26,9 +30,10 @@ export const MoviePage = () => {
 
   return (
     <>
+      <AddMovieModal opened={opened} onAdd={() => refetch()} onClose={close} size={'xl'} />
       <MovieList movies={data ?? []} onRemove={() => refetch()} />
       <Affix position={{ bottom: 30, right: 30 }}>
-        <ActionIcon radius="xl" size={60}>
+        <ActionIcon radius="xl" size={60} onClick={open}>
           <Plus size={30} />
         </ActionIcon>
       </Affix>

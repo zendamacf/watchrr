@@ -59,10 +59,11 @@ export async function POST(request: NextRequest) {
       .values({
         name: found.name,
         moviedb_id: found.id,
-        releasedate: DateTime.fromJSDate(found.releaseDate).toFormat('kkkk-LL-dd'),
+        releasedate: DateTime.fromISO(found.releasedate).toFormat('kkkk-LL-dd'),
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
       })
+      .onConflictDoNothing()
       .returning({ movie_id: movies.id });
     if (!inserted) {
       throw new Error(`Failed to insert show ${moviedb_id}`);
@@ -70,7 +71,13 @@ export async function POST(request: NextRequest) {
     movie_id = inserted.movie_id;
   }
 
-  await db.insert(watcher_movies).values({ watcher_id: user.id, movie_id });
+  await db
+    .insert(watcher_movies)
+    .values({ watcher_id: user.id, movie_id })
+    .onConflictDoUpdate({
+      target: [watcher_movies.movie_id, watcher_movies.watcher_id],
+      set: { watched: false },
+    });
 
   return NextResponse.json({ message: 'Success' }, { status: 201 });
 }

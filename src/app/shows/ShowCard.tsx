@@ -3,7 +3,18 @@
 import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import { ActionIcon, Badge, Group, Image, Stack, Text, Title } from '@mantine/core';
+import {
+  ActionIcon,
+  Badge,
+  Group,
+  Image,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
@@ -37,6 +48,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
       children: <Text size="sm">Do you want to stop following {show.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
+      centered: true,
       onConfirm: () => mutate(tvshow_id),
     });
 
@@ -54,9 +66,16 @@ export const ShowCard = ({ show, onRemove }: Props) => {
         <Stack h={'100%'} justify={'space-between'} flex={2}>
           <Stack gap={'xs'}>
             <Title order={3}>{show.name}</Title>
-            <Text c={'dimmed'} lineClamp={3}>
-              {show.description}
-            </Text>
+            <Popover width={'unset'}>
+              <PopoverTarget>
+                <Text c={'dimmed'} lineClamp={3}>
+                  {show.description}
+                </Text>
+              </PopoverTarget>
+              <PopoverDropdown>
+                <Text>{show.description}</Text>
+              </PopoverDropdown>
+            </Popover>
           </Stack>
           <Group justify={'space-between'}>
             <Badge color={'blue'} variant={'outline'}>
