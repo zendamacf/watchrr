@@ -1,5 +1,5 @@
 import { guardUser } from '@/utils/auth';
-import { Container } from '@mantine/core';
+import { Container, Space } from '@mantine/core';
 import { User } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 import { ComponentType } from 'react';
@@ -15,6 +15,7 @@ export async function AuthedPage({ children: Child }: { children: ComponentType<
         <SiteHeader />
         <Container fluid>
           <Child user={user} />
+          <Space style={{ height: '100px' }} />
         </Container>
       </main>
     </div>

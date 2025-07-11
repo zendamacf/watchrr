@@ -4,7 +4,7 @@ import { Movie } from '@/types';
 import { ActionIcon, Affix, Alert, Center, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Space } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { AddMovieModal } from './AddMovieModal';
 import { MovieList } from './MovieList';
 
@@ -37,7 +37,6 @@ export const MoviePage = () => {
           <Plus size={30} />
         </ActionIcon>
       </Affix>
-      <Space style={{ height: '100px' }} />
     </>
   );
 };
