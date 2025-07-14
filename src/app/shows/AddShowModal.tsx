@@ -41,10 +41,10 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
     onSuccess: (data, tvshow) => {
       onAdd();
       refresh({ tvshowId: data.tvshowId, name: tvshow.name });
-      showSuccess('Nice!', `You're now following ${tvshow.name}`);
+      showSuccess({ title: 'Nice!', message: `You're now following ${tvshow.name}` });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -74,7 +74,7 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
               <Popover width={'unset'}>
                 <PopoverTarget>
                   <ActionIcon color={'blue'}>
-                    <List />
+                    <List size={'20'} />
                   </ActionIcon>
                 </PopoverTarget>
                 <PopoverDropdown>
@@ -86,7 +86,7 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
                 loading={pendingAdd}
                 onClick={() => add({ moviedb_id: show.id, name: show.name })}
               >
-                <Plus />
+                <Plus size={'20'} />
               </ActionIcon>
             </>
           }

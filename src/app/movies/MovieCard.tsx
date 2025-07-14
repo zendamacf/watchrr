@@ -24,10 +24,10 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
     },
     onSuccess: (_data, movie_id) => {
       onRemove(movie_id);
-      showSuccess('Nice!', `You watched ${movie.name}`);
+      showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -38,10 +38,10 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
     },
     onSuccess: (_data, movie_id) => {
       onRemove(movie_id);
-      showSuccess('All done!', `You are no longer following ${movie.name}`);
+      showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -71,7 +71,7 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
             loading={pendingWatched}
             onClick={() => watched(movie.id)}
           >
-            <Check />
+            <Check size={'20'} />
           </ActionIcon>
           <ActionIcon
             color={'red'}
@@ -79,7 +79,7 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
             loading={pendingRemove}
             onClick={() => confirmUnsubscribe(movie.id)}
           >
-            <X />
+            <X size={'20'} />
           </ActionIcon>
         </>
       }

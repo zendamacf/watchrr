@@ -1,6 +1,6 @@
 'use client';
 
-import { Group } from '@mantine/core';
+import { SimpleGrid } from '@mantine/core';
 import { EpisodeCard } from './EpisodeCard';
 import { ParsedEpisode } from './types';
 
@@ -12,10 +12,10 @@ export type GroupedEpisodesProps = {
 
 export const GroupedEpisodes = ({ episodes, showDates, ...props }: GroupedEpisodesProps) => {
   return (
-    <Group wrap={'wrap'} gap={'md'}>
+    <SimpleGrid cols={{ xs: 1, sm: 2, md: 2, lg: 3, xl: 4 }}>
       {episodes.map((r) => (
         <EpisodeCard key={r.episodes.id} episode={r} showDate={showDates} {...props} />
       ))}
-    </Group>
+    </SimpleGrid>
   );
 };

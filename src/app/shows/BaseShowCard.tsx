@@ -52,7 +52,11 @@ export const BaseShowCard = ({ show, actions, ...props }: Props) => {
             <Badge color={'blue'} variant={'outline'}>
               {show.country}
             </Badge>
-            {actions && <Group justify={'end'}>{actions}</Group>}
+            {actions && (
+              <Group justify={'end'} gap={'xs'}>
+                {actions}
+              </Group>
+            )}
           </Group>
         </Stack>
       </Group>

@@ -26,10 +26,10 @@ export const ShowCard = ({ show, onRemove }: Props) => {
     },
     onSuccess: (_data, tvshow_id) => {
       onRemove(tvshow_id);
-      showSuccess('All done!', `You are no longer following ${show.name}`);
+      showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -55,7 +55,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
             loading={refreshPending}
             onClick={() => refresh({ tvshowId: show.id, name: show.name })}
           >
-            <RefreshCcw />
+            <RefreshCcw size={'20'} />
           </ActionIcon>
           <ActionIcon
             color={'red'}
@@ -63,7 +63,7 @@ export const ShowCard = ({ show, onRemove }: Props) => {
             loading={removePending}
             onClick={() => confirmUnsubscribe(show.id)}
           >
-            <X />
+            <X size={'20'} />
           </ActionIcon>
         </>
       }

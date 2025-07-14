@@ -37,10 +37,10 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
     },
     onSuccess: (_data, movie) => {
       onAdd();
-      showSuccess('Nice!', `You're now following ${movie.name}`);
+      showSuccess({ title: 'Nice!', message: `You're now following ${movie.name}` });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -72,7 +72,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
               <Popover width={'unset'}>
                 <PopoverTarget>
                   <ActionIcon color={'blue'}>
-                    <List />
+                    <List size={'20'} />
                   </ActionIcon>
                 </PopoverTarget>
                 <PopoverDropdown>
@@ -84,7 +84,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
                 loading={pendingAdd}
                 onClick={() => add({ moviedb_id: movie.id, name: movie.name })}
               >
-                <Plus />
+                <Plus size={'20'} />
               </ActionIcon>
             </>
           }

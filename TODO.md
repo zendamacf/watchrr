@@ -1,12 +1,12 @@
 # TODO
 
 - Actually migrate site
-- Populate `watcher_episode` when `episode` is added.
 - Periodically resync movies & episodes
-- Get adding shows & movies working
+- Add searching of shows & movies
 
 # DONE
 
+- Get adding shows & movies working
 - Use smaller image sizes due to load times
 - Fix show backdrop opacity
 - Access Supabase via Drizzle ORM
@@ -16,3 +16,4 @@
 # IGNORING
 
 - Investigate tRPC
+- Populate `watcher_episode` when `episode` is added.

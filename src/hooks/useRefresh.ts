@@ -15,18 +15,27 @@ export const useRefreshMovie = () => {
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {
-      const notificationId = showLoading(
-        'Working on it...',
-        `We're refreshing everything for ${name}`,
-      );
+      const notificationId = showLoading({
+        title: 'Working on it...',
+        message: `We're refreshing everything for ${name}`,
+      });
       return { notificationId };
     },
     onSuccess: (_data, { name }, { notificationId }) => {
-      doneLoadingSuccess('All done!', `We've refreshed everything for ${name}`, notificationId);
+      doneLoadingSuccess({
+        title: 'All done!',
+        message: `We've refreshed everything for ${name}`,
+        id: notificationId,
+      });
     },
     onError(error, _var, context) {
-      if (context) doneLoadingError('An error occurred', error.message, context.notificationId);
-      else showError('An error occurred', error.message);
+      if (context)
+        doneLoadingError({
+          title: 'An error occurred',
+          message: error.message,
+          id: context.notificationId,
+        });
+      else showError({ title: 'An error occurred', message: error.message });
     },
   });
 
@@ -47,18 +56,27 @@ export const useRefreshShow = () => {
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {
-      const notificationId = showLoading(
-        'Working on it...',
-        `We're refreshing everything for ${name}`,
-      );
+      const notificationId = showLoading({
+        title: 'Working on it...',
+        message: `We're refreshing everything for ${name}`,
+      });
       return { notificationId };
     },
     onSuccess: (_data, { name }, { notificationId }) => {
-      doneLoadingSuccess('All done!', `We've refreshed everything for ${name}`, notificationId);
+      doneLoadingSuccess({
+        title: 'All done!',
+        message: `We've refreshed everything for ${name}`,
+        id: notificationId,
+      });
     },
     onError(error, _var, context) {
-      if (context) doneLoadingError('An error occurred', error.message, context.notificationId);
-      else showError('An error occurred', error.message);
+      if (context)
+        doneLoadingError({
+          title: 'An error occurred',
+          message: error.message,
+          id: context.notificationId,
+        });
+      else showError({ title: 'An error occurred', message: error.message });
     },
   });
 

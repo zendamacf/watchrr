@@ -62,7 +62,11 @@ export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...pro
               </Popover>
             )}
           </Stack>
-          {actions && <Group justify={'end'}>{actions}</Group>}
+          {actions && (
+            <Group justify={'end'} gap={'xs'}>
+              {actions}
+            </Group>
+          )}
         </Stack>
       </Group>
     </BackdropCard>

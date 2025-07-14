@@ -3,10 +3,10 @@
 import { BackdropCard } from '@/components/BackdropCard';
 import { useAlert } from '@/hooks/useAlert';
 import { DateFormat } from '@/utils/dates';
-import { ActionIcon, Group, Stack, Text, Title } from '@mantine/core';
+import { ActionIcon, CopyButton, Group, Stack, Text, Title } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import classNames from 'classnames';
-import { Check } from 'lucide-react';
+import { Check, ClipboardCheck, Copy } from 'lucide-react';
 import classes from './EpisodeCard.module.css';
 import { ParsedEpisode } from './types';
 
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
-  const { showError, showSuccess } = useAlert();
+  const { showError, showSuccess, showInfo } = useAlert();
 
   const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
@@ -28,15 +28,22 @@ export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
     },
     onSuccess: (_data, episode_id) => {
       onRemove(episode_id);
-      showSuccess('Nice!', `You watched ${episode.tvshows.name} ${episodeNumber}`);
+      showSuccess({
+        title: 'Nice!',
+        message: `You watched ${episode.tvshows.name} ${episodeNumber}`,
+      });
     },
     onError(error) {
-      showError('An error occurred', error.message);
+      showError({ title: 'An error occurred', message: error.message });
     },
   });
 
   return (
-    <BackdropCard key={episode.episodes.id} w={400} backdrop={episode.tvshows.backdrop_slug}>
+    <BackdropCard
+      key={episode.episodes.id}
+      style={{ width: '100%' }}
+      backdrop={episode.tvshows.backdrop_slug}
+    >
       <Title order={3} lineClamp={1}>
         {episode.tvshows.name}
       </Title>
@@ -50,13 +57,29 @@ export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
             </Text>
           )}
         </Stack>
-        <ActionIcon
-          loaderProps={{ type: 'dots' }}
-          loading={isPending}
-          onClick={() => mutate(episode.episodes.id)}
-        >
-          <Check />
-        </ActionIcon>
+        <Group justify={'end'} gap={'xs'}>
+          <CopyButton value={`${episode.tvshows.name} ${episodeNumber}`} timeout={2000}>
+            {({ copied, copy }) => (
+              <ActionIcon
+                variant={'outline'}
+                color={copied ? 'blue' : 'grey'}
+                onClick={() => {
+                  copy();
+                  showInfo({ message: 'Copied', icon: <ClipboardCheck /> });
+                }}
+              >
+                {copied ? <ClipboardCheck size={'20'} /> : <Copy size={'20'} />}
+              </ActionIcon>
+            )}
+          </CopyButton>
+          <ActionIcon
+            loaderProps={{ type: 'dots' }}
+            loading={isPending}
+            onClick={() => mutate(episode.episodes.id)}
+          >
+            <Check size={'20'} />
+          </ActionIcon>
+        </Group>
       </Group>
     </BackdropCard>
   );

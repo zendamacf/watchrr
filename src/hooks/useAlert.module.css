@@ -12,8 +12,8 @@
 }
 
 .icon {
-  color: darken(var(--notification-color), light-dark(0.1, 0.3));
-  background-color: var(--mantine-color-white);
+  color: var(--mantine-color-white);
+  background-color: darken(var(--notification-color), light-dark(0.1, 0.3));
 }
 
 .closeButton {
