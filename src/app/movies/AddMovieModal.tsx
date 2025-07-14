@@ -2,6 +2,8 @@ import { useAlert } from '@/hooks/useAlert';
 import { TMDBMovie } from '@/lib/themoviedb/movies';
 import {
   ActionIcon,
+  Center,
+  Loader,
   LoadingOverlay,
   Modal,
   ModalProps,
@@ -25,7 +27,11 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
   const [search, setSearch] = useDebouncedState('', 500);
   const { showSuccess, showError } = useAlert();
 
-  const { isFetching, data } = useQuery<TMDBMovie[]>({
+  const {
+    isLoading: isFirstLoading,
+    isFetching,
+    data,
+  } = useQuery<TMDBMovie[]>({
     queryKey: ['searchMovies', search],
     queryFn: async () => {
       if (!search.trim()) return [];
@@ -35,6 +41,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
       throw new Error((await response.json()).message);
     },
     placeholderData: (prev) => prev,
+    enabled: props.opened && search !== '',
   });
 
   const { mutate: add, isPending: pendingAdd } = useMutation<
@@ -72,6 +79,11 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
+      {isFirstLoading && (
+        <Center>
+          <Loader type={'dots'} />
+        </Center>
+      )}
       <div style={{ position: 'relative' }}>
         <LoadingOverlay
           loaderProps={{ type: 'dots' }}

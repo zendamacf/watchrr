@@ -1,7 +1,10 @@
 import { useAlert } from '@/hooks/useAlert';
+import { useRefreshShow } from '@/hooks/useRefresh';
 import { TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import {
   ActionIcon,
+  Center,
+  Loader,
   LoadingOverlay,
   Modal,
   ModalProps,
@@ -24,7 +27,11 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
   const [search, setSearch] = useDebouncedState('', 500);
   const { showSuccess, showError } = useAlert();
 
-  const { isFetching, data } = useQuery<TMDBTvShow[]>({
+  const {
+    isLoading: isFirstLoading,
+    isFetching,
+    data,
+  } = useQuery<TMDBTvShow[]>({
     queryKey: ['searchShows', search],
     queryFn: async () => {
       if (!search.trim()) return [];
@@ -34,10 +41,13 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
       throw new Error((await response.json()).message);
     },
     placeholderData: (prev) => prev,
+    enabled: props.opened && search !== '',
   });
 
+  const { refresh } = useRefreshShow();
+
   const { mutate: add, isPending: pendingAdd } = useMutation<
-    unknown,
+    { tvshowId: number },
     Error,
     { moviedb_id: number; name: string }
   >({
@@ -50,16 +60,21 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
         },
         body: JSON.stringify({ moviedb_id: tvshow.moviedb_id }),
       });
-      if (!response.ok) throw new Error((await response.json()).message);
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message);
+      return { tvshowId: json.tvshow_id };
     },
-    onSuccess: (_data, tvshow) => {
+    onSuccess: (data, tvshow) => {
       onAdd();
+      refresh({ tvshowId: data.tvshowId, name: tvshow.name });
       showSuccess('Nice!', `You're now following ${tvshow.name}`);
     },
     onError(error) {
       showError('An error occurred', error.message);
     },
   });
+
+  console.log(isFirstLoading);
 
   return (
     <Modal title={'Add Show'} {...props}>
@@ -71,6 +86,11 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
+      {isFirstLoading && (
+        <Center>
+          <Loader type={'dots'} />
+        </Center>
+      )}
       <div style={{ position: 'relative' }}>
         <LoadingOverlay
           loaderProps={{ type: 'dots' }}

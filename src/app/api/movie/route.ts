@@ -79,5 +79,5 @@ export async function POST(request: NextRequest) {
       set: { watched: false },
     });
 
-  return NextResponse.json({ message: 'Success' }, { status: 201 });
+  return NextResponse.json({ message: 'Success', movie_id }, { status: 201 });
 }
