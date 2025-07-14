@@ -1,11 +1,13 @@
 import {
   Center,
+  Group,
   Loader,
   LoadingOverlay,
   Modal,
   ModalProps,
   SimpleGrid,
   Space,
+  Text,
   TextInput,
 } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
@@ -40,7 +42,8 @@ export const AddMediaModal = <T extends object>({
   return (
     <Modal {...props}>
       <TextInput
-        placeholder="Search"
+        placeholder={'Search'}
+        data-autofocus
         defaultValue={search}
         onChange={(event) => setSearch(event.currentTarget.value)}
         leftSection={<Search />}
@@ -49,6 +52,16 @@ export const AddMediaModal = <T extends object>({
       {query.isLoading && (
         <Center>
           <Loader type={'dots'} />
+        </Center>
+      )}
+      {!query.isFetched && (
+        <Center p={'xl'}>
+          <Text size={'xl'} c={'dimmed'}>
+            <Group gap={'xs'}>
+              <Search />
+              Search above to get started!
+            </Group>
+          </Text>
         </Center>
       )}
       <div style={{ position: 'relative' }}>
