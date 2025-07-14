@@ -26,7 +26,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
   ];
   const diffs = showLookup.filter(({ dbKey, apiKey }) => dbShow[dbKey] !== apiShow[apiKey]);
   if (diffs.length) {
-    console.log(`[SHOW][${dbShow.name}] Updating metadata`);
+    console.log(`[SHOW][${dbShow.name}] Updating metadata, changes in ${Object.keys(diffs)}`);
     await db
       .update(tvshows)
       .set({
@@ -49,6 +49,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
     { dbKey: 'name', apiKey: 'name' },
     { dbKey: 'description', apiKey: 'description' },
     { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
+    { dbKey: 'airdate', apiKey: 'airdate' },
   ];
   let inserted = 0;
   let updated = 0;
@@ -91,4 +92,5 @@ export const refreshTvShow = async (tvshow_id: number) => {
     }
   }
   console.log(`[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`);
+  console.log(`[SHOW][${dbShow.name}] Finished refreshing`);
 };
