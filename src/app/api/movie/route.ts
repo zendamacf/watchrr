@@ -62,8 +62,9 @@ export async function POST(request: NextRequest) {
         releasedate: DateTime.fromISO(found.releasedate).toSQLDate(),
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
+        description: found.description,
       })
-      .onConflictDoNothing()
+      .onConflictDoNothing({ target: movies.moviedb_id })
       .returning({ movie_id: movies.id });
     if (!inserted) {
       throw new Error(`Failed to insert show ${moviedb_id}`);

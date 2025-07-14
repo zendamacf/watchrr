@@ -60,8 +60,9 @@ export async function POST(request: NextRequest) {
         country: found.country,
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
+        description: found.description,
       })
-      .onConflictDoNothing()
+      .onConflictDoNothing({ target: tvshows.moviedb_id })
       .returning({ tvshow_id: tvshows.id });
     if (!inserted) {
       throw new Error(`Failed to insert show ${moviedb_id}`);
