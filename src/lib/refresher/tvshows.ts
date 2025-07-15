@@ -5,6 +5,7 @@ import { Episode, Show } from '@/types';
 import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { ResourceNotFound } from './errors';
+import { dateCompare, DiffLookup, getDiff } from './utils';
 
 /**
  * Refresh all metadata for a TV Show & its episodes, and imports in any new episodes.
@@ -17,16 +18,18 @@ export const refreshTvShow = async (tvshow_id: number) => {
 
   console.log(`[SHOW][${dbShow.name}] Refreshing`);
   const apiShow = await getTvShow(dbShow.moviedb_id);
-  const showLookup: { dbKey: keyof Show; apiKey: keyof TMDBTvShow }[] = [
+  const showLookup: DiffLookup<Show, TMDBTvShow>[] = [
     { dbKey: 'name', apiKey: 'name' },
     { dbKey: 'description', apiKey: 'description' },
     { dbKey: 'country', apiKey: 'country' },
     { dbKey: 'poster_slug', apiKey: 'poster' },
     { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
   ];
-  const diffs = showLookup.filter(({ dbKey, apiKey }) => dbShow[dbKey] !== apiShow[apiKey]);
+  const diffs = getDiff(dbShow, apiShow, showLookup);
   if (diffs.length) {
-    console.log(`[SHOW][${dbShow.name}] Updating metadata, changes in ${Object.keys(diffs)}`);
+    console.info(
+      `[SHOW][${dbShow.name}] Updating metadata, changes in ${diffs.map((d) => d.dbKey)}`,
+    );
     await db
       .update(tvshows)
       .set({
@@ -42,14 +45,16 @@ export const refreshTvShow = async (tvshow_id: number) => {
   console.log(`[SHOW][${dbShow.name}] Refreshing episodes`);
   const dbEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, dbShow.id));
   const apiEpisodes = await getAllEpisodes(dbShow.moviedb_id);
-  console.log(
-    `[SHOW][${dbShow.name}] ${dbEpisodes.length}/${apiEpisodes.length} episodes existing`,
-  );
-  const episodeLookup: { dbKey: keyof Episode; apiKey: keyof TMDBEpisode }[] = [
+  if (apiEpisodes.length > dbEpisodes.length) {
+    console.info(
+      `[SHOW][${dbShow.name}] ${dbEpisodes.length}/${apiEpisodes.length} episodes existing`,
+    );
+  }
+  const episodeLookup: DiffLookup<Episode, TMDBEpisode>[] = [
     { dbKey: 'name', apiKey: 'name' },
     { dbKey: 'description', apiKey: 'description' },
     { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
-    { dbKey: 'airdate', apiKey: 'airdate' },
+    { dbKey: 'airdate', apiKey: 'airdate', compare: dateCompare },
   ];
   let inserted = 0;
   let updated = 0;
@@ -57,9 +62,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
   for (const apiEpisode of apiEpisodes) {
     const dbEpisode = dbEpisodes.find((e) => e.moviedb_id === apiEpisode.id);
     if (dbEpisode) {
-      const diffs = episodeLookup.filter(
-        ({ dbKey, apiKey }) => dbEpisode[dbKey] !== apiEpisode[apiKey],
-      );
+      const diffs = getDiff(dbEpisode, apiEpisode, episodeLookup);
       if (diffs.length) {
         await db
           .update(episodes)
@@ -91,6 +94,10 @@ export const refreshTvShow = async (tvshow_id: number) => {
       inserted++;
     }
   }
-  console.log(`[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`);
+  if (inserted + updated > 0) {
+    console.info(
+      `[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`,
+    );
+  }
   console.log(`[SHOW][${dbShow.name}] Finished refreshing`);
 };
