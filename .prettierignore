@@ -1,0 +1,5 @@
+dist
+coverage
+
+# TODO: Remove this when legacy has been removed
+legacy

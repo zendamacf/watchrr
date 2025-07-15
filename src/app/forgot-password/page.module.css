@@ -1,0 +1,12 @@
+.controls {
+  @media (max-width: $mantine-breakpoint-xs) {
+    flex-direction: column-reverse;
+  }
+}
+
+.control {
+  @media (max-width: $mantine-breakpoint-xs) {
+    width: 100%;
+    text-align: center;
+  }
+}

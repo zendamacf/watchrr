@@ -1,0 +1,25 @@
+.root {
+  background-color: darken(var(--notification-color), light-dark(0.1, 0.3));
+
+  &::before {
+    background-color: var(--mantine-color-white);
+  }
+}
+
+.description,
+.title {
+  color: var(--mantine-color-white);
+}
+
+.icon {
+  color: var(--mantine-color-white);
+  background-color: darken(var(--notification-color), light-dark(0.1, 0.3));
+}
+
+.closeButton {
+  color: var(--mantine-color-white);
+
+  @mixin hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
