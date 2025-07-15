@@ -2,7 +2,6 @@
 
 - Actually migrate site
 - Periodically resync movies & episodes
-- Add searching of shows & movies
 - Add Sentry integration
 
 # DONE
@@ -13,6 +12,7 @@
 - Access Supabase via Drizzle ORM
 - Populate Supabase from original DB
 - Populate posters when fetching
+- Add searching of shows & movies
 
 # IGNORING
 

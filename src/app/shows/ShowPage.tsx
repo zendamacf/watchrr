@@ -1,15 +1,17 @@
 'use client';
 
 import { Show } from '@/types';
-import { ActionIcon, Affix, Alert, Center, Loader } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { ActionIcon, Affix, Alert, Center, Loader, Space, TextInput } from '@mantine/core';
+import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
+import { useMemo } from 'react';
 import { AddShowModal } from './AddShowModal';
 import { ShowList } from './ShowList';
 
 export const ShowPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [search, setSearch] = useDebouncedState('', 200);
 
   const { isLoading, isError, data, refetch } = useQuery<Show[]>({
     queryKey: ['getShows'],
@@ -19,6 +21,17 @@ export const ShowPage = () => {
       throw new Error((await response.json()).message);
     },
   });
+
+  const shows = useMemo(() => {
+    const trimmedSearch = search.trim().toLowerCase();
+    return trimmedSearch
+      ? data?.filter(
+          (d) =>
+            d.name.toLowerCase().includes(trimmedSearch) ||
+            d.description?.toLowerCase().includes(trimmedSearch),
+        )
+      : data;
+  }, [search, data]);
 
   if (isLoading)
     return (
@@ -31,7 +44,14 @@ export const ShowPage = () => {
   return (
     <>
       <AddShowModal opened={opened} onAdd={() => refetch()} onClose={close} size={'xl'} />
-      <ShowList shows={data ?? []} onRemove={() => refetch()} />
+      <TextInput
+        placeholder={'Search'}
+        defaultValue={search}
+        onChange={(event) => setSearch(event.currentTarget.value)}
+        leftSection={<Search />}
+      />
+      <Space h={'md'} />
+      <ShowList shows={shows ?? []} onRemove={() => refetch()} />
       <Affix position={{ bottom: 30, right: 30 }}>
         <ActionIcon radius="xl" size={60} onClick={open}>
           <Plus size={30} />
