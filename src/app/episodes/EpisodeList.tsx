@@ -62,7 +62,7 @@ export const EpisodeList = () => {
   if (isLoading)
     return (
       <Center>
-        <Loader type={'dots'} />
+        <Loader />
       </Center>
     );
   if (isError) return <Alert color={'red'}>An error occurred</Alert>;

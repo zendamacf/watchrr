@@ -3,6 +3,7 @@
 - Actually migrate site
 - Periodically resync movies & episodes
 - Add searching of shows & movies
+- Add Sentry integration
 
 # DONE
 

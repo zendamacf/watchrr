@@ -82,7 +82,6 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
                 </PopoverDropdown>
               </Popover>
               <ActionIcon
-                loaderProps={{ type: 'dots' }}
                 loading={pendingAdd}
                 onClick={() => add({ moviedb_id: show.id, name: show.name })}
               >

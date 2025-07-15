@@ -51,7 +51,7 @@ export const AddMediaModal = <T extends object>({
       <Space h={'md'} />
       {query.isLoading && (
         <Center>
-          <Loader type={'dots'} />
+          <Loader />
         </Center>
       )}
       {!query.isFetched && (
@@ -66,7 +66,6 @@ export const AddMediaModal = <T extends object>({
       )}
       <div style={{ position: 'relative' }}>
         <LoadingOverlay
-          loaderProps={{ type: 'dots' }}
           visible={query.isFetching}
           zIndex={1000}
           overlayProps={{ radius: 'sm', blur: 2 }}

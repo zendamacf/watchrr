@@ -80,7 +80,6 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
                 </PopoverDropdown>
               </Popover>
               <ActionIcon
-                loaderProps={{ type: 'dots' }}
                 loading={pendingAdd}
                 onClick={() => add({ moviedb_id: movie.id, name: movie.name })}
               >

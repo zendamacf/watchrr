@@ -51,7 +51,6 @@ export const ShowCard = ({ show, onRemove }: Props) => {
         <>
           <ActionIcon
             color={'blue'}
-            loaderProps={{ type: 'dots' }}
             loading={refreshPending}
             onClick={() => refresh({ tvshowId: show.id, name: show.name })}
           >
@@ -59,7 +58,6 @@ export const ShowCard = ({ show, onRemove }: Props) => {
           </ActionIcon>
           <ActionIcon
             color={'red'}
-            loaderProps={{ type: 'dots' }}
             loading={removePending}
             onClick={() => confirmUnsubscribe(show.id)}
           >

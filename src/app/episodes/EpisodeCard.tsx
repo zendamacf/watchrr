@@ -72,11 +72,7 @@ export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
               </ActionIcon>
             )}
           </CopyButton>
-          <ActionIcon
-            loaderProps={{ type: 'dots' }}
-            loading={isPending}
-            onClick={() => mutate(episode.episodes.id)}
-          >
+          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.id)}>
             <Check size={'20'} />
           </ActionIcon>
         </Group>

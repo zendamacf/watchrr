@@ -66,16 +66,11 @@ export const MovieCard = ({ movie, onRemove }: Props) => {
       description
       actions={
         <>
-          <ActionIcon
-            loaderProps={{ type: 'dots' }}
-            loading={pendingWatched}
-            onClick={() => watched(movie.id)}
-          >
+          <ActionIcon loading={pendingWatched} onClick={() => watched(movie.id)}>
             <Check size={'20'} />
           </ActionIcon>
           <ActionIcon
             color={'red'}
-            loaderProps={{ type: 'dots' }}
             loading={pendingRemove}
             onClick={() => confirmUnsubscribe(movie.id)}
           >
