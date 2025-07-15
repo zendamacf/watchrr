@@ -30,10 +30,9 @@ export default function Error({
   );
 }
 
-function AlertCircleIcon(props: any) {
+function AlertCircleIcon() {
   return (
     <svg
-      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"
