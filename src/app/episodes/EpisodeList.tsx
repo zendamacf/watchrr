@@ -2,9 +2,11 @@
 
 import { Episode, Show } from '@/types';
 import { DateFormat } from '@/utils/dates';
-import { Alert, Center, Loader, Stack, Title } from '@mantine/core';
+import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
+import { useDebouncedState } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { getTimezonesForCountry } from 'countries-and-timezones';
+import { Search } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import { GroupedEpisodes } from './GroupedEpisodes';
@@ -12,6 +14,8 @@ import { PastEpisodes } from './PastEpisodes';
 import { ParsedEpisode } from './types';
 
 export const EpisodeList = () => {
+  const [search, setSearch] = useDebouncedState('', 200);
+
   const { isLoading, isError, data, refetch } = useQuery<
     {
       episodes: Episode;
@@ -28,24 +32,31 @@ export const EpisodeList = () => {
 
   const { pastEpisodes, futureDates } = useMemo(() => {
     if (!data) return { pastEpisodes: [], futureDates: {} };
-    const converted = data.map<ParsedEpisode>((r) => {
-      let localDate: DateTime;
-      // Convert to user timezone
-      const timezones = r.tvshows.country ? getTimezonesForCountry(r.tvshows.country) : [];
-      if (timezones?.length) {
-        // Just get first, with dates we don't have to be too accurate
-        const [tz] = timezones;
-        // Convert from original timezone to user's
-        const dt = DateTime.fromSQL(r.episodes.airdate, { zone: tz?.name })
-          // Hardcode at 8PM, as moviedb doesn't store airtimes
-          .set({ hour: 20 })
-          // TODO: Pull this from user config
-          .setZone('Pacific/Auckland');
-        localDate = dt;
-      } else localDate = DateTime.fromSQL(r.episodes.airdate);
-      const inPast = localDate.startOf('day') < DateTime.now().startOf('day');
-      return { ...r, episodes: { ...r.episodes, local_date: localDate, in_past: inPast } };
-    });
+    const trimmedSearch = search.trim().toLowerCase();
+    const converted = data
+      .filter(
+        (r) =>
+          r.tvshows.name.toLowerCase().includes(trimmedSearch) ||
+          r.episodes.name.toLowerCase().includes(trimmedSearch),
+      )
+      .map<ParsedEpisode>((r) => {
+        let localDate: DateTime;
+        // Convert to user timezone
+        const timezones = r.tvshows.country ? getTimezonesForCountry(r.tvshows.country) : [];
+        if (timezones?.length) {
+          // Just get first, with dates we don't have to be too accurate
+          const [tz] = timezones;
+          // Convert from original timezone to user's
+          const dt = DateTime.fromSQL(r.episodes.airdate, { zone: tz?.name })
+            // Hardcode at 8PM, as moviedb doesn't store airtimes
+            .set({ hour: 20 })
+            // TODO: Pull this from user config
+            .setZone('Pacific/Auckland');
+          localDate = dt;
+        } else localDate = DateTime.fromSQL(r.episodes.airdate);
+        const inPast = localDate.startOf('day') < DateTime.now().startOf('day');
+        return { ...r, episodes: { ...r.episodes, local_date: localDate, in_past: inPast } };
+      });
 
     const pastEpisodes = converted.filter((r) => r.episodes.in_past);
     const futureEpisodes = converted.filter((r) => !r.episodes.in_past);
@@ -57,7 +68,7 @@ export const EpisodeList = () => {
     }, {});
 
     return { pastEpisodes, futureDates };
-  }, [data]);
+  }, [search, data]);
 
   if (isLoading)
     return (
@@ -68,17 +79,28 @@ export const EpisodeList = () => {
   if (isError) return <Alert color={'red'}>An error occurred</Alert>;
 
   return (
-    <Stack gap={'xl'}>
-      {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} onRemove={() => refetch()} />}
+    <>
+      <TextInput
+        placeholder={'Search'}
+        defaultValue={search}
+        onChange={(event) => setSearch(event.currentTarget.value)}
+        leftSection={<Search />}
+      />
+      <Space h={'md'} />
+      <Stack gap={'xl'}>
+        {!!pastEpisodes.length && (
+          <PastEpisodes episodes={pastEpisodes} onRemove={() => refetch()} />
+        )}
 
-      {Object.entries(futureDates).map(([date, episodes]) => (
-        <Stack gap={'sm'} key={date}>
-          <Title order={2}>
-            {DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}
-          </Title>
-          <GroupedEpisodes episodes={episodes} onRemove={() => refetch()} />
-        </Stack>
-      ))}
-    </Stack>
+        {Object.entries(futureDates).map(([date, episodes]) => (
+          <Stack gap={'sm'} key={date}>
+            <Title order={2}>
+              {DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}
+            </Title>
+            <GroupedEpisodes episodes={episodes} onRemove={() => refetch()} />
+          </Stack>
+        ))}
+      </Stack>
+    </>
   );
 };
