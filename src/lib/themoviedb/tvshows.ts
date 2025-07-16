@@ -17,7 +17,7 @@ export type TMDBEpisode = {
   episodeNumber: number;
   name: string;
   description: string | null;
-  airdate: string | null;
+  airdate: string;
   backdrop: string | null;
 };
 
@@ -72,6 +72,7 @@ export const getAllEpisodes = async (moviedb_id: number): Promise<TMDBEpisode[]>
     });
     allEpisodes.push(
       ...data.episodes
+        // TMDB typing is misleading, this can be null
         .filter((d) => d.air_date !== null)
         .map<TMDBEpisode>((d) => ({
           id: d.id,
