@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { SupabaseSafeSession } from './safeSession';
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -54,7 +55,9 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getUser();
+  if (!process.env.SUPABASE_AUTH_JWT_SECRET) throw new Error('SUPABASE_AUTH_JWT_SECRET is not set');
+  const safeSession = new SupabaseSafeSession(supabase, process.env.SUPABASE_AUTH_JWT_SECRET);
+  await safeSession.getUser();
 
   return response;
 }

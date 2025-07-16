@@ -1,6 +1,5 @@
 import {
   Center,
-  Group,
   Loader,
   LoadingOverlay,
   Modal,
@@ -54,13 +53,11 @@ export const AddMediaModal = <T extends object>({
           <Loader />
         </Center>
       )}
-      {!query.isFetched && (
+      {!query.isFetched && !query.isLoading && (
         <Center p={'xl'}>
           <Text size={'xl'} c={'dimmed'}>
-            <Group gap={'xs'}>
-              <Search />
-              Search above to get started!
-            </Group>
+            <Search style={{ verticalAlign: 'sub', marginRight: '4px' }} /> Search above to get
+            started!
           </Text>
         </Center>
       )}
