@@ -5,6 +5,7 @@ import { QueryProvider } from '@/components/QueryProvider';
 import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
@@ -47,6 +48,7 @@ export default function RootLayout({
             <ModalsProvider>{children}</ModalsProvider>
           </QueryProvider>
         </MantineProvider>
+        <Analytics />
       </body>
     </html>
   );
