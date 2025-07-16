@@ -43,7 +43,7 @@ export const EpisodeList = () => {
           .setZone('Pacific/Auckland');
         localDate = dt;
       } else localDate = DateTime.fromSQL(r.episodes.airdate);
-      const inPast = localDate < DateTime.now();
+      const inPast = localDate.startOf('day') < DateTime.now().startOf('day');
       return { ...r, episodes: { ...r.episodes, local_date: localDate, in_past: inPast } };
     });
 

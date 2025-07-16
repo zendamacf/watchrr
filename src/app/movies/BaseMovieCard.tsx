@@ -27,7 +27,8 @@ type Props = {
 } & CardProps;
 
 export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...props }: Props) => {
-  const inPast = !!movie.releaseDate && movie.releaseDate < DateTime.now();
+  const inPast =
+    !!movie.releaseDate && movie.releaseDate.startOf('day') < DateTime.now().startOf('day');
 
   return (
     <BackdropCard {...props} style={{ width: '100%' }} backdrop={movie.backdrop_slug}>
