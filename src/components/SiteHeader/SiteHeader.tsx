@@ -37,7 +37,9 @@ function MainNav({
   return (
     <header className={classes.header}>
       <Group justify="space-between" h="100%">
-        <Logo w={160} />
+        <a href={'/'}>
+          <Logo w={160} />
+        </a>
 
         <Group h="100%" gap={0} visibleFrom="sm">
           {links.map((link) => (
@@ -81,7 +83,11 @@ function MobileNav({
       position={'right'}
       size="100%"
       padding="md"
-      title={<Logo w={180} />}
+      title={
+        <a href={'/'}>
+          <Logo w={180} />
+        </a>
+      }
       hiddenFrom="sm"
       zIndex={1000000}
     >
