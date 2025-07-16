@@ -3,7 +3,7 @@ import { Anchor, Box, Button, Center, Group, TextInput } from '@mantine/core';
 import { ArrowLeft } from 'lucide-react';
 import classes from './page.module.css';
 
-export function ForgotPassword() {
+export default async function ForgotPassword() {
   return (
     <PublicPage title={'Forgot your password?'} subtitle={'Enter your email to get a reset link'}>
       <TextInput label="Your email" placeholder="email@example.com" required />
