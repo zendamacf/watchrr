@@ -17,7 +17,7 @@ export type TMDBEpisode = {
   episodeNumber: number;
   name: string;
   description: string | null;
-  airdate: string;
+  airdate: string | null;
   backdrop: string | null;
 };
 
@@ -71,16 +71,18 @@ export const getAllEpisodes = async (moviedb_id: number): Promise<TMDBEpisode[]>
       seasonNumber: season.season_number,
     });
     allEpisodes.push(
-      ...data.episodes.map<TMDBEpisode>((d) => ({
-        id: d.id,
-        seasonNumber: d.season_number,
-        episodeNumber: d.episode_number,
-        name: d.name,
-        description: d.overview,
-        airdate: DateTime.fromJSDate(new Date(d.air_date)).toISO()!,
-        moviedb_id: d.id,
-        backdrop: d.still_path,
-      })),
+      ...data.episodes
+        .filter((d) => d.air_date !== null)
+        .map<TMDBEpisode>((d) => ({
+          id: d.id,
+          seasonNumber: d.season_number,
+          episodeNumber: d.episode_number,
+          name: d.name,
+          description: d.overview,
+          airdate: DateTime.fromJSDate(new Date(d.air_date)).toISO()!,
+          moviedb_id: d.id,
+          backdrop: d.still_path,
+        })),
     );
   }
   return allEpisodes;
