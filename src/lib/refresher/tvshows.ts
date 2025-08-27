@@ -51,6 +51,8 @@ export const refreshTvShow = async (tvshow_id: number) => {
     );
   }
   const episodeLookup: DiffLookup<Episode, TMDBEpisode>[] = [
+    { dbKey: 'season', apiKey: 'seasonNumber' },
+    { dbKey: 'episode', apiKey: 'episodeNumber' },
     { dbKey: 'name', apiKey: 'name' },
     { dbKey: 'description', apiKey: 'description' },
     { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
