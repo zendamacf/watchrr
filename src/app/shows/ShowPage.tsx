@@ -1,6 +1,7 @@
 'use client';
 
-import { Show } from '@/types';
+import { QueryKey } from '@/components/QueryProvider';
+import { ShowsResponse } from '@/types';
 import { ActionIcon, Affix, Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
@@ -13,8 +14,8 @@ export const ShowPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data, refetch } = useQuery<Show[]>({
-    queryKey: ['getShows'],
+  const { isLoading, isError, data } = useQuery<ShowsResponse>({
+    queryKey: [QueryKey.getShows],
     queryFn: async () => {
       const response = await fetch('/api/tvshow', { method: 'get' });
       if (response.ok) return await response.json();
@@ -43,7 +44,7 @@ export const ShowPage = () => {
 
   return (
     <>
-      <AddShowModal opened={opened} onAdd={() => refetch()} onClose={close} size={'xl'} />
+      <AddShowModal opened={opened} onClose={close} size={'xl'} />
       <TextInput
         placeholder={'Search'}
         defaultValue={search}
@@ -51,7 +52,7 @@ export const ShowPage = () => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
-      <ShowList shows={shows ?? []} onRemove={() => refetch()} />
+      <ShowList shows={shows ?? []} />
       <Affix position={{ bottom: 30, right: 30 }}>
         <ActionIcon radius="xl" size={60} onClick={open}>
           <Plus size={30} />

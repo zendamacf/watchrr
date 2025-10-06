@@ -1,4 +1,5 @@
 import { AddMediaModal } from '@/components/AddMediaModal';
+import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { TMDBTvShow } from '@/lib/themoviedb/tvshows';
@@ -10,16 +11,17 @@ import {
   PopoverTarget,
   Text,
 } from '@mantine/core';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { List, Plus } from 'lucide-react';
 import { BaseShowCard } from './BaseShowCard';
 
-type Props = { onAdd: () => void } & ModalProps;
+type Props = ModalProps;
 
-export const AddShowModal = ({ onAdd, ...props }: Props) => {
+export const AddShowModal = (props: Props) => {
   const { showSuccess, showError } = useAlert();
   const { refresh } = useRefreshShow();
 
+  const queryClient = useQueryClient();
   const { mutate: add, isPending: pendingAdd } = useMutation<
     { tvshowId: number },
     Error,
@@ -39,9 +41,9 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
       return { tvshowId: json.tvshow_id };
     },
     onSuccess: (data, tvshow) => {
-      onAdd();
       refresh({ tvshowId: data.tvshowId, name: tvshow.name });
       showSuccess({ title: 'Nice!', message: `You're now following ${tvshow.name}` });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
     },
     onError(error) {
       showError({ title: 'An error occurred', message: error.message });
@@ -52,7 +54,7 @@ export const AddShowModal = ({ onAdd, ...props }: Props) => {
     <AddMediaModal<TMDBTvShow>
       title={'Add Show'}
       {...props}
-      queryKey={'searchShows'}
+      queryKey={QueryKey.searchShows}
       queryFn={async (search) => {
         const params = new URLSearchParams({ q: search.trim() });
         const response = await fetch(`/api/tvshow/search?${params.toString()}`, { method: 'get' });
