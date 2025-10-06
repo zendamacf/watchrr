@@ -7,7 +7,6 @@ import { ParsedEpisode } from './types';
 export type GroupedEpisodesProps = {
   episodes: ParsedEpisode[];
   showDates?: boolean;
-  onRemove: () => void;
 };
 
 export const GroupedEpisodes = ({ episodes, showDates, ...props }: GroupedEpisodesProps) => {

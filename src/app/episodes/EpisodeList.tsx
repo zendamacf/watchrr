@@ -1,6 +1,7 @@
 'use client';
 
-import { Episode, Show } from '@/types';
+import { QueryKey } from '@/components/QueryProvider';
+import { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
@@ -16,13 +17,8 @@ import { ParsedEpisode } from './types';
 export const EpisodeList = () => {
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data, refetch } = useQuery<
-    {
-      episodes: Episode;
-      tvshows: Show;
-    }[]
-  >({
-    queryKey: ['getEpisodes'],
+  const { isLoading, isError, data } = useQuery<EpisodesResponse>({
+    queryKey: [QueryKey.getEpisodes],
     queryFn: async () => {
       const response = await fetch('/api/episode', { method: 'get' });
       if (response.ok) return await response.json();
@@ -88,16 +84,14 @@ export const EpisodeList = () => {
       />
       <Space h={'md'} />
       <Stack gap={'xl'}>
-        {!!pastEpisodes.length && (
-          <PastEpisodes episodes={pastEpisodes} onRemove={() => refetch()} />
-        )}
+        {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} />}
 
         {Object.entries(futureDates).map(([date, episodes]) => (
           <Stack gap={'sm'} key={date}>
             <Title order={2}>
               {DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}
             </Title>
-            <GroupedEpisodes episodes={episodes} onRemove={() => refetch()} />
+            <GroupedEpisodes episodes={episodes} />
           </Stack>
         ))}
       </Stack>

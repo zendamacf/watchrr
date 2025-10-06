@@ -1,10 +1,12 @@
 'use client';
 
 import { BackdropCard } from '@/components/BackdropCard';
+import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { ActionIcon, CopyButton, Group, Stack, Text, Title } from '@mantine/core';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { Check, ClipboardCheck, Copy } from 'lucide-react';
 import classes from './EpisodeCard.module.css';
@@ -13,28 +15,41 @@ import { ParsedEpisode } from './types';
 type Props = {
   episode: ParsedEpisode;
   showDate?: boolean;
-  onRemove: (episode_id: number) => void;
 };
 
-export const EpisodeCard = ({ episode, showDate, onRemove }: Props) => {
+type MutationContext = { previousEpisodes: EpisodesResponse | undefined };
+
+export const EpisodeCard = ({ episode, showDate }: Props) => {
   const { showError, showSuccess, showInfo } = useAlert();
 
   const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
-  const { mutate, isPending } = useMutation<unknown, Error, number>({
+  const queryClient = useQueryClient();
+  const { mutate, isPending } = useMutation<unknown, Error, number, MutationContext>({
     mutationFn: async (episode_id) => {
       const response = await fetch(`/api/episode/${episode_id}/`, { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onSuccess: (_data, episode_id) => {
-      onRemove(episode_id);
+    onMutate: async (episode_id) => {
+      // Cancel ongoing refetch to not overwrite optimistic update
+      await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
+      const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
+      queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
+        old?.filter((o) => o.episodes.id !== episode_id),
+      );
+      return { previousEpisodes }; // Context for rollback
+    },
+    onSuccess: () => {
       showSuccess({
         title: 'Nice!',
         message: `You watched ${episode.tvshows.name} ${episodeNumber}`,
       });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
     },
-    onError(error) {
+    onError(error, _vars, context) {
       showError({ title: 'An error occurred', message: error.message });
+      // Revert optimistic update
+      queryClient.setQueryData([QueryKey.getEpisodes], context?.previousEpisodes);
     },
   });
 
