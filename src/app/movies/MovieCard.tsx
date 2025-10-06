@@ -1,48 +1,75 @@
 'use client';
 
+import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
-import { Movie } from '@/types';
+import { Movie, MoviesResponse } from '@/types';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { BaseMovieCard } from './BaseMovieCard';
 
 type Props = {
   movie: Movie;
-  onRemove: (movie_id: number) => void;
 };
 
-export const MovieCard = ({ movie, onRemove }: Props) => {
+type MutationContext = { previousMovies: MoviesResponse | undefined };
+
+export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
 
-  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, number>({
+  const onMutate = async (movie_id: number): Promise<MutationContext> => {
+    // Cancel ongoing refetch to not overwrite optimistic update
+    await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
+    const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
+    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) =>
+      old?.filter((o) => o.id !== movie_id),
+    );
+    return { previousMovies }; // Context for rollback
+  };
+
+  const onError = (error: Error, _vars: unknown, context: MutationContext | undefined) => {
+    showError({ title: 'An error occurred', message: error.message });
+    // Revert optimistic update
+    queryClient.setQueryData([QueryKey.getEpisodes], context?.previousMovies);
+  };
+
+  const queryClient = useQueryClient();
+  const { mutate: watched, isPending: pendingWatched } = useMutation<
+    unknown,
+    Error,
+    number,
+    MutationContext
+  >({
     mutationFn: async (movie_id) => {
       const response = await fetch(`/api/movie/${movie_id}/`, { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onSuccess: (_data, movie_id) => {
-      onRemove(movie_id);
+    onMutate,
+    onSuccess: () => {
       showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
     },
-    onError(error) {
-      showError({ title: 'An error occurred', message: error.message });
-    },
+    onError,
   });
 
-  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, number>({
+  const { mutate: remove, isPending: pendingRemove } = useMutation<
+    unknown,
+    Error,
+    number,
+    MutationContext
+  >({
     mutationFn: async (movie_id) => {
       const response = await fetch(`/api/movie/${movie_id}/`, { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onSuccess: (_data, movie_id) => {
-      onRemove(movie_id);
+    onMutate,
+    onSuccess: () => {
       showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
     },
-    onError(error) {
-      showError({ title: 'An error occurred', message: error.message });
-    },
+    onError,
   });
 
   const confirmUnsubscribe = (movie_id: number) =>

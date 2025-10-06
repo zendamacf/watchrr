@@ -1,6 +1,7 @@
 'use client';
 
-import { Movie } from '@/types';
+import { QueryKey } from '@/components/QueryProvider';
+import { MoviesResponse } from '@/types';
 import { ActionIcon, Affix, Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
@@ -13,8 +14,8 @@ export const MoviePage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data, refetch } = useQuery<Movie[]>({
-    queryKey: ['getMovies'],
+  const { isLoading, isError, data } = useQuery<MoviesResponse>({
+    queryKey: [QueryKey.getMovies],
     queryFn: async () => {
       const response = await fetch('/api/movie', { method: 'get' });
       if (response.ok) return await response.json();
@@ -43,7 +44,7 @@ export const MoviePage = () => {
 
   return (
     <>
-      <AddMovieModal opened={opened} onAdd={() => refetch()} onClose={close} size={'xl'} />
+      <AddMovieModal opened={opened} onClose={close} size={'xl'} />
       <TextInput
         placeholder={'Search'}
         defaultValue={search}
@@ -51,7 +52,7 @@ export const MoviePage = () => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
-      <MovieList movies={movies ?? []} onRemove={() => refetch()} />
+      <MovieList movies={movies ?? []} />
       <Affix position={{ bottom: 30, right: 30 }}>
         <ActionIcon radius="xl" size={60} onClick={open}>
           <Plus size={30} />

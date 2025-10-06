@@ -1,4 +1,5 @@
 import { AddMediaModal } from '@/components/AddMediaModal';
+import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { TMDBMovie } from '@/lib/themoviedb/movies';
 import {
@@ -9,16 +10,17 @@ import {
   PopoverTarget,
   Text,
 } from '@mantine/core';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { List, Plus } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { BaseMovieCard } from './BaseMovieCard';
 
-type Props = { onAdd: () => void } & ModalProps;
+type Props = ModalProps;
 
-export const AddMovieModal = ({ onAdd, ...props }: Props) => {
+export const AddMovieModal = (props: Props) => {
   const { showSuccess, showError } = useAlert();
 
+  const queryClient = useQueryClient();
   const { mutate: add, isPending: pendingAdd } = useMutation<
     unknown,
     Error,
@@ -36,8 +38,8 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onSuccess: (_data, movie) => {
-      onAdd();
       showSuccess({ title: 'Nice!', message: `You're now following ${movie.name}` });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
     },
     onError(error) {
       showError({ title: 'An error occurred', message: error.message });
@@ -48,7 +50,7 @@ export const AddMovieModal = ({ onAdd, ...props }: Props) => {
     <AddMediaModal<TMDBMovie>
       title={'Add Movie'}
       {...props}
-      queryKey={'searchMovies'}
+      queryKey={QueryKey.searchMovies}
       queryFn={async (search) => {
         const params = new URLSearchParams({ q: search.trim() });
         const response = await fetch(`/api/movie/search?${params.toString()}`, { method: 'get' });
