@@ -1,11 +1,12 @@
 'use client';
 
+import { FloatingButton } from '@/components/FloatingButton';
 import { QueryKey } from '@/components/QueryProvider';
 import { ShowsResponse } from '@/types';
-import { ActionIcon, Affix, Alert, Center, Loader, Space, TextInput } from '@mantine/core';
+import { Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { AddShowModal } from './AddShowModal';
 import { ShowList } from './ShowList';
@@ -53,11 +54,7 @@ export const ShowPage = () => {
       />
       <Space h={'md'} />
       <ShowList shows={shows ?? []} />
-      <Affix position={{ bottom: 30, right: 30 }}>
-        <ActionIcon radius="xl" size={60} onClick={open}>
-          <Plus size={30} />
-        </ActionIcon>
-      </Affix>
+      <FloatingButton onClick={open} />
     </>
   );
 };
