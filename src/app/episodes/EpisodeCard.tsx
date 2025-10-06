@@ -37,15 +37,13 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
       queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
         old?.filter((o) => o.episodes.id !== episode_id),
       );
-      return { previousEpisodes }; // Context for rollback
-    },
-    onSuccess: () => {
       showSuccess({
         title: 'Nice!',
         message: `You watched ${episode.tvshows.name} ${episodeNumber}`,
       });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
+      return { previousEpisodes }; // Context for rollback
     },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] }),
     onError(error, _vars, context) {
       showError({ title: 'An error occurred', message: error.message });
       // Revert optimistic update

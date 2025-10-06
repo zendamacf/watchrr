@@ -39,12 +39,10 @@ export const ShowCard = ({ show }: Props) => {
       queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) =>
         old?.filter((o) => o.id !== tvshow_id),
       );
+      showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
       return { previousShows }; // Context for rollback
     },
-    onSuccess: () => {
-      showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] }),
     onError: (error, _vars, context) => {
       showError({ title: 'An error occurred', message: error.message });
       // Revert optimistic update

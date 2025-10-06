@@ -19,13 +19,14 @@ type MutationContext = { previousMovies: MoviesResponse | undefined };
 export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
 
-  const onMutate = async (movie_id: number): Promise<MutationContext> => {
+  const onMutate = async (movie_id: number, callback?: () => void): Promise<MutationContext> => {
     // Cancel ongoing refetch to not overwrite optimistic update
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
     const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
     queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) =>
       old?.filter((o) => o.id !== movie_id),
     );
+    if (callback) callback();
     return { previousMovies }; // Context for rollback
   };
 
@@ -46,11 +47,11 @@ export const MovieCard = ({ movie }: Props) => {
       const response = await fetch(`/api/movie/${movie_id}/`, { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate,
-    onSuccess: () => {
-      showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
-    },
+    onMutate: (movie_id) =>
+      onMutate(movie_id, () =>
+        showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` }),
+      ),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
@@ -64,11 +65,11 @@ export const MovieCard = ({ movie }: Props) => {
       const response = await fetch(`/api/movie/${movie_id}/`, { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate,
-    onSuccess: () => {
-      showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
-    },
+    onMutate: (movie_id) =>
+      onMutate(movie_id, () =>
+        showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` }),
+      ),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
