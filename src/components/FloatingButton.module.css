@@ -1,3 +1,3 @@
 .root {
-  --ai-bd: 2px solid var(--mantine-primary-color-2);
+  --ai-bd: 2px solid light-dark(var(--mantine-color-gray-2), var(--mantine-primary-color-2));
 }
