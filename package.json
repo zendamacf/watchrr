@@ -7,7 +7,7 @@
     "start": "next start",
     "start:dev": "next dev --turbopack",
     "format": "prettier --write .",
-    "lint": "prettier --check . && next lint",
+    "lint": "prettier --check . && eslint . && next lint",
     "typecheck": "tsc --noEmit",
     "db:push": "drizzle-kit push",
     "db:migrate": "drizzle-kit migrate",
