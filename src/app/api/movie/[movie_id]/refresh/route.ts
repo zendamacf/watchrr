@@ -8,10 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function PUT(
   _request: NextRequest,
-  { params }: { params: Promise<{ movie_id: number }> },
+  { params }: { params: Promise<{ movie_id: string }> },
 ) {
-  const { movie_id } = await params;
-  if (!movie_id) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
+  const movie_id = parseInt((await params).movie_id);
+  if (isNaN(movie_id)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });

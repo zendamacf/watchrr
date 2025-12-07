@@ -9,10 +9,10 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ tvshow_id: number }> },
+  { params }: { params: Promise<{ tvshow_id: string }> },
 ) {
-  const { tvshow_id } = await params;
-  if (!tvshow_id) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
+  const tvshow_id = parseInt((await params).tvshow_id);
+  if (isNaN(tvshow_id)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
