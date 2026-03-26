@@ -6,6 +6,7 @@ import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/c
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import './globals.css';
@@ -49,6 +50,7 @@ export default function RootLayout({
           </QueryProvider>
         </MantineProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
