@@ -26,11 +26,29 @@ export async function seedUser(options: { email: string; password: string }): Pr
   }
 
   const passwordHash = await hashPassword(options.password);
-  const [user] = await db.insert(users).values({ email, passwordHash }).returning({ id: users.id, email: users.email });
 
-  if (!user) {
-    throw new Error(`Failed to seed user ${email}`);
+  try {
+    const [user] = await db
+      .insert(users)
+      .values({ email, passwordHash })
+      .returning({ id: users.id, email: users.email });
+    if (!user) {
+      throw new Error(`Failed to seed user ${email}`);
+    }
+    return { id: user.id, email: user.email, password: options.password };
+  } catch (error) {
+    const isDuplicate =
+      typeof error === 'object' && error !== null && 'code' in error && (error as { code: string }).code === '23505';
+    if (!isDuplicate) throw error;
+
+    const [user] = await db
+      .select({ id: users.id, email: users.email })
+      .from(users)
+      .where(eq(lower(users.email), email))
+      .limit(1);
+    if (!user) {
+      throw new Error(`Failed to seed user ${email}`);
+    }
+    return { id: user.id, email: user.email, password: options.password };
   }
-
-  return { id: user.id, email: user.email, password: options.password };
 }

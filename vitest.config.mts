@@ -27,10 +27,10 @@ export default defineConfig({
         'src/lib/themoviedb/client.ts',
       ],
       thresholds: {
-        lines: 32,
-        statements: 30,
-        branches: 31,
-        functions: 23,
+        lines: 48,
+        statements: 48,
+        branches: 50,
+        functions: 31,
       },
     },
     projects: [
@@ -42,6 +42,7 @@ export default defineConfig({
           envFile: '.env',
           setupFiles: ['./vitest.setup.ts'],
           include: ['src/**/*.test.ts'],
+          fileParallelism: false,
         },
       },
       {
