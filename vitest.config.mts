@@ -16,7 +16,21 @@ export default defineConfig({
       reporter: ['text', 'html', 'lcov'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
-      exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', '**/*.d.ts'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/test/**',
+        '**/*.d.ts',
+        'src/instrumentation*.ts',
+        'src/app/global-error.tsx',
+        'src/app/error.tsx',
+        'src/lib/db/schema.ts',
+      ],
+      thresholds: {
+        lines: 20,
+        statements: 18,
+        branches: 23,
+        functions: 10,
+      },
     },
     projects: [
       {
@@ -24,6 +38,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
+          envFile: '.env',
           setupFiles: ['./vitest.setup.ts'],
           include: ['src/**/*.test.ts'],
         },
@@ -33,6 +48,7 @@ export default defineConfig({
         test: {
           name: 'ui',
           environment: 'happy-dom',
+          envFile: '.env',
           setupFiles: ['./vitest.setup.ts', './vitest.setup.dom.ts'],
           include: ['src/**/*.test.tsx'],
           sequence: { concurrent: false },
