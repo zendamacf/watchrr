@@ -5,13 +5,13 @@ export const routes = {
   movies: '/movies',
   signin: '/signin',
   signup: '/signup',
-  signout: '/auth/signout',
 } as const;
 
 export const apiRoutes = {
   auth: {
     login: '/api/auth/login',
     signup: '/api/auth/signup',
+    logout: '/api/auth/logout',
   },
   episode: '/api/episode',
   episodeById: (episodeId: number | string) => `/api/episode/${episodeId}/`,

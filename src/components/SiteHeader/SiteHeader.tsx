@@ -4,6 +4,7 @@ import { Box, Burger, Divider, Drawer, Group, ScrollArea, Stack } from '@mantine
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation';
+import { SignOutButton } from '@/components/auth/SignOutButton';
 import { routes } from '@/lib/routes';
 import { Logo } from '../Logo';
 import classes from './SiteHeader.module.css';
@@ -52,9 +53,7 @@ function MainNav({ drawerOpened, toggleDrawer }: { drawerOpened: boolean; toggle
 
         <Group h="100%" visibleFrom="sm">
           <ThemeToggle />
-          <a href={routes.signout} className={classes.link}>
-            Sign out
-          </a>
+          <SignOutButton className={classes.link} />
         </Group>
 
         <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
@@ -97,9 +96,7 @@ function MobileNav({ drawerOpened, closeDrawer }: { drawerOpened: boolean; close
 
         <Stack justify="center" px="md">
           <ThemeToggle />
-          <a href={routes.signout} className={classes.link} style={{ paddingLeft: 0 }}>
-            Sign out
-          </a>
+          <SignOutButton className={classes.link} style={{ paddingLeft: 0 }} onSignedOut={closeDrawer} />
         </Stack>
       </ScrollArea>
     </Drawer>
