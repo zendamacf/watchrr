@@ -2,14 +2,9 @@
 
 import { Button } from '@mantine/core';
 import Link from 'next/link';
+import { routes } from '@/lib/routes';
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <main>
       <div>
@@ -23,7 +18,7 @@ export default function Error({
           <Button variant="outline" onClick={() => reset()}>
             Try again
           </Button>
-          <Link href="/">Back to homepage</Link>
+          <Link href={routes.home}>Back to homepage</Link>
         </div>
       </div>
     </main>
@@ -33,6 +28,7 @@ export default function Error({
 function AlertCircleIcon() {
   return (
     <svg
+      aria-hidden
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="24"

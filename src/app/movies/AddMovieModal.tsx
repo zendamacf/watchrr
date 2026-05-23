@@ -1,19 +1,12 @@
+import { ActionIcon, type ModalProps, Popover, PopoverDropdown, PopoverTarget, Text } from '@mantine/core';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { List, Plus } from 'lucide-react';
+import { DateTime } from 'luxon';
 import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiRoutes } from '@/lib/routes';
-import { TMDBMovie } from '@/lib/themoviedb/movies';
-import {
-  ActionIcon,
-  ModalProps,
-  Popover,
-  PopoverDropdown,
-  PopoverTarget,
-  Text,
-} from '@mantine/core';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { List, Plus } from 'lucide-react';
-import { DateTime } from 'luxon';
+import type { TMDBMovie } from '@/lib/themoviedb/movies';
 import { BaseMovieCard } from './BaseMovieCard';
 
 type Props = ModalProps;
@@ -22,11 +15,7 @@ export const AddMovieModal = (props: Props) => {
   const { showSuccess, showError } = useAlert();
 
   const queryClient = useQueryClient();
-  const { mutate: add, isPending: pendingAdd } = useMutation<
-    unknown,
-    Error,
-    { moviedb_id: number; name: string }
-  >({
+  const { mutate: add, isPending: pendingAdd } = useMutation<unknown, Error, { moviedb_id: number; name: string }>({
     mutationFn: async (movie) => {
       const response = await fetch(apiRoutes.movie, {
         method: 'POST',
@@ -82,10 +71,7 @@ export const AddMovieModal = (props: Props) => {
                   <Text>{movie.description}</Text>
                 </PopoverDropdown>
               </Popover>
-              <ActionIcon
-                loading={pendingAdd}
-                onClick={() => add({ moviedb_id: movie.id, name: movie.name })}
-              >
+              <ActionIcon loading={pendingAdd} onClick={() => add({ moviedb_id: movie.id, name: movie.name })}>
                 <Plus size={'20'} />
               </ActionIcon>
             </>

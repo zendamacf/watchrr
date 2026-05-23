@@ -1,10 +1,10 @@
-import { db } from '@/lib/db';
-import { lower, users } from '@/lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { NextResponse } from 'next/server';
 import { buildAuthCookie } from '@/lib/auth/cookies';
 import { signAccessToken } from '@/lib/auth/jwt';
 import { verifyPassword } from '@/lib/auth/password';
-import { eq } from 'drizzle-orm';
-import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { lower, users } from '@/lib/db/schema';
 
 export async function POST(request: Request) {
   let body: unknown;

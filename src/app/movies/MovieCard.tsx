@@ -1,14 +1,14 @@
 'use client';
 
-import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
-import { useAlert } from '@/hooks/useAlert';
-import { Movie, MoviesResponse } from '@/types';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { QueryKey } from '@/components/QueryProvider';
+import { useAlert } from '@/hooks/useAlert';
+import { apiRoutes } from '@/lib/routes';
+import type { Movie, MoviesResponse } from '@/types';
 import { BaseMovieCard } from './BaseMovieCard';
 
 type Props = {
@@ -24,9 +24,7 @@ export const MovieCard = ({ movie }: Props) => {
     // Cancel ongoing refetch to not overwrite optimistic update
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
     const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
-    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) =>
-      old?.filter((o) => o.id !== movie_id),
-    );
+    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movie_id));
     if (callback) callback();
     return { previousMovies }; // Context for rollback
   };
@@ -38,30 +36,18 @@ export const MovieCard = ({ movie }: Props) => {
   };
 
   const queryClient = useQueryClient();
-  const { mutate: watched, isPending: pendingWatched } = useMutation<
-    unknown,
-    Error,
-    number,
-    MutationContext
-  >({
+  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, number, MutationContext>({
     mutationFn: async (movie_id) => {
       const response = await fetch(apiRoutes.movieById(movie_id), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: (movie_id) =>
-      onMutate(movie_id, () =>
-        showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` }),
-      ),
+      onMutate(movie_id, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const { mutate: remove, isPending: pendingRemove } = useMutation<
-    unknown,
-    Error,
-    number,
-    MutationContext
-  >({
+  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, number, MutationContext>({
     mutationFn: async (movie_id) => {
       const response = await fetch(apiRoutes.movieById(movie_id), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
@@ -98,11 +84,7 @@ export const MovieCard = ({ movie }: Props) => {
           <ActionIcon loading={pendingWatched} onClick={() => watched(movie.id)}>
             <Check size={'20'} />
           </ActionIcon>
-          <ActionIcon
-            color={'red'}
-            loading={pendingRemove}
-            onClick={() => confirmUnsubscribe(movie.id)}
-          >
+          <ActionIcon color={'red'} loading={pendingRemove} onClick={() => confirmUnsubscribe(movie.id)}>
             <X size={'20'} />
           </ActionIcon>
         </>

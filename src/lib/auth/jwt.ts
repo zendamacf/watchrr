@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { JWT_EXPIRY } from './constants';
 
 export function getJwtSecret(): Uint8Array {

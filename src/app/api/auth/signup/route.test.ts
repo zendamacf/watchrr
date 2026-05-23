@@ -1,13 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
 import { apiRoutes } from '@/lib/routes';
-import {
-  mockHashPassword,
-  mockLimit,
-  mockReturning,
-  resetAuthMocks,
-} from '@/test/mocks';
 import { testUser } from '@/test/fixtures/user';
+import { mockHashPassword, mockLimit, mockReturning, resetAuthMocks } from '@/test/mocks';
 import { POST } from './route';
 
 function signupRequest(body: unknown) {

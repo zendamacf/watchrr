@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
 import { apiRoutes } from '@/lib/routes';
-import { mockLimit, mockVerifyPassword, resetAuthMocks } from '@/test/mocks';
 import { testUser } from '@/test/fixtures/user';
+import { mockLimit, mockVerifyPassword, resetAuthMocks } from '@/test/mocks';
 import { POST } from './route';
 
 function loginRequest(body: unknown) {

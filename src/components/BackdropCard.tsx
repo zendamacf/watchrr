@@ -1,5 +1,5 @@
+import { Card, type CardProps } from '@mantine/core';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import { Card, CardProps } from '@mantine/core';
 import classes from './BackdropCard.module.css';
 
 type Props = {

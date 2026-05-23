@@ -34,7 +34,7 @@
 	}
 */
 
-import { AuthError, SupabaseClient, UserAppMetadata, UserMetadata } from '@supabase/supabase-js';
+import { AuthError, type SupabaseClient, type UserAppMetadata, type UserMetadata } from '@supabase/supabase-js';
 import { jwtVerify } from 'jose';
 
 export type SupabaseSafeUser = {
@@ -47,9 +47,7 @@ export type SupabaseSafeUser = {
   user_metadata: UserMetadata;
 };
 
-export type SupabaseSafeUserResponse =
-  | { data: SupabaseSafeUser; error: null }
-  | { data: null; error: AuthError };
+export type SupabaseSafeUserResponse = { data: SupabaseSafeUser; error: null } | { data: null; error: AuthError };
 
 export class SupabaseSafeSession {
   private supabase: SupabaseClient;

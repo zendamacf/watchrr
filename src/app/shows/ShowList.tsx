@@ -1,7 +1,7 @@
 'use client';
 
-import { Show } from '@/types';
 import { SimpleGrid } from '@mantine/core';
+import type { Show } from '@/types';
 import { ShowCard } from './ShowCard';
 
 type Props = { shows: Show[] };

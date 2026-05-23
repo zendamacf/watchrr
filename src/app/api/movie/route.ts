@@ -1,10 +1,10 @@
+import { and, eq, exists } from 'drizzle-orm';
+import { DateTime } from 'luxon';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { movies, subscribed_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
-import { and, eq, exists } from 'drizzle-orm';
-import { DateTime } from 'luxon';
-import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Get all movies currently subscribed to.

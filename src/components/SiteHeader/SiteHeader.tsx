@@ -1,10 +1,10 @@
 'use client';
 
-import { routes } from '@/lib/routes';
 import { Box, Burger, Divider, Drawer, Group, ScrollArea, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation';
+import { routes } from '@/lib/routes';
 import { Logo } from '../Logo';
 import classes from './SiteHeader.module.css';
 import { ThemeToggle } from './ThemeToggle';
@@ -26,13 +26,7 @@ const links = [
   { label: 'Movies', href: routes.movies },
 ];
 
-function MainNav({
-  drawerOpened,
-  toggleDrawer,
-}: {
-  drawerOpened: boolean;
-  toggleDrawer: () => void;
-}) {
+function MainNav({ drawerOpened, toggleDrawer }: { drawerOpened: boolean; toggleDrawer: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -69,13 +63,7 @@ function MainNav({
   );
 }
 
-function MobileNav({
-  drawerOpened,
-  closeDrawer,
-}: {
-  drawerOpened: boolean;
-  closeDrawer: () => void;
-}) {
+function MobileNav({ drawerOpened, closeDrawer }: { drawerOpened: boolean; closeDrawer: () => void }) {
   const pathname = usePathname();
   return (
     <Drawer

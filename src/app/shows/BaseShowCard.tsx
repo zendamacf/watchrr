@@ -1,11 +1,8 @@
 'use client';
 
-import { BackdropCard } from '@/components/BackdropCard';
-import { getImageUrl } from '@/lib/themoviedb/images';
-import { Show } from '@/types';
 import {
   Badge,
-  CardProps,
+  type CardProps,
   Group,
   Image,
   Popover,
@@ -15,7 +12,10 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { BackdropCard } from '@/components/BackdropCard';
+import { getImageUrl } from '@/lib/themoviedb/images';
+import type { Show } from '@/types';
 
 type Props = {
   show: Show;

@@ -15,13 +15,7 @@ export function buildAuthCookie(token: string): string {
 }
 
 export function buildClearAuthCookie(): string {
-  const parts = [
-    `${AUTH_COOKIE_NAME}=`,
-    'Path=/',
-    'HttpOnly',
-    'SameSite=Lax',
-    'Max-Age=0',
-  ];
+  const parts = [`${AUTH_COOKIE_NAME}=`, 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
   if (process.env.NODE_ENV === 'production') {
     parts.push('Secure');
   }

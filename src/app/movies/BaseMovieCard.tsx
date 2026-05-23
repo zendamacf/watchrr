@@ -1,11 +1,7 @@
 'use client';
 
-import { BackdropCard } from '@/components/BackdropCard';
-import { getImageUrl } from '@/lib/themoviedb/images';
-import { Movie } from '@/types';
-import { DateFormat } from '@/utils/dates';
 import {
-  CardProps,
+  type CardProps,
   Group,
   Image,
   Popover,
@@ -17,7 +13,11 @@ import {
   Title,
 } from '@mantine/core';
 import { DateTime } from 'luxon';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { BackdropCard } from '@/components/BackdropCard';
+import { getImageUrl } from '@/lib/themoviedb/images';
+import type { Movie } from '@/types';
+import { DateFormat } from '@/utils/dates';
 
 type Props = {
   movie: Omit<Movie, 'releasedate'> & { releaseDate: DateTime | null };
@@ -27,8 +27,7 @@ type Props = {
 } & CardProps;
 
 export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...props }: Props) => {
-  const inPast =
-    !!movie.releaseDate && movie.releaseDate.startOf('day') < DateTime.now().startOf('day');
+  const inPast = !!movie.releaseDate && movie.releaseDate.startOf('day') < DateTime.now().startOf('day');
 
   return (
     <BackdropCard {...props} style={{ width: '100%' }} backdrop={movie.backdrop_slug}>

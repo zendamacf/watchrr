@@ -31,5 +31,5 @@
   font-weight: 700;
   background-color: alpha(var(--primary), 0.1);
   /* Override dark theme */
-  color: var(--primary) !important;
+  color: var(--primary);
 }

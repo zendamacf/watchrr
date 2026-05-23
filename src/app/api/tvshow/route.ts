@@ -1,9 +1,9 @@
+import { and, eq, exists } from 'drizzle-orm';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { guardUser } from '@/utils/auth';
-import { and, eq, exists } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Get all TV Shows currently subscribed to.
@@ -20,12 +20,7 @@ export async function GET() {
         db
           .select()
           .from(subscribed_tvshows)
-          .where(
-            and(
-              eq(subscribed_tvshows.tvshow_id, tvshows.id),
-              eq(subscribed_tvshows.watcher_id, user.id),
-            ),
-          ),
+          .where(and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id))),
       ),
     )
     .orderBy(tvshows.name);
@@ -70,10 +65,7 @@ export async function POST(request: NextRequest) {
     tvshow_id = inserted.tvshow_id;
   }
 
-  await db
-    .insert(subscribed_tvshows)
-    .values({ watcher_id: user.id, tvshow_id })
-    .onConflictDoNothing();
+  await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_id }).onConflictDoNothing();
 
   return NextResponse.json({ message: 'Success', tvshow_id }, { status: 201 });
 }

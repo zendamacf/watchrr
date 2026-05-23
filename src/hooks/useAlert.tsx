@@ -1,7 +1,7 @@
 import { Text, Title } from '@mantine/core';
-import { NotificationData, notifications } from '@mantine/notifications';
+import { type NotificationData, notifications } from '@mantine/notifications';
 import { Check, Info, X } from 'lucide-react';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import classes from './useAlert.module.css';
 
 const successProps = {
@@ -60,11 +60,8 @@ export const useAlert = () => {
     showError: (props: MessageProps) => showMessage({ ...errorProps, ...props }),
     showLoading: (props: MessageProps) => showMessage({ ...loadingProps, ...props }),
 
-    doneLoadingSuccess: (props: UpdateMessageProps) =>
-      notifications.update({ ...successProps, ...props }),
-    doneLoadingInfo: (props: UpdateMessageProps) =>
-      notifications.update({ ...infoProps, ...props }),
-    doneLoadingError: (props: UpdateMessageProps) =>
-      notifications.update({ ...errorProps, ...props }),
+    doneLoadingSuccess: (props: UpdateMessageProps) => notifications.update({ ...successProps, ...props }),
+    doneLoadingInfo: (props: UpdateMessageProps) => notifications.update({ ...infoProps, ...props }),
+    doneLoadingError: (props: UpdateMessageProps) => notifications.update({ ...errorProps, ...props }),
   };
 };

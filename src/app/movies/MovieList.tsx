@@ -1,7 +1,7 @@
 'use client';
 
-import { Movie } from '@/types';
 import { SimpleGrid } from '@mantine/core';
+import type { Movie } from '@/types';
 import { MovieCard } from './MovieCard';
 
 type Props = { movies: Movie[] };

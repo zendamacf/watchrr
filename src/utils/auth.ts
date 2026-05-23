@@ -1,6 +1,6 @@
+import { headers } from 'next/headers';
 import { authenticateHeaders } from '@/lib/auth/session';
 import type { AuthUser } from '@/lib/auth/types';
-import { headers } from 'next/headers';
 
 export type { AuthUser } from '@/lib/auth/types';
 

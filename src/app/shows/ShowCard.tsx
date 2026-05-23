@@ -1,14 +1,14 @@
 'use client';
 
-import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
-import { useAlert } from '@/hooks/useAlert';
-import { useRefreshShow } from '@/hooks/useRefresh';
-import { Show, ShowsResponse } from '@/types';
 import { ActionIcon, Text } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCcw, X } from 'lucide-react';
+import { QueryKey } from '@/components/QueryProvider';
+import { useAlert } from '@/hooks/useAlert';
+import { useRefreshShow } from '@/hooks/useRefresh';
+import { apiRoutes } from '@/lib/routes';
+import type { Show, ShowsResponse } from '@/types';
 import { BaseShowCard } from './BaseShowCard';
 
 type Props = {
@@ -23,12 +23,7 @@ export const ShowCard = ({ show }: Props) => {
   const { refresh, refreshPending } = useRefreshShow();
 
   const queryClient = useQueryClient();
-  const { mutate: remove, isPending: removePending } = useMutation<
-    unknown,
-    Error,
-    number,
-    MutationContext
-  >({
+  const { mutate: remove, isPending: removePending } = useMutation<unknown, Error, number, MutationContext>({
     mutationFn: async (tvshow_id) => {
       const response = await fetch(apiRoutes.tvshowById(tvshow_id), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
@@ -37,9 +32,7 @@ export const ShowCard = ({ show }: Props) => {
       // Cancel ongoing refetch to not overwrite optimistic update
       await queryClient.cancelQueries({ queryKey: [QueryKey.getShows] });
       const previousShows = queryClient.getQueryData<ShowsResponse>([QueryKey.getShows]);
-      queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) =>
-        old?.filter((o) => o.id !== tvshow_id),
-      );
+      queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) => old?.filter((o) => o.id !== tvshow_id));
       showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
       return { previousShows }; // Context for rollback
     },
@@ -74,11 +67,7 @@ export const ShowCard = ({ show }: Props) => {
           >
             <RefreshCcw size={'20'} />
           </ActionIcon>
-          <ActionIcon
-            color={'red'}
-            loading={removePending}
-            onClick={() => confirmUnsubscribe(show.id)}
-          >
+          <ActionIcon color={'red'} loading={removePending} onClick={() => confirmUnsubscribe(show.id)}>
             <X size={'20'} />
           </ActionIcon>
         </>

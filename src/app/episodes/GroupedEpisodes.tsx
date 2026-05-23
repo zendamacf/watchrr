@@ -2,7 +2,7 @@
 
 import { SimpleGrid } from '@mantine/core';
 import { EpisodeCard } from './EpisodeCard';
-import { ParsedEpisode } from './types';
+import type { ParsedEpisode } from './types';
 
 export type GroupedEpisodesProps = {
   episodes: ParsedEpisode[];

@@ -4,14 +4,14 @@
  * @throws {ResourceNotFound} if the Movie cannot be found.
  */
 
-import { Movie } from '@/types';
 import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
+import type { Movie } from '@/types';
 import { db } from '../db';
 import { movies } from '../db/schema';
-import { getMovie, TMDBMovie } from '../themoviedb/movies';
+import { getMovie, type TMDBMovie } from '../themoviedb/movies';
 import { ResourceNotFound } from './errors';
-import { dateCompare, DiffLookup, getDiff } from './utils';
+import { type DiffLookup, dateCompare, getDiff } from './utils';
 
 export const refreshMovie = async (movie_id: number) => {
   const [dbMovie] = await db.select().from(movies).where(eq(movies.id, movie_id));
@@ -30,9 +30,7 @@ export const refreshMovie = async (movie_id: number) => {
 
   const diffs = getDiff(dbMovie, apiMovie, movieLookup);
   if (diffs.length) {
-    console.info(
-      `[MOVIE][${dbMovie.name}] Updating metadata, changes in ${diffs.map((d) => d.dbKey)}`,
-    );
+    console.info(`[MOVIE][${dbMovie.name}] Updating metadata, changes in ${diffs.map((d) => d.dbKey)}`);
     await db
       .update(movies)
       .set({

@@ -1,17 +1,17 @@
 'use client';
 
-import { BackdropCard } from '@/components/BackdropCard';
-import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
-import { useAlert } from '@/hooks/useAlert';
-import { EpisodesResponse } from '@/types';
-import { DateFormat } from '@/utils/dates';
 import { ActionIcon, CopyButton, Group, Stack, Text, Title } from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
 import { Check, ClipboardCheck, Copy } from 'lucide-react';
+import { BackdropCard } from '@/components/BackdropCard';
+import { QueryKey } from '@/components/QueryProvider';
+import { useAlert } from '@/hooks/useAlert';
+import { apiRoutes } from '@/lib/routes';
+import type { EpisodesResponse } from '@/types';
+import { DateFormat } from '@/utils/dates';
 import classes from './EpisodeCard.module.css';
-import { ParsedEpisode } from './types';
+import type { ParsedEpisode } from './types';
 
 type Props = {
   episode: ParsedEpisode;
@@ -53,11 +53,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   });
 
   return (
-    <BackdropCard
-      key={episode.episodes.id}
-      style={{ width: '100%' }}
-      backdrop={episode.tvshows.backdrop_slug}
-    >
+    <BackdropCard key={episode.episodes.id} style={{ width: '100%' }} backdrop={episode.tvshows.backdrop_slug}>
       <Title order={3} lineClamp={1}>
         {episode.tvshows.name}
       </Title>

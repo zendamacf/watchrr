@@ -24,9 +24,7 @@ export function resolveAuthToken(headers: Headers): string | null {
   return getTokenFromCookie(headers.get('cookie'), AUTH_COOKIE_NAME);
 }
 
-export async function authenticateHeaders(
-  headers: Headers,
-): Promise<{ userId: string } | null> {
+export async function authenticateHeaders(headers: Headers): Promise<{ userId: string } | null> {
   const token = resolveAuthToken(headers);
   if (!token) return null;
   try {

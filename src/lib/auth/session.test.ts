@@ -1,5 +1,5 @@
-import { apiRoutes } from '@/lib/routes';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { apiRoutes } from '@/lib/routes';
 import { AUTH_COOKIE_NAME } from './constants';
 import { signAccessToken } from './jwt';
 import {

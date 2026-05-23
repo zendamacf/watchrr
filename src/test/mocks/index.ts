@@ -3,7 +3,7 @@ import { mockLimit, mockReturning, resetDbMocks } from './db';
 import './password';
 import { mockHashPassword, mockVerifyPassword, resetPasswordMocks } from './password';
 
-export { mockLimit, mockReturning, resetDbMocks, mockHashPassword, mockVerifyPassword, resetPasswordMocks };
+export { mockHashPassword, mockLimit, mockReturning, mockVerifyPassword, resetDbMocks, resetPasswordMocks };
 
 export function resetAuthMocks() {
   resetDbMocks();

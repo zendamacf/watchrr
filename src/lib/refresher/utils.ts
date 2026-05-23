@@ -19,8 +19,6 @@ export const getDiff = <TDb, TApi>(
   lookup: DiffLookup<TDb, TApi>[],
 ): DiffLookup<TDb, TApi>[] => {
   return lookup.filter(({ dbKey, apiKey, compare }) =>
-    compare
-      ? !compare(dbMedia[dbKey], apiMedia[apiKey])
-      : !defaultCompare(dbMedia[dbKey], apiMedia[apiKey]),
+    compare ? !compare(dbMedia[dbKey], apiMedia[apiKey]) : !defaultCompare(dbMedia[dbKey], apiMedia[apiKey]),
   );
 };

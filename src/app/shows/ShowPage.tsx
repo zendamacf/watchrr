@@ -1,14 +1,14 @@
 'use client';
 
-import { FloatingButton } from '@/components/FloatingButton';
-import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
-import { ShowsResponse } from '@/types';
 import { Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
+import { FloatingButton } from '@/components/FloatingButton';
+import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
+import type { ShowsResponse } from '@/types';
 import { AddShowModal } from './AddShowModal';
 import { ShowList } from './ShowList';
 
@@ -29,9 +29,7 @@ export const ShowPage = () => {
     const trimmedSearch = search.trim().toLowerCase();
     return trimmedSearch
       ? data?.filter(
-          (d) =>
-            d.name.toLowerCase().includes(trimmedSearch) ||
-            d.description?.toLowerCase().includes(trimmedSearch),
+          (d) => d.name.toLowerCase().includes(trimmedSearch) || d.description?.toLowerCase().includes(trimmedSearch),
         )
       : data;
   }, [search, data]);

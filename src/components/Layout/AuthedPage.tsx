@@ -1,15 +1,11 @@
-import { routes } from '@/lib/routes';
-import { AuthUser, guardUser } from '@/utils/auth';
 import { Container, Space } from '@mantine/core';
 import { redirect } from 'next/navigation';
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
+import { routes } from '@/lib/routes';
+import { type AuthUser, guardUser } from '@/utils/auth';
 import { SiteHeader } from '../SiteHeader';
 
-export async function AuthedPage({
-  children: Child,
-}: {
-  children: ComponentType<{ user: AuthUser }>;
-}) {
+export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: AuthUser }> }) {
   const user = await guardUser();
   if (!user) redirect(routes.signin);
 

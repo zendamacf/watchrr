@@ -6,8 +6,9 @@
     "build": "next build",
     "start": "next start",
     "start:dev": "next dev --turbopack",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && eslint .",
+    "format": "biome format --write .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -42,8 +43,7 @@
     "tmdb-ts": "^2.0.1"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tanstack/eslint-plugin-query": "^5.81.2",
+    "@biomejs/biome": "^2.4.15",
     "@types/bcrypt": "^6.0.0",
     "@types/lodash.chunk": "^4.2.9",
     "@types/luxon": "^3.6.2",
@@ -51,14 +51,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.1",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.4",
-    "eslint-config-prettier": "^10.0.1",
     "postcss": "^8.5.10",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
-    "prettier": "^3.6.0",
-    "prettier-plugin-tailwindcss": "^0.6.13",
     "typescript": "^5",
     "vitest": "^4.1.7"
   }

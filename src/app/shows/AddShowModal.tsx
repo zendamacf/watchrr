@@ -1,19 +1,12 @@
+import { ActionIcon, type ModalProps, Popover, PopoverDropdown, PopoverTarget, Text } from '@mantine/core';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { List, Plus } from 'lucide-react';
 import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { apiRoutes } from '@/lib/routes';
-import { TMDBTvShow } from '@/lib/themoviedb/tvshows';
-import {
-  ActionIcon,
-  ModalProps,
-  Popover,
-  PopoverDropdown,
-  PopoverTarget,
-  Text,
-} from '@mantine/core';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { List, Plus } from 'lucide-react';
+import type { TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import { BaseShowCard } from './BaseShowCard';
 
 type Props = ModalProps;
@@ -84,10 +77,7 @@ export const AddShowModal = (props: Props) => {
                   <Text>{show.description}</Text>
                 </PopoverDropdown>
               </Popover>
-              <ActionIcon
-                loading={pendingAdd}
-                onClick={() => add({ moviedb_id: show.id, name: show.name })}
-              >
+              <ActionIcon loading={pendingAdd} onClick={() => add({ moviedb_id: show.id, name: show.name })}>
                 <Plus size={'20'} />
               </ActionIcon>
             </>

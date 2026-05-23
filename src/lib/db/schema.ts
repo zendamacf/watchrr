@@ -1,4 +1,4 @@
-import { type SQL, sql } from "drizzle-orm";
+import { type SQL, sql } from 'drizzle-orm';
 import {
   type AnyPgColumn,
   boolean,
@@ -18,14 +18,14 @@ import {
  */
 
 export const users = pgTable(
-  "users",
+  'users',
   {
-    id: uuid("id").defaultRandom().primaryKey(),
-    email: text("email").notNull(),
-    passwordHash: text("password_hash").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
+    id: uuid('id').defaultRandom().primaryKey(),
+    email: text('email').notNull(),
+    passwordHash: text('password_hash').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (table) => [uniqueIndex("users_email_unique_idx").on(lower(table.email))],
+  (table) => [uniqueIndex('users_email_unique_idx').on(lower(table.email))],
 );
 
 export const tvshows = pgTable('tvshows', {
