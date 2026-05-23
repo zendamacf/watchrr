@@ -24,12 +24,13 @@ export default defineConfig({
         'src/app/global-error.tsx',
         'src/app/error.tsx',
         'src/lib/db/schema.ts',
+        'src/lib/themoviedb/client.ts',
       ],
       thresholds: {
-        lines: 20,
-        statements: 18,
-        branches: 23,
-        functions: 10,
+        lines: 27,
+        statements: 25,
+        branches: 28,
+        functions: 18,
       },
     },
     projects: [
