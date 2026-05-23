@@ -10,6 +10,7 @@
     "lint": "prettier --check . && eslint .",
     "typecheck": "tsc --noEmit",
     "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
@@ -24,6 +25,7 @@
     "@tanstack/react-query": "^5.81.5",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^2.0.0",
+    "bcrypt": "^6.0.0",
     "classnames": "^2.5.1",
     "countries-and-timezones": "^3.8.0",
     "drizzle-orm": "^0.45.2",
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tanstack/eslint-plugin-query": "^5.81.2",
+    "@types/bcrypt": "^6.0.0",
     "@types/lodash.chunk": "^4.2.9",
     "@types/luxon": "^3.6.2",
     "@types/node": "^20",

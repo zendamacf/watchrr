@@ -1,13 +1,11 @@
-import { SupabaseSafeSession } from './supabase/safeSession';
-import { createClient } from './supabase/server';
+import { authenticateHeaders } from '@/lib/auth/session';
+import type { AuthUser } from '@/lib/auth/types';
+import { headers } from 'next/headers';
 
-export const guardUser = async () => {
-  const supabase = await createClient();
+export type { AuthUser } from '@/lib/auth/types';
 
-  if (!process.env.SUPABASE_AUTH_JWT_SECRET) throw new Error('SUPABASE_AUTH_JWT_SECRET is not set');
-  const safeSession = new SupabaseSafeSession(supabase, process.env.SUPABASE_AUTH_JWT_SECRET);
-
-  const { data, error } = await safeSession.getUser();
-  if (error || !data) return null;
-  return data;
+export const guardUser = async (): Promise<AuthUser | null> => {
+  const result = await authenticateHeaders(await headers());
+  if (!result) return null;
+  return { id: result.userId };
 };

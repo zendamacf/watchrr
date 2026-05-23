@@ -1,4 +1,6 @@
+import { type SQL, sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   date,
   integer,
@@ -6,13 +8,25 @@ import {
   primaryKey,
   serial,
   text,
+  timestamp,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { authUsers } from 'drizzle-orm/supabase';
 
 /**
  * Public schema
  */
+
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex("users_email_unique_idx").on(lower(table.email))],
+);
 
 export const tvshows = pgTable('tvshows', {
   id: serial().primaryKey(),
@@ -46,7 +60,7 @@ export const subscribed_tvshows = pgTable(
       .references(() => tvshows.id, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
-      .references(() => authUsers.id, { onDelete: 'restrict' }),
+      .references(() => users.id, { onDelete: 'restrict' }),
   },
   (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
 );
@@ -59,7 +73,7 @@ export const watched_episodes = pgTable(
       .references(() => episodes.id, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
-      .references(() => authUsers.id, { onDelete: 'restrict' }),
+      .references(() => users.id, { onDelete: 'restrict' }),
   },
   (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
 );
@@ -82,8 +96,12 @@ export const subscribed_movies = pgTable(
       .references(() => movies.id, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
-      .references(() => authUsers.id, { onDelete: 'restrict' }),
+      .references(() => users.id, { onDelete: 'restrict' }),
     watched: boolean().notNull().default(false),
   },
   (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
 );
+
+export function lower(email: AnyPgColumn): SQL {
+  return sql`lower(${email})`;
+}
