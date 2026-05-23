@@ -26,7 +26,7 @@ export function SignOutButton({ onSignedOut, ...props }: SignOutButtonProps) {
   }
 
   return (
-    <UnstyledButton {...props} onClick={handleSignOut} disabled={pending || props.disabled}>
+    <UnstyledButton {...props} onClick={handleSignOut} data-disabled={pending || undefined}>
       Sign out
     </UnstyledButton>
   );
