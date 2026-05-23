@@ -3,7 +3,7 @@ import {
   Loader,
   LoadingOverlay,
   Modal,
-  ModalProps,
+  type ModalProps,
   SimpleGrid,
   Space,
   Text,
@@ -12,7 +12,7 @@ import {
 import { useDebouncedState } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
 type Props<T> = {
   queryKey: string;
@@ -20,12 +20,7 @@ type Props<T> = {
   builder: (elem: T) => ReactElement;
 } & ModalProps;
 
-export const AddMediaModal = <T extends object>({
-  queryKey,
-  queryFn,
-  builder,
-  ...props
-}: Props<T>) => {
+export const AddMediaModal = <T extends object>({ queryKey, queryFn, builder, ...props }: Props<T>) => {
   const [search, setSearch] = useDebouncedState('', 500);
 
   const query = useQuery<T[]>({
@@ -56,17 +51,12 @@ export const AddMediaModal = <T extends object>({
       {!query.isFetched && !query.isLoading && (
         <Center p={'xl'}>
           <Text size={'xl'} c={'dimmed'}>
-            <Search style={{ verticalAlign: 'sub', marginRight: '4px' }} /> Search above to get
-            started!
+            <Search style={{ verticalAlign: 'sub', marginRight: '4px' }} /> Search above to get started!
           </Text>
         </Center>
       )}
       <div style={{ position: 'relative' }}>
-        <LoadingOverlay
-          visible={query.isFetching}
-          zIndex={1000}
-          overlayProps={{ radius: 'sm', blur: 2 }}
-        />
+        <LoadingOverlay visible={query.isFetching} zIndex={1000} overlayProps={{ radius: 'sm', blur: 2 }} />
         <SimpleGrid cols={{ xs: 1, sm: 2 }}>{query.data?.map(builder)}</SimpleGrid>
       </div>
     </Modal>

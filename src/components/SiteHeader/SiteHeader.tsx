@@ -4,6 +4,8 @@ import { Box, Burger, Divider, Drawer, Group, ScrollArea, Stack } from '@mantine
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
 import { usePathname } from 'next/navigation';
+import { SignOutButton } from '@/components/auth/SignOutButton';
+import { routes } from '@/lib/routes';
 import { Logo } from '../Logo';
 import classes from './SiteHeader.module.css';
 import { ThemeToggle } from './ThemeToggle';
@@ -20,24 +22,18 @@ export function SiteHeader() {
 }
 
 const links = [
-  { label: 'Episodes', href: '/episodes' },
-  { label: 'Shows', href: '/shows' },
-  { label: 'Movies', href: '/movies' },
+  { label: 'Episodes', href: routes.episodes },
+  { label: 'Shows', href: routes.shows },
+  { label: 'Movies', href: routes.movies },
 ];
 
-function MainNav({
-  drawerOpened,
-  toggleDrawer,
-}: {
-  drawerOpened: boolean;
-  toggleDrawer: () => void;
-}) {
+function MainNav({ drawerOpened, toggleDrawer }: { drawerOpened: boolean; toggleDrawer: () => void }) {
   const pathname = usePathname();
 
   return (
     <header className={classes.header}>
       <Group justify="space-between" h="100%">
-        <a href={'/'}>
+        <a href={routes.home}>
           <Logo w={160} />
         </a>
 
@@ -57,9 +53,7 @@ function MainNav({
 
         <Group h="100%" visibleFrom="sm">
           <ThemeToggle />
-          <a href={'/auth/signout'} className={classes.link}>
-            Sign out
-          </a>
+          <SignOutButton className={classes.link} />
         </Group>
 
         <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
@@ -68,13 +62,7 @@ function MainNav({
   );
 }
 
-function MobileNav({
-  drawerOpened,
-  closeDrawer,
-}: {
-  drawerOpened: boolean;
-  closeDrawer: () => void;
-}) {
+function MobileNav({ drawerOpened, closeDrawer }: { drawerOpened: boolean; closeDrawer: () => void }) {
   const pathname = usePathname();
   return (
     <Drawer
@@ -84,7 +72,7 @@ function MobileNav({
       size="100%"
       padding="md"
       title={
-        <a href={'/'}>
+        <a href={routes.home}>
           <Logo w={180} />
         </a>
       }
@@ -108,9 +96,7 @@ function MobileNav({
 
         <Stack justify="center" px="md">
           <ThemeToggle />
-          <a href={'/auth/signout'} className={classes.link} style={{ paddingLeft: 0 }}>
-            Sign out
-          </a>
+          <SignOutButton className={classes.link} style={{ paddingLeft: 0 }} onSignedOut={closeDrawer} />
         </Stack>
       </ScrollArea>
     </Drawer>

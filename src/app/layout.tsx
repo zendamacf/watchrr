@@ -1,19 +1,17 @@
 import '@mantine/core/styles.css';
-import '@mantine/notifications/styles.css';
 
-import { QueryProvider } from '@/components/QueryProvider';
-import { ColorSchemeScript, mantineHtmlProps, MantineProvider } from '@mantine/core';
-import { ModalsProvider } from '@mantine/modals';
-import { Notifications } from '@mantine/notifications';
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
+import type { ReactNode } from 'react';
 import './globals.css';
 import theme from './theme';
 
 const font = Raleway({
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -32,25 +30,22 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const isProd = process.env.NODE_ENV === 'production';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" {...mantineHtmlProps} className={font.className}>
       <head>
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>
-          <Notifications />
-          <QueryProvider>
-            <ModalsProvider>{children}</ModalsProvider>
-          </QueryProvider>
-        </MantineProvider>
-        <Analytics />
-        <SpeedInsights />
+        <MantineProvider theme={theme}>{children}</MantineProvider>
+        {isProd && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );

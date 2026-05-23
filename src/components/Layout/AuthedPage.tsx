@@ -1,17 +1,13 @@
-import { guardUser } from '@/utils/auth';
-import { SupabaseSafeUser } from '@/utils/supabase/safeSession';
 import { Container, Space } from '@mantine/core';
 import { redirect } from 'next/navigation';
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
+import { routes } from '@/lib/routes';
+import { type AuthUser, guardUser } from '@/utils/auth';
 import { SiteHeader } from '../SiteHeader';
 
-export async function AuthedPage({
-  children: Child,
-}: {
-  children: ComponentType<{ user: SupabaseSafeUser }>;
-}) {
+export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: AuthUser }> }) {
   const user = await guardUser();
-  if (!user) redirect('/signin');
+  if (!user) redirect(routes.signin);
 
   return (
     <div>

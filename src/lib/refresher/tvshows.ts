@@ -1,11 +1,11 @@
-import { db } from '@/lib/db';
-import { episodes, tvshows } from '@/lib/db/schema';
-import { getAllEpisodes, getTvShow, TMDBEpisode, TMDBTvShow } from '@/lib/themoviedb/tvshows';
-import { Episode, Show } from '@/types';
 import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
+import { db } from '@/lib/db';
+import { episodes, tvshows } from '@/lib/db/schema';
+import { getAllEpisodes, getTvShow, type TMDBEpisode, type TMDBTvShow } from '@/lib/themoviedb/tvshows';
+import type { Episode, Show } from '@/types';
 import { ResourceNotFound } from './errors';
-import { dateCompare, DiffLookup, getDiff } from './utils';
+import { type DiffLookup, dateCompare, getDiff } from './utils';
 
 /**
  * Refresh all metadata for a TV Show & its episodes, and imports in any new episodes.
@@ -27,9 +27,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
   ];
   const diffs = getDiff(dbShow, apiShow, showLookup);
   if (diffs.length) {
-    console.info(
-      `[SHOW][${dbShow.name}] Updating metadata, changes in ${diffs.map((d) => d.dbKey)}`,
-    );
+    console.info(`[SHOW][${dbShow.name}] Updating metadata, changes in ${diffs.map((d) => d.dbKey)}`);
     await db
       .update(tvshows)
       .set({
@@ -46,9 +44,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
   const dbEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, dbShow.id));
   const apiEpisodes = await getAllEpisodes(dbShow.moviedb_id);
   if (apiEpisodes.length > dbEpisodes.length) {
-    console.info(
-      `[SHOW][${dbShow.name}] ${dbEpisodes.length}/${apiEpisodes.length} episodes existing`,
-    );
+    console.info(`[SHOW][${dbShow.name}] ${dbEpisodes.length}/${apiEpisodes.length} episodes existing`);
   }
   const episodeLookup: DiffLookup<Episode, TMDBEpisode>[] = [
     { dbKey: 'season', apiKey: 'seasonNumber' },
@@ -97,9 +93,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
     }
   }
   if (inserted + updated > 0) {
-    console.info(
-      `[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`,
-    );
+    console.info(`[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`);
   }
   console.log(`[SHOW][${dbShow.name}] Finished refreshing`);
 };

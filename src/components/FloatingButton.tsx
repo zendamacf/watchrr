@@ -1,4 +1,4 @@
-import { ActionIcon, ActionIconProps, Affix } from '@mantine/core';
+import { ActionIcon, type ActionIconProps, Affix } from '@mantine/core';
 import { Plus } from 'lucide-react';
 import classes from './FloatingButton.module.css';
 
