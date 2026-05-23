@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
+import { apiRoutes } from '@/lib/routes';
 import {
   mockHashPassword,
   mockLimit,
@@ -10,7 +11,7 @@ import { testUser } from '@/test/fixtures/user';
 import { POST } from './route';
 
 function signupRequest(body: unknown) {
-  return new Request('http://localhost/api/auth/signup', {
+  return new Request(`http://localhost${apiRoutes.auth.signup}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -25,7 +26,7 @@ describe('POST /api/auth/signup', () => {
 
   it('returns 400 for invalid JSON', async () => {
     const response = await POST(
-      new Request('http://localhost/api/auth/signup', {
+      new Request(`http://localhost${apiRoutes.auth.signup}`, {
         method: 'POST',
         body: 'not json',
       }),

@@ -2,6 +2,7 @@
 
 import { FloatingButton } from '@/components/FloatingButton';
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { MoviesResponse } from '@/types';
 import { Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
@@ -18,7 +19,7 @@ export const MoviePage = () => {
   const { isLoading, isError, data } = useQuery<MoviesResponse>({
     queryKey: [QueryKey.getMovies],
     queryFn: async () => {
-      const response = await fetch('/api/movie', { method: 'get' });
+      const response = await fetch(apiRoutes.movie, { method: 'get' });
       if (response.ok) return await response.json();
       throw new Error((await response.json()).message);
     },

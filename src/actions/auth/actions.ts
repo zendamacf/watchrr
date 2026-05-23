@@ -1,5 +1,6 @@
 'use server';
 
+import { routes } from '@/lib/routes';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -19,8 +20,8 @@ export async function signup(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/signin');
+  revalidatePath(routes.home, 'layout');
+  redirect(routes.signin);
 }
 
 export async function signin(formData: FormData) {
@@ -38,8 +39,8 @@ export async function signin(formData: FormData) {
     throw new Error(error.message);
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  revalidatePath(routes.home, 'layout');
+  redirect(routes.home);
 }
 
 export async function signout() {
@@ -51,5 +52,5 @@ export async function signout() {
     throw new Error(error.message);
   }
 
-  redirect('/signin');
+  redirect(routes.signin);
 }

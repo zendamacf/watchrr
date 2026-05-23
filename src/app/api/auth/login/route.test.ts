@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
+import { apiRoutes } from '@/lib/routes';
 import { mockLimit, mockVerifyPassword, resetAuthMocks } from '@/test/mocks';
 import { testUser } from '@/test/fixtures/user';
 import { POST } from './route';
 
 function loginRequest(body: unknown) {
-  return new Request('http://localhost/api/auth/login', {
+  return new Request(`http://localhost${apiRoutes.auth.login}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -20,7 +21,7 @@ describe('POST /api/auth/login', () => {
 
   it('returns 400 for invalid JSON', async () => {
     const response = await POST(
-      new Request('http://localhost/api/auth/login', {
+      new Request(`http://localhost${apiRoutes.auth.login}`, {
         method: 'POST',
         body: 'not json',
       }),

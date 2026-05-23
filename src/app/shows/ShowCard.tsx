@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { Show, ShowsResponse } from '@/types';
@@ -29,7 +30,7 @@ export const ShowCard = ({ show }: Props) => {
     MutationContext
   >({
     mutationFn: async (tvshow_id) => {
-      const response = await fetch(`/api/tvshow/${tvshow_id}/`, { method: 'delete' });
+      const response = await fetch(apiRoutes.tvshowById(tvshow_id), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: async (tvshow_id) => {

@@ -1,3 +1,4 @@
+import { routes } from '@/lib/routes';
 import { AuthUser, guardUser } from '@/utils/auth';
 import { Container, Space } from '@mantine/core';
 import { redirect } from 'next/navigation';
@@ -10,7 +11,7 @@ export async function AuthedPage({
   children: ComponentType<{ user: AuthUser }>;
 }) {
   const user = await guardUser();
-  if (!user) redirect('/signin');
+  if (!user) redirect(routes.signin);
 
   return (
     <div>

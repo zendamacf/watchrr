@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
@@ -20,7 +21,7 @@ export const EpisodeList = () => {
   const { isLoading, isError, data } = useQuery<EpisodesResponse>({
     queryKey: [QueryKey.getEpisodes],
     queryFn: async () => {
-      const response = await fetch('/api/episode', { method: 'get' });
+      const response = await fetch(apiRoutes.episode, { method: 'get' });
       if (response.ok) return await response.json();
       throw new Error((await response.json()).message);
     },

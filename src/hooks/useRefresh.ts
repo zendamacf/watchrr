@@ -1,3 +1,4 @@
+import { apiRoutes } from '@/lib/routes';
 import { useMutation } from '@tanstack/react-query';
 import { useAlert } from './useAlert';
 
@@ -11,7 +12,7 @@ export const useRefreshMovie = () => {
     { notificationId: string }
   >({
     mutationFn: async ({ movieId }) => {
-      const response = await fetch(`/api/movie/${movieId}/refresh`, { method: 'put' });
+      const response = await fetch(apiRoutes.movieRefresh(movieId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {
@@ -52,7 +53,7 @@ export const useRefreshShow = () => {
     { notificationId: string }
   >({
     mutationFn: async ({ tvshowId }) => {
-      const response = await fetch(`/api/tvshow/${tvshowId}/refresh`, { method: 'put' });
+      const response = await fetch(apiRoutes.tvshowRefresh(tvshowId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {

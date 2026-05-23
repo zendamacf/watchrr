@@ -1,5 +1,6 @@
 'use client';
 
+import { routes } from '@/lib/routes';
 import { Box, Burger, Divider, Drawer, Group, ScrollArea, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
@@ -20,9 +21,9 @@ export function SiteHeader() {
 }
 
 const links = [
-  { label: 'Episodes', href: '/episodes' },
-  { label: 'Shows', href: '/shows' },
-  { label: 'Movies', href: '/movies' },
+  { label: 'Episodes', href: routes.episodes },
+  { label: 'Shows', href: routes.shows },
+  { label: 'Movies', href: routes.movies },
 ];
 
 function MainNav({
@@ -37,7 +38,7 @@ function MainNav({
   return (
     <header className={classes.header}>
       <Group justify="space-between" h="100%">
-        <a href={'/'}>
+        <a href={routes.home}>
           <Logo w={160} />
         </a>
 
@@ -57,7 +58,7 @@ function MainNav({
 
         <Group h="100%" visibleFrom="sm">
           <ThemeToggle />
-          <a href={'/auth/signout'} className={classes.link}>
+          <a href={routes.signout} className={classes.link}>
             Sign out
           </a>
         </Group>
@@ -84,7 +85,7 @@ function MobileNav({
       size="100%"
       padding="md"
       title={
-        <a href={'/'}>
+        <a href={routes.home}>
           <Logo w={180} />
         </a>
       }
@@ -108,7 +109,7 @@ function MobileNav({
 
         <Stack justify="center" px="md">
           <ThemeToggle />
-          <a href={'/auth/signout'} className={classes.link} style={{ paddingLeft: 0 }}>
+          <a href={routes.signout} className={classes.link} style={{ paddingLeft: 0 }}>
             Sign out
           </a>
         </Stack>

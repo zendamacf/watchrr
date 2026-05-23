@@ -1,3 +1,4 @@
+import { apiRoutes } from '@/lib/routes';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from './constants';
 import { signAccessToken } from './jwt';
@@ -84,7 +85,7 @@ describe('authenticateRequest', () => {
 
   it('delegates to request headers', async () => {
     const token = await signAccessToken(userId);
-    const request = new Request('http://localhost/api/episode', {
+    const request = new Request(`http://localhost${apiRoutes.episode}`, {
       headers: { authorization: `Bearer ${token}` },
     });
     await expect(authenticateRequest(request)).resolves.toEqual({ userId });

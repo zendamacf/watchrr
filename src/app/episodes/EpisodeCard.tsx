@@ -2,6 +2,7 @@
 
 import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { useAlert } from '@/hooks/useAlert';
 import { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
@@ -27,7 +28,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation<unknown, Error, number, MutationContext>({
     mutationFn: async (episode_id) => {
-      const response = await fetch(`/api/episode/${episode_id}/`, { method: 'put' });
+      const response = await fetch(apiRoutes.episodeById(episode_id), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: async (episode_id) => {

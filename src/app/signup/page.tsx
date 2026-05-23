@@ -1,4 +1,5 @@
 import { signup } from '@/actions/auth/actions';
+import { routes } from '@/lib/routes';
 import { PublicPage } from '@/components/Layout/PublicPage';
 import { guardUser } from '@/utils/auth';
 import { Anchor, Button, PasswordInput, TextInput } from '@mantine/core';
@@ -6,14 +7,14 @@ import { redirect } from 'next/navigation';
 
 export default async function SignUpPage() {
   const user = await guardUser();
-  if (user) redirect('/');
+  if (user) redirect(routes.home);
 
   return (
     <PublicPage
       title={'Sign Up'}
       subtitle={
         <>
-          Already have an account? <Anchor href={'/signin'}>Sign In</Anchor>
+          Already have an account? <Anchor href={routes.signin}>Sign In</Anchor>
         </>
       }
     >

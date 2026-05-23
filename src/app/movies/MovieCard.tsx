@@ -1,6 +1,7 @@
 'use client';
 
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { useAlert } from '@/hooks/useAlert';
 import { Movie, MoviesResponse } from '@/types';
 import { ActionIcon, Text } from '@mantine/core';
@@ -44,7 +45,7 @@ export const MovieCard = ({ movie }: Props) => {
     MutationContext
   >({
     mutationFn: async (movie_id) => {
-      const response = await fetch(`/api/movie/${movie_id}/`, { method: 'put' });
+      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: (movie_id) =>
@@ -62,7 +63,7 @@ export const MovieCard = ({ movie }: Props) => {
     MutationContext
   >({
     mutationFn: async (movie_id) => {
-      const response = await fetch(`/api/movie/${movie_id}/`, { method: 'delete' });
+      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: (movie_id) =>

@@ -2,6 +2,7 @@ import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
+import { apiRoutes } from '@/lib/routes';
 import { TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import {
   ActionIcon,
@@ -28,7 +29,7 @@ export const AddShowModal = (props: Props) => {
     { moviedb_id: number; name: string }
   >({
     mutationFn: async (tvshow) => {
-      const response = await fetch('/api/tvshow', {
+      const response = await fetch(apiRoutes.tvshow, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -57,7 +58,7 @@ export const AddShowModal = (props: Props) => {
       queryKey={QueryKey.searchShows}
       queryFn={async (search) => {
         const params = new URLSearchParams({ q: search.trim() });
-        const response = await fetch(`/api/tvshow/search?${params.toString()}`, { method: 'get' });
+        const response = await fetch(apiRoutes.tvshowSearch(params), { method: 'get' });
         if (response.ok) return await response.json();
         throw new Error((await response.json()).message);
       }}
