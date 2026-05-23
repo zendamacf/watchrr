@@ -1,17 +1,11 @@
 import { MantineProvider } from '@mantine/core';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { type RenderHookOptions, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import theme from '@/app/theme';
+import { createTestQueryClient } from '@/test/render';
 
-export function createTestQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
-}
+export { createTestQueryClient };
 
 export function createHookWrapper(queryClient = createTestQueryClient()) {
   return function Wrapper({ children }: { children: ReactNode }) {
