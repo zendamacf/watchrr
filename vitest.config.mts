@@ -27,10 +27,10 @@ export default defineConfig({
         'src/lib/themoviedb/client.ts',
       ],
       thresholds: {
-        lines: 27,
-        statements: 25,
-        branches: 28,
-        functions: 18,
+        lines: 32,
+        statements: 30,
+        branches: 31,
+        functions: 23,
       },
     },
     projects: [
