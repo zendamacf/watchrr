@@ -41,4 +41,16 @@ describe('jwt', () => {
       .sign(new TextEncoder().encode('test-jwt-secret'));
     await expect(verifyAccessToken(token)).rejects.toThrow('Invalid token subject');
   });
+
+  it('verifyAccessToken rejects an expired token', async () => {
+    const { SignJWT } = await import('jose');
+    const now = Math.floor(Date.now() / 1000);
+    const token = await new SignJWT({})
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject(userId)
+      .setIssuedAt(now - 7200)
+      .setExpirationTime(now - 3600)
+      .sign(new TextEncoder().encode('test-jwt-secret'));
+    await expect(verifyAccessToken(token)).rejects.toThrow();
+  });
 });

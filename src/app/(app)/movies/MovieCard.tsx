@@ -81,10 +81,15 @@ export const MovieCard = ({ movie }: Props) => {
       description
       actions={
         <>
-          <ActionIcon loading={pendingWatched} onClick={() => watched(movie.id)}>
+          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>
             <Check size={'20'} />
           </ActionIcon>
-          <ActionIcon color={'red'} loading={pendingRemove} onClick={() => confirmUnsubscribe(movie.id)}>
+          <ActionIcon
+            aria-label="Unsubscribe"
+            color={'red'}
+            loading={pendingRemove}
+            onClick={() => confirmUnsubscribe(movie.id)}
+          >
             <X size={'20'} />
           </ActionIcon>
         </>

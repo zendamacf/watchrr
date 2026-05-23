@@ -4,3 +4,5 @@
 
 A tracker for your favorite shows & movies.
 [watchrr.kalopsia.dev](https://watchrr.kalopsia.dev)
+
+See [TESTING.md](./src/test/README.md) for how to run tests and coverage locally.

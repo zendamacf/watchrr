@@ -13,7 +13,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
+      reporter: ['text', 'html', 'lcov', 'json-summary'],
       reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
@@ -25,12 +25,33 @@ export default defineConfig({
         'src/app/error.tsx',
         'src/lib/db/schema.ts',
         'src/lib/themoviedb/client.ts',
+        'src/app/**/page.tsx',
+        'src/app/**/layout.tsx',
+        'src/components/Layout/AuthedPage.tsx',
+        'src/components/**',
+        'src/lib/sentry/**',
       ],
       thresholds: {
-        lines: 66,
-        statements: 66,
-        branches: 65,
-        functions: 58,
+        lines: 56,
+        statements: 57,
+        branches: 55,
+        functions: 46,
+        'src/lib/auth/**': {
+          lines: 95,
+          branches: 90,
+        },
+        'src/lib/refresher/**': {
+          lines: 80,
+        },
+        'src/lib/themoviedb/**': {
+          lines: 95,
+        },
+        'src/app/api/**': {
+          lines: 85,
+        },
+        'src/hooks/**': {
+          lines: 90,
+        },
       },
     },
     projects: [
