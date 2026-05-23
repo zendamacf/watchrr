@@ -1,11 +1,20 @@
-import './db';
-import { mockLimit, mockReturning, resetDbMocks } from './db';
-import './password';
-import { mockHashPassword, mockVerifyPassword, resetPasswordMocks } from './password';
+import { resetAuthGuardMocks } from './auth';
+import { resetRefresherMocks } from './refresher';
+import { resetThemoviedbMocks } from './themoviedb';
 
-export { mockHashPassword, mockLimit, mockReturning, mockVerifyPassword, resetDbMocks, resetPasswordMocks };
+export { mockGuardUser, resetAuthGuardMocks } from './auth';
+export { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from './refresher';
+export {
+  mockGetAllEpisodes,
+  mockGetMovie,
+  mockGetTvShow,
+  mockSearchMovies,
+  mockSearchTvShows,
+  resetThemoviedbMocks,
+} from './themoviedb';
 
-export function resetAuthMocks() {
-  resetDbMocks();
-  resetPasswordMocks();
+export function resetMediaMocks() {
+  resetAuthGuardMocks();
+  resetThemoviedbMocks();
+  resetRefresherMocks();
 }

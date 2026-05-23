@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
 import { apiRoutes } from '@/lib/routes';
-import { testUser } from '@/test/fixtures/user';
-import { mockLimit, mockVerifyPassword, resetAuthMocks } from '@/test/mocks';
+import { seedEmails, seedPassword } from '@/test/fixtures/user';
+import { seedUser } from '@/test/seeds';
 import { POST } from './route';
 
 function loginRequest(body: unknown) {
@@ -16,7 +16,6 @@ function loginRequest(body: unknown) {
 describe('POST /api/auth/login', () => {
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
-    resetAuthMocks();
   });
 
   it('returns 400 for invalid JSON', async () => {
@@ -42,25 +41,21 @@ describe('POST /api/auth/login', () => {
   });
 
   it('returns 401 when user is not found', async () => {
-    mockLimit.mockResolvedValue([]);
     const response = await POST(loginRequest({ email: 'nobody@example.com', password: 'secret' }));
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({ message: 'Invalid email or password' });
-    expect(mockVerifyPassword).not.toHaveBeenCalled();
   });
 
   it('returns 401 when password does not match', async () => {
-    mockLimit.mockResolvedValue([testUser]);
-    mockVerifyPassword.mockResolvedValue(false);
-    const response = await POST(loginRequest({ email: 'test@example.com', password: 'wrong' }));
+    await seedUser({ email: seedEmails.loginWrongPassword, password: seedPassword });
+    const response = await POST(loginRequest({ email: seedEmails.loginWrongPassword, password: 'wrong' }));
     expect(response.status).toBe(401);
-    expect(mockVerifyPassword).toHaveBeenCalledWith('wrong', testUser.passwordHash);
+    await expect(response.json()).resolves.toEqual({ message: 'Invalid email or password' });
   });
 
   it('returns 200 with token and Set-Cookie on success', async () => {
-    mockLimit.mockResolvedValue([testUser]);
-    mockVerifyPassword.mockResolvedValue(true);
-    const response = await POST(loginRequest({ email: '  Test@Example.COM  ', password: 'secret' }));
+    await seedUser({ email: seedEmails.loginSuccess, password: seedPassword });
+    const response = await POST(loginRequest({ email: `  ${seedEmails.loginSuccess}  `, password: seedPassword }));
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(typeof body.token).toBe('string');
@@ -68,6 +63,5 @@ describe('POST /api/auth/login', () => {
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toContain(`${AUTH_COOKIE_NAME}=`);
     expect(setCookie).toContain('HttpOnly');
-    expect(mockVerifyPassword).toHaveBeenCalledWith('secret', testUser.passwordHash);
   });
 });

@@ -1,6 +1,8 @@
-export const testUser = {
-  id: 'e1e31db5-d029-4ba7-aa65-fd6a5e7fdea',
-  email: 'test@example.com',
-  passwordHash: 'hashed',
-  createdAt: new Date(),
-};
+/** Stable emails for idempotent seeds across test runs. */
+export const seedEmails = {
+  loginSuccess: 'vitest-login-success@example.com',
+  loginWrongPassword: 'vitest-login-wrong-password@example.com',
+  signupTaken: 'vitest-signup-taken@example.com',
+} as const;
+
+export const seedPassword = 'secret';

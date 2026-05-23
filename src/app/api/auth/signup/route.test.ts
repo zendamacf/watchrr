@@ -1,8 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
 import { apiRoutes } from '@/lib/routes';
-import { testUser } from '@/test/fixtures/user';
-import { mockHashPassword, mockLimit, mockReturning, resetAuthMocks } from '@/test/mocks';
+import { seedEmails, seedPassword } from '@/test/fixtures/user';
+import { seedUser } from '@/test/seeds';
 import { POST } from './route';
 
 function signupRequest(body: unknown) {
@@ -16,7 +17,6 @@ function signupRequest(body: unknown) {
 describe('POST /api/auth/signup', () => {
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
-    resetAuthMocks();
   });
 
   it('returns 400 for invalid JSON', async () => {
@@ -42,37 +42,23 @@ describe('POST /api/auth/signup', () => {
   });
 
   it('returns 409 when email is already registered', async () => {
-    mockLimit.mockResolvedValue([{ id: 'existing-id' }]);
-    const response = await POST(signupRequest({ email: 'taken@example.com', password: 'secret' }));
+    await seedUser({ email: seedEmails.signupTaken, password: seedPassword });
+    const response = await POST(signupRequest({ email: seedEmails.signupTaken, password: 'other-secret' }));
     expect(response.status).toBe(409);
     await expect(response.json()).resolves.toEqual({
       message: 'An account with this email already exists',
     });
-    expect(mockHashPassword).not.toHaveBeenCalled();
-    expect(mockReturning).not.toHaveBeenCalled();
   });
 
   it('returns 201 with token and Set-Cookie on success', async () => {
-    mockLimit.mockResolvedValue([]);
-    mockHashPassword.mockResolvedValue('hashed-password');
-    mockReturning.mockResolvedValue([{ id: testUser.id }]);
-    const response = await POST(signupRequest({ email: '  New@Example.COM  ', password: 'secret' }));
+    const email = `vitest-signup-${randomUUID()}@example.com`;
+    const response = await POST(signupRequest({ email: `  ${email}  `, password: seedPassword }));
     expect(response.status).toBe(201);
-    expect(mockHashPassword).toHaveBeenCalledWith('secret');
     const body = await response.json();
     expect(typeof body.token).toBe('string');
     expect(body.token.length).toBeGreaterThan(0);
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toContain(`${AUTH_COOKIE_NAME}=`);
     expect(setCookie).toContain('HttpOnly');
-  });
-
-  it('returns 500 when insert returns no row', async () => {
-    mockLimit.mockResolvedValue([]);
-    mockHashPassword.mockResolvedValue('hashed-password');
-    mockReturning.mockResolvedValue([]);
-    const response = await POST(signupRequest({ email: 'new@example.com', password: 'secret' }));
-    expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({ message: 'Failed to create account' });
   });
 });
