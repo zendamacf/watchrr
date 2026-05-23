@@ -20,6 +20,9 @@
     "changeset": "changeset",
     "changeset:version": "changeset version"
   },
+  "lint-staged": {
+    "*": "npm run lint:fix && npm run format"
+  },
   "dependencies": {
     "@mantine/core": "^8.1.2",
     "@mantine/hooks": "^8.1.2",
@@ -58,6 +61,8 @@
     "@vitest/coverage-v8": "^4.1.7",
     "drizzle-kit": "^0.31.1",
     "happy-dom": "^20.9.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
     "postcss": "^8.5.10",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",

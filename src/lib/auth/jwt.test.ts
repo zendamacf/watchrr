@@ -31,4 +31,14 @@ describe('jwt', () => {
     process.env.AUTH_JWT_SECRET = 'other-secret';
     await expect(verifyAccessToken(token)).rejects.toThrow();
   });
+
+  it('verifyAccessToken rejects a token without a subject', async () => {
+    const { SignJWT } = await import('jose');
+    const token = await new SignJWT({})
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(new TextEncoder().encode('test-jwt-secret'));
+    await expect(verifyAccessToken(token)).rejects.toThrow('Invalid token subject');
+  });
 });
