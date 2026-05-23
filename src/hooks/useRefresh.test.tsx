@@ -6,13 +6,15 @@ import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { renderHookWithProviders } from '@/test/renderHook';
 import { useRefreshMovie, useRefreshShow } from './useRefresh';
 
-const mockShow = vi.fn(() => 'notification-id');
-const mockUpdate = vi.fn();
+const { mockShow, mockUpdate } = vi.hoisted(() => ({
+  mockShow: vi.fn(() => 'notification-id'),
+  mockUpdate: vi.fn(),
+}));
 
 vi.mock('@mantine/notifications', () => ({
   notifications: {
-    show: (...args: unknown[]) => mockShow(...args),
-    update: (...args: unknown[]) => mockUpdate(...args),
+    show: mockShow,
+    update: mockUpdate,
   },
 }));
 

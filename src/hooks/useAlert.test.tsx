@@ -6,13 +6,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import theme from '@/app/theme';
 import { useAlert } from './useAlert';
 
-const mockShow = vi.fn(() => 'notification-id');
-const mockUpdate = vi.fn();
+const { mockShow, mockUpdate } = vi.hoisted(() => ({
+  mockShow: vi.fn(() => 'notification-id'),
+  mockUpdate: vi.fn(),
+}));
 
 vi.mock('@mantine/notifications', () => ({
   notifications: {
-    show: (...args: unknown[]) => mockShow(...args),
-    update: (...args: unknown[]) => mockUpdate(...args),
+    show: mockShow,
+    update: mockUpdate,
   },
 }));
 
