@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type RenderHookOptions, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import theme from '@/app/theme';
