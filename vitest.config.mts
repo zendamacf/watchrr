@@ -11,8 +11,33 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'node',
-    setupFiles: ['./vitest.setup.ts'],
-    include: ['src/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', '**/*.d.ts'],
+    },
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          environment: 'node',
+          setupFiles: ['./vitest.setup.ts'],
+          include: ['src/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'ui',
+          environment: 'happy-dom',
+          setupFiles: ['./vitest.setup.ts', './vitest.setup.dom.ts'],
+          include: ['src/**/*.test.tsx'],
+          sequence: { concurrent: false },
+        },
+      },
+    ],
   },
 });

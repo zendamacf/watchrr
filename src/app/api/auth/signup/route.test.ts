@@ -36,6 +36,11 @@ describe('POST /api/auth/signup', () => {
     await expect(response.json()).resolves.toEqual({ message: 'Email and password are required' });
   });
 
+  it('returns 400 when email or password is empty after trim', async () => {
+    const response = await POST(signupRequest({ email: '  ', password: 'x' }));
+    expect(response.status).toBe(400);
+  });
+
   it('returns 409 when email is already registered', async () => {
     mockLimit.mockResolvedValue([{ id: 'existing-id' }]);
     const response = await POST(signupRequest({ email: 'taken@example.com', password: 'secret' }));
