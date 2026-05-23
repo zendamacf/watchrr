@@ -1,9 +1,7 @@
 import { resetAuthGuardMocks } from './auth';
-import { resetRefresherMocks } from './refresher';
 import { resetThemoviedbMocks } from './themoviedb';
 
 export { mockGuardUser, resetAuthGuardMocks } from './auth';
-export { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from './refresher';
 export {
   mockGetAllEpisodes,
   mockGetMovie,
@@ -13,8 +11,8 @@ export {
   resetThemoviedbMocks,
 } from './themoviedb';
 
+/** Resets auth guard and TMDB mocks. For refresher mocks, import `@/test/mocks/refresher` separately. */
 export function resetMediaMocks() {
   resetAuthGuardMocks();
   resetThemoviedbMocks();
-  resetRefresherMocks();
 }
