@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 
-export const mockRefreshMovie = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
-export const mockRefreshTvShow = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
+export const mockRefreshMovie = vi.fn();
+export const mockRefreshTvShow = vi.fn();
 
 vi.mock('@/lib/refresher/movies', () => ({
   refreshMovie: (...args: unknown[]) => mockRefreshMovie(...args),
