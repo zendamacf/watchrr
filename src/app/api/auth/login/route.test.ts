@@ -1,32 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
+import { mockLimit, mockVerifyPassword, resetAuthMocks } from '@/test/mocks';
+import { testUser } from '@/test/fixtures/user';
 import { POST } from './route';
-
-const mockLimit = vi.fn();
-const mockVerifyPassword = vi.fn();
-
-vi.mock('@/lib/db', () => ({
-  db: {
-    select: () => ({
-      from: () => ({
-        where: () => ({
-          limit: (...args: unknown[]) => mockLimit(...args),
-        }),
-      }),
-    }),
-  },
-}));
-
-vi.mock('@/lib/auth/password', () => ({
-  verifyPassword: (...args: unknown[]) => mockVerifyPassword(...args),
-}));
-
-const user = {
-  id: 'e1e31db5-d029-4ba7-aa65-fd6a5e7fdea',
-  email: 'test@example.com',
-  passwordHash: 'hashed',
-  createdAt: new Date(),
-};
 
 function loginRequest(body: unknown) {
   return new Request('http://localhost/api/auth/login', {
@@ -39,8 +15,7 @@ function loginRequest(body: unknown) {
 describe('POST /api/auth/login', () => {
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
-    mockLimit.mockReset();
-    mockVerifyPassword.mockReset();
+    resetAuthMocks();
   });
 
   it('returns 400 for invalid JSON', async () => {
@@ -74,15 +49,15 @@ describe('POST /api/auth/login', () => {
   });
 
   it('returns 401 when password does not match', async () => {
-    mockLimit.mockResolvedValue([user]);
+    mockLimit.mockResolvedValue([testUser]);
     mockVerifyPassword.mockResolvedValue(false);
     const response = await POST(loginRequest({ email: 'test@example.com', password: 'wrong' }));
     expect(response.status).toBe(401);
-    expect(mockVerifyPassword).toHaveBeenCalledWith('wrong', user.passwordHash);
+    expect(mockVerifyPassword).toHaveBeenCalledWith('wrong', testUser.passwordHash);
   });
 
   it('returns 200 with token and Set-Cookie on success', async () => {
-    mockLimit.mockResolvedValue([user]);
+    mockLimit.mockResolvedValue([testUser]);
     mockVerifyPassword.mockResolvedValue(true);
     const response = await POST(loginRequest({ email: '  Test@Example.COM  ', password: 'secret' }));
     expect(response.status).toBe(200);
@@ -92,6 +67,6 @@ describe('POST /api/auth/login', () => {
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toContain(`${AUTH_COOKIE_NAME}=`);
     expect(setCookie).toContain('HttpOnly');
-    expect(mockVerifyPassword).toHaveBeenCalledWith('secret', user.passwordHash);
+    expect(mockVerifyPassword).toHaveBeenCalledWith('secret', testUser.passwordHash);
   });
 });
