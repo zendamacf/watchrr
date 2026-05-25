@@ -32,10 +32,10 @@ export default defineConfig({
         'src/lib/sentry/**',
       ],
       thresholds: {
-        lines: 56,
-        statements: 57,
-        branches: 55,
-        functions: 46,
+        lines: 90,
+        statements: 90,
+        branches: 80,
+        functions: 90,
         'src/lib/auth/**': {
           lines: 95,
           branches: 90,
@@ -48,6 +48,10 @@ export default defineConfig({
         },
         'src/app/api/**': {
           lines: 85,
+        },
+        'src/app/(app)/**': {
+          lines: 85,
+          branches: 75,
         },
         'src/hooks/**': {
           lines: 90,
