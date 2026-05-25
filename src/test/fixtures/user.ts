@@ -6,9 +6,4 @@ export const seedEmails = {
   apiUser: 'vitest-api@example.com',
 } as const;
 
-/** Dedicated e2e user (Playwright); separate from vitest-* rows. */
-export const e2eEmails = {
-  login: 'e2e-login@example.com',
-} as const;
-
 export const seedPassword = 'secret';
