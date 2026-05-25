@@ -32,14 +32,18 @@ export const viewport: Viewport = {
 
 const isProd = process.env.NODE_ENV === 'production';
 
+const DEFAULT_COLOR_THEME = 'auto';
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" {...mantineHtmlProps} className={font.className}>
       <head>
-        <ColorSchemeScript />
+        <ColorSchemeScript defaultColorScheme={DEFAULT_COLOR_THEME} />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme} defaultColorScheme={DEFAULT_COLOR_THEME}>
+          {children}
+        </MantineProvider>
         {isProd && (
           <>
             <Analytics />

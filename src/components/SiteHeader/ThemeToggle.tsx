@@ -1,14 +1,15 @@
 'use client';
 
-import { Switch, useMantineColorScheme } from '@mantine/core';
+import { Switch, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { useMounted } from '@mantine/hooks';
 import { Moon, Sun } from 'lucide-react';
 import { useCallback } from 'react';
 
 export function ThemeToggle() {
-  const { setColorScheme, colorScheme } = useMantineColorScheme({ keepTransitions: true });
+  const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const mounted = useMounted();
-  const isDark = colorScheme === 'dark';
+  const isDark = computedColorScheme === 'dark';
 
   const toggleTheme = useCallback(() => {
     setColorScheme(isDark ? 'light' : 'dark');

@@ -1,6 +1,5 @@
 # TODO
 
-* Use device theme as default.
 
 ## Maybe
 
@@ -19,3 +18,4 @@
 * Set up CI/CD for automatic database migrations after MR merges
 * Add CI/CD for automatic branching of Neon database for tests.
 * Manually migrate data from Supabase database to Neon
+* Use device theme as default.
