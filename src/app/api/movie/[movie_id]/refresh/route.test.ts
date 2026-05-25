@@ -43,7 +43,7 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
     const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: String(movie.id) }));
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({ message: 'Success' });
-    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
+    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.uuid);
   });
 
   it('refreshes the movie by uuid', async () => {
@@ -51,6 +51,6 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
     mockRefreshMovie.mockResolvedValue(undefined);
     const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.uuid)), routeParams({ movie_id: movie.uuid }));
     expect(response.status).toBe(200);
-    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
+    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.uuid);
   });
 });

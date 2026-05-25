@@ -38,7 +38,7 @@ describe('refreshMovie', () => {
   });
 
   it('throws ResourceNotFound when the movie row does not exist', async () => {
-    await expect(refreshMovie(99_999_999)).rejects.toBeInstanceOf(ResourceNotFound);
+    await expect(refreshMovie('00000000-0000-4000-8000-000000009998')).rejects.toBeInstanceOf(ResourceNotFound);
     expect(mockGetMovie).not.toHaveBeenCalled();
   });
 
@@ -53,7 +53,7 @@ describe('refreshMovie', () => {
     });
     mockGetMovie.mockResolvedValue(tmdbMovie(MOVIedb_UNCHANGED));
 
-    await refreshMovie(movie.id);
+    await refreshMovie(movie.uuid);
 
     expect(mockGetMovie).toHaveBeenCalledWith(MOVIedb_UNCHANGED);
     const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
@@ -85,7 +85,7 @@ describe('refreshMovie', () => {
       }),
     );
 
-    await refreshMovie(movie.id);
+    await refreshMovie(movie.uuid);
 
     const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
     expect(after).toMatchObject({

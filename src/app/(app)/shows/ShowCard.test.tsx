@@ -2,10 +2,11 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
+import { toPublicShow } from '@/lib/db/public-media';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
-import type { Show } from '@/types';
+import type { ShowPublic } from '@/types';
 import { ShowCard } from './ShowCard';
 
 const { mockRefresh, mockShowError, mockShowSuccess } = vi.hoisted(() => ({
@@ -41,7 +42,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const show: Show = { ...testShow, id: 88_002, name: 'Card Show' };
+const show: ShowPublic = toPublicShow({ ...testShow, id: 88_002, name: 'Card Show' });
 
 describe('ShowCard', () => {
   beforeEach(() => {

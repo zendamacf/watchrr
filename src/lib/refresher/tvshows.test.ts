@@ -40,7 +40,7 @@ describe('refreshTvShow', () => {
   });
 
   it('throws ResourceNotFound when the show row does not exist', async () => {
-    await expect(refreshTvShow(99_999_999)).rejects.toBeInstanceOf(ResourceNotFound);
+    await expect(refreshTvShow('00000000-0000-4000-8000-000000009999')).rejects.toBeInstanceOf(ResourceNotFound);
     expect(mockGetTvShow).not.toHaveBeenCalled();
   });
 
@@ -56,7 +56,7 @@ describe('refreshTvShow', () => {
     mockGetTvShow.mockResolvedValue(tmdbShow(SHOW_UNCHANGED));
     mockGetAllEpisodes.mockResolvedValue([]);
 
-    await refreshTvShow(show.id);
+    await refreshTvShow(show.uuid);
 
     const [after] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
     expect(after?.name).toBe('Synced Show');
@@ -101,7 +101,7 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.id);
+    await refreshTvShow(show.uuid);
 
     const [afterShow] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
     expect(afterShow).toMatchObject({
@@ -112,7 +112,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/new-back.jpg',
     });
 
-    const afterEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
+    const afterEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_uuid, show.uuid));
     expect(afterEpisodes).toHaveLength(2);
     expect(afterEpisodes.map((e) => e.moviedb_id).sort()).toEqual([900_001, 900_002]);
     expect(afterEpisodes.find((e) => e.moviedb_id === 900_001)?.name).toBe('Premiere');
@@ -152,7 +152,7 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.id);
+    await refreshTvShow(show.uuid);
 
     const [afterEpisode] = await db.select().from(episodes).where(eq(episodes.moviedb_id, 900_101));
     expect(afterEpisode).toMatchObject({
@@ -205,9 +205,9 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.id);
+    await refreshTvShow(show.uuid);
 
-    const episodeRows = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
+    const episodeRows = await db.select().from(episodes).where(eq(episodes.tvshow_uuid, show.uuid));
     expect(episodeRows).toHaveLength(1);
     expect(episodeRows[0]?.name).toBe('Stable Episode');
   });

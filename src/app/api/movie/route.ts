@@ -2,6 +2,7 @@ import { and, eq, exists } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { toPublicMovie } from '@/lib/db/public-media';
 import { movies, subscribed_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
@@ -23,7 +24,7 @@ export async function GET() {
           .from(subscribed_movies)
           .where(
             and(
-              eq(subscribed_movies.movie_id, movies.id),
+              eq(subscribed_movies.movie_uuid, movies.uuid),
               eq(subscribed_movies.watcher_id, user.id),
               eq(subscribed_movies.watched, false),
             ),
@@ -32,7 +33,7 @@ export async function GET() {
     )
     .orderBy(movies.releasedate, movies.name);
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(data.map(toPublicMovie), { status: 200 });
 }
 
 /**
@@ -78,5 +79,5 @@ export async function POST(request: NextRequest) {
       set: { watched: false },
     });
 
-  return NextResponse.json({ message: 'Success', movie_id: movie.id, movie_uuid: movie.uuid }, { status: 201 });
+  return NextResponse.json({ message: 'Success', movie_uuid: movie.uuid }, { status: 201 });
 }

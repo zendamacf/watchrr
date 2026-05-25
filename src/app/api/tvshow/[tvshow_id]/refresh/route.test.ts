@@ -42,7 +42,7 @@ describe('PUT /api/tvshow/[tvshow_id]/refresh', () => {
     mockRefreshTvShow.mockResolvedValue(undefined);
     const response = await PUT(nextPut(apiRoutes.tvshowRefresh(show.id)), routeParams({ tvshow_id: String(show.id) }));
     expect(response.status).toBe(200);
-    expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
+    expect(mockRefreshTvShow).toHaveBeenCalledWith(show.uuid);
   });
 
   it('refreshes the show by uuid', async () => {
@@ -50,6 +50,6 @@ describe('PUT /api/tvshow/[tvshow_id]/refresh', () => {
     mockRefreshTvShow.mockResolvedValue(undefined);
     const response = await PUT(nextPut(apiRoutes.tvshowRefresh(show.uuid)), routeParams({ tvshow_id: show.uuid }));
     expect(response.status).toBe(200);
-    expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
+    expect(mockRefreshTvShow).toHaveBeenCalledWith(show.uuid);
   });
 });

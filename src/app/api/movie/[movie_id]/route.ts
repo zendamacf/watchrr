@@ -21,7 +21,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
   await db
     .update(subscribed_movies)
     .set({ watched: true })
-    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, resolved.id)));
+    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_uuid, resolved.uuid)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
@@ -41,7 +41,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
 
   await db
     .delete(subscribed_movies)
-    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, resolved.id)));
+    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_uuid, resolved.uuid)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }

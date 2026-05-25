@@ -2,11 +2,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
+import { toPublicMovie } from '@/lib/db/public-media';
 import { apiRoutes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testMovie } from '@/test/fixtures/movie';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
-import type { Movie } from '@/types';
+import type { MoviePublic } from '@/types';
 import { MovieCard } from './MovieCard';
 
 const { mockShowError, mockShowSuccess } = vi.hoisted(() => ({
@@ -34,7 +35,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const movie: Movie = { ...testMovie, id: 88_001, name: 'Card Movie' };
+const movie: MoviePublic = toPublicMovie({ ...testMovie, id: 88_001, name: 'Card Movie' });
 
 describe('MovieCard', () => {
   beforeEach(() => {

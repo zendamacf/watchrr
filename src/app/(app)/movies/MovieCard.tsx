@@ -8,11 +8,11 @@ import { DateTime } from 'luxon';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiRoutes } from '@/lib/routes';
-import type { Movie, MoviesResponse } from '@/types';
+import type { MoviePublic, MoviesResponse } from '@/types';
 import { BaseMovieCard } from './BaseMovieCard';
 
 type Props = {
-  movie: Movie;
+  movie: MoviePublic;
 };
 
 type MutationContext = { previousMovies: MoviesResponse | undefined };

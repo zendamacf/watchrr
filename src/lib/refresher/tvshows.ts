@@ -12,8 +12,8 @@ import { type DiffLookup, dateCompare, getDiff } from './utils';
  *
  * @throws {ResourceNotFound} if the TV Show cannot be found.
  */
-export const refreshTvShow = async (tvshow_id: number) => {
-  const [dbShow] = await db.select().from(tvshows).where(eq(tvshows.id, tvshow_id));
+export const refreshTvShow = async (tvshowUuid: string) => {
+  const [dbShow] = await db.select().from(tvshows).where(eq(tvshows.uuid, tvshowUuid));
   if (!dbShow) throw new ResourceNotFound();
 
   console.log(`[SHOW][${dbShow.name}] Refreshing`);
@@ -37,11 +37,11 @@ export const refreshTvShow = async (tvshow_id: number) => {
         poster_slug: apiShow.poster,
         backdrop_slug: apiShow.backdrop,
       })
-      .where(eq(tvshows.id, tvshow_id));
+      .where(eq(tvshows.uuid, tvshowUuid));
   }
 
   console.log(`[SHOW][${dbShow.name}] Refreshing episodes`);
-  const dbEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, dbShow.id));
+  const dbEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_uuid, dbShow.uuid));
   const apiEpisodes = await getAllEpisodes(dbShow.moviedb_id);
   if (apiEpisodes.length > dbEpisodes.length) {
     console.info(`[SHOW][${dbShow.name}] ${dbEpisodes.length}/${apiEpisodes.length} episodes existing`);
@@ -73,7 +73,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
             backdrop_slug: apiEpisode.backdrop,
             description: apiEpisode.description,
           })
-          .where(eq(episodes.id, dbEpisode.id));
+          .where(eq(episodes.uuid, dbEpisode.uuid));
         updated++;
       } else {
         ignored++;

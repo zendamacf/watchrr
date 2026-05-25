@@ -13,24 +13,24 @@ import { refreshTvShow } from '@/lib/refresher/tvshows';
  */
 export async function GET() {
   const subbedMovies = await db
-    .selectDistinct({ movie_id: subscribed_movies.movie_id, name: movies.name })
+    .selectDistinct({ movie_uuid: subscribed_movies.movie_uuid, name: movies.name })
     .from(subscribed_movies)
-    .innerJoin(movies, eq(movies.id, subscribed_movies.movie_id))
+    .innerJoin(movies, eq(movies.uuid, subscribed_movies.movie_uuid))
     .where(eq(subscribed_movies.watched, false))
     .orderBy(movies.name);
 
   for (const movieChunk of chunk(subbedMovies, 30)) {
-    await Promise.all(movieChunk.map((m) => refreshMovie(m.movie_id)));
+    await Promise.all(movieChunk.map((m) => refreshMovie(m.movie_uuid)));
   }
 
   const subbedShows = await db
-    .selectDistinct({ tvshow_id: subscribed_tvshows.tvshow_id, name: tvshows.name })
+    .selectDistinct({ tvshow_uuid: subscribed_tvshows.tvshow_uuid, name: tvshows.name })
     .from(subscribed_tvshows)
-    .innerJoin(tvshows, eq(tvshows.id, subscribed_tvshows.tvshow_id))
+    .innerJoin(tvshows, eq(tvshows.uuid, subscribed_tvshows.tvshow_uuid))
     .orderBy(tvshows.name);
 
   for (const showChunk of chunk(subbedShows, 30)) {
-    await Promise.all(showChunk.map((s) => refreshTvShow(s.tvshow_id)));
+    await Promise.all(showChunk.map((s) => refreshTvShow(s.tvshow_uuid)));
   }
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });

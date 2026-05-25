@@ -1,6 +1,7 @@
 import { and, eq, exists } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { toPublicShow } from '@/lib/db/public-media';
 import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { guardUser } from '@/utils/auth';
@@ -20,12 +21,12 @@ export async function GET() {
         db
           .select()
           .from(subscribed_tvshows)
-          .where(and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id))),
+          .where(and(eq(subscribed_tvshows.tvshow_uuid, tvshows.uuid), eq(subscribed_tvshows.watcher_id, user.id))),
       ),
     )
     .orderBy(tvshows.name);
 
-  return NextResponse.json(data, { status: 200 });
+  return NextResponse.json(data.map(toPublicShow), { status: 200 });
 }
 
 /**
@@ -68,5 +69,5 @@ export async function POST(request: NextRequest) {
     .values({ watcher_id: user.id, tvshow_id: show.id, tvshow_uuid: show.uuid })
     .onConflictDoNothing();
 
-  return NextResponse.json({ message: 'Success', tvshow_id: show.id, tvshow_uuid: show.uuid }, { status: 201 });
+  return NextResponse.json({ message: 'Success', tvshow_uuid: show.uuid }, { status: 201 });
 }

@@ -18,7 +18,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
   if (!resolved) return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
 
   try {
-    await refreshMovie(resolved.id);
+    await refreshMovie(resolved.uuid);
   } catch (e) {
     if (e instanceof ResourceNotFound) return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
     throw e;

@@ -20,7 +20,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
 
   await db
     .delete(subscribed_tvshows)
-    .where(and(eq(subscribed_tvshows.watcher_id, user.id), eq(subscribed_tvshows.tvshow_id, resolved.id)));
+    .where(and(eq(subscribed_tvshows.watcher_id, user.id), eq(subscribed_tvshows.tvshow_uuid, resolved.uuid)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
