@@ -24,6 +24,9 @@ jobs:
   e2e:
     needs: setup
     runs-on: ubuntu-latest
+    env:
+      AUTH_JWT_SECRET: test-jwt-secret
+      THEMOVIEDB_ACCESS_TOKEN: test-tmdb-token
 
     steps:
       - name: Create Neon Branch
@@ -62,8 +65,6 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
-          AUTH_JWT_SECRET: test-jwt-secret
-          THEMOVIEDB_ACCESS_TOKEN: test-tmdb-token
 
       - name: Upload Playwright report
         if: always()
