@@ -8,11 +8,11 @@ export const useRefreshMovie = () => {
   const { mutate: refresh, isPending: refreshPending } = useMutation<
     unknown,
     Error,
-    { movieId: number; name: string },
+    { movieUuid: string; name: string },
     { notificationId: string }
   >({
-    mutationFn: async ({ movieId }) => {
-      const response = await fetch(apiRoutes.movieRefresh(movieId), { method: 'put' });
+    mutationFn: async ({ movieUuid }) => {
+      const response = await fetch(apiRoutes.movieRefresh(movieUuid), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {
@@ -49,11 +49,11 @@ export const useRefreshShow = () => {
   const { mutate: refresh, isPending: refreshPending } = useMutation<
     unknown,
     Error,
-    { tvshowId: number; name: string },
+    { tvshowUuid: string; name: string },
     { notificationId: string }
   >({
-    mutationFn: async ({ tvshowId }) => {
-      const response = await fetch(apiRoutes.tvshowRefresh(tvshowId), { method: 'put' });
+    mutationFn: async ({ tvshowUuid }) => {
+      const response = await fetch(apiRoutes.tvshowRefresh(tvshowUuid), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: ({ name }) => {

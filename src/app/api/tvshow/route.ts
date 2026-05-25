@@ -68,7 +68,5 @@ export async function POST(request: NextRequest) {
     .values({ watcher_id: user.id, tvshow_id: show.id, tvshow_uuid: show.uuid })
     .onConflictDoNothing();
 
-  const tvshow_id = show.id;
-
-  return NextResponse.json({ message: 'Success', tvshow_id }, { status: 201 });
+  return NextResponse.json({ message: 'Success', tvshow_id: show.id, tvshow_uuid: show.uuid }, { status: 201 });
 }

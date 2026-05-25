@@ -19,55 +19,53 @@ type MutationContext = { previousMovies: MoviesResponse | undefined };
 
 export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
+  const queryClient = useQueryClient();
 
-  const onMutate = async (movie_id: number, callback?: () => void): Promise<MutationContext> => {
-    // Cancel ongoing refetch to not overwrite optimistic update
+  const onMutate = async (movieUuid: string, callback?: () => void): Promise<MutationContext> => {
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
     const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
-    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movie_id));
+    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.uuid !== movieUuid));
     if (callback) callback();
-    return { previousMovies }; // Context for rollback
+    return { previousMovies };
   };
 
   const onError = (error: Error, _vars: unknown, context: MutationContext | undefined) => {
     showError({ title: 'An error occurred', message: error.message });
-    // Revert optimistic update
-    queryClient.setQueryData([QueryKey.getEpisodes], context?.previousMovies);
+    queryClient.setQueryData([QueryKey.getMovies], context?.previousMovies);
   };
 
-  const queryClient = useQueryClient();
-  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (movie_id) => {
-      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'put' });
+  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (movieUuid) => {
+      const response = await fetch(apiRoutes.movieById(movieUuid), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movie_id) =>
-      onMutate(movie_id, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
+    onMutate: (movieUuid) =>
+      onMutate(movieUuid, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (movie_id) => {
-      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'delete' });
+  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (movieUuid) => {
+      const response = await fetch(apiRoutes.movieById(movieUuid), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movie_id) =>
-      onMutate(movie_id, () =>
+    onMutate: (movieUuid) =>
+      onMutate(movieUuid, () =>
         showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` }),
       ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const confirmUnsubscribe = (movie_id: number) =>
+  const confirmUnsubscribe = (movieUuid: string) =>
     openConfirmModal({
       title: 'Are you sure?',
       children: <Text size="sm">Do you want to stop following {movie.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       centered: true,
-      onConfirm: () => remove(movie_id),
+      onConfirm: () => remove(movieUuid),
     });
 
   return (
@@ -81,14 +79,14 @@ export const MovieCard = ({ movie }: Props) => {
       description
       actions={
         <>
-          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>
+          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.uuid)}>
             <Check size={'20'} />
           </ActionIcon>
           <ActionIcon
             aria-label="Unsubscribe"
             color={'red'}
             loading={pendingRemove}
-            onClick={() => confirmUnsubscribe(movie.id)}
+            onClick={() => confirmUnsubscribe(movie.uuid)}
           >
             <X size={'20'} />
           </ActionIcon>

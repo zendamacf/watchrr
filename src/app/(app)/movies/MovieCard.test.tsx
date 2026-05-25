@@ -52,7 +52,7 @@ describe('MovieCard', () => {
     await user.click(buttons[0]!);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(apiRoutes.movieById(movie.id), { method: 'put' });
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.movieById(movie.uuid), { method: 'put' });
       expect(mockShowSuccess).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringContaining('Card Movie') }),
       );

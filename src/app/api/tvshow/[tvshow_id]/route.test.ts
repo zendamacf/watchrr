@@ -31,8 +31,8 @@ describe('DELETE /api/tvshow/[tvshow_id]', () => {
     expect(response.status).toBe(401);
   });
 
-  it('removes the subscription', async () => {
-    const { tvshowId } = await seedSubscribedTvShow({
+  it('removes the subscription by legacy numeric id', async () => {
+    const { tvshowId, show } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_401, name: 'Drop Show' },
     });
@@ -40,6 +40,21 @@ describe('DELETE /api/tvshow/[tvshow_id]', () => {
       nextDelete(apiRoutes.tvshowById(tvshowId)),
       routeParams({ tvshow_id: String(tvshowId) }),
     );
+    expect(response.status).toBe(200);
+
+    const rows = await db
+      .select()
+      .from(subscribed_tvshows)
+      .where(and(eq(subscribed_tvshows.watcher_id, userId), eq(subscribed_tvshows.tvshow_id, tvshowId)));
+    expect(rows).toHaveLength(0);
+  });
+
+  it('removes the subscription by uuid', async () => {
+    const { tvshowId, show } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 998_402, name: 'Drop Show UUID' },
+    });
+    const response = await DELETE(nextDelete(apiRoutes.tvshowById(show.uuid)), routeParams({ tvshow_id: show.uuid }));
     expect(response.status).toBe(200);
 
     const rows = await db

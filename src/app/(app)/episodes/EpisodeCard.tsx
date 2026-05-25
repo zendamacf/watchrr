@@ -26,17 +26,16 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (episode_id) => {
-      const response = await fetch(apiRoutes.episodeById(episode_id), { method: 'put' });
+  const { mutate, isPending } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (episodeUuid) => {
+      const response = await fetch(apiRoutes.episodeById(episodeUuid), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: async (episode_id) => {
-      // Cancel ongoing refetch to not overwrite optimistic update
+    onMutate: async (episodeUuid) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
       const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
       queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.filter((o) => o.episodes.id !== episode_id),
+        old?.filter((o) => o.episodes.uuid !== episodeUuid),
       );
       showSuccess({
         title: 'Nice!',
@@ -53,7 +52,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   });
 
   return (
-    <BackdropCard key={episode.episodes.id} style={{ width: '100%' }} backdrop={episode.tvshows.backdrop_slug}>
+    <BackdropCard key={episode.episodes.uuid} style={{ width: '100%' }} backdrop={episode.tvshows.backdrop_slug}>
       <Title order={3} lineClamp={1}>
         {episode.tvshows.name}
       </Title>
@@ -82,7 +81,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
               </ActionIcon>
             )}
           </CopyButton>
-          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.id)}>
+          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.uuid)}>
             <Check size={'20'} />
           </ActionIcon>
         </Group>

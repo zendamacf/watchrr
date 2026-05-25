@@ -17,7 +17,7 @@ export const AddShowModal = (props: Props) => {
 
   const queryClient = useQueryClient();
   const { mutate: add, isPending: pendingAdd } = useMutation<
-    { tvshowId: number },
+    { tvshowUuid: string },
     Error,
     { moviedb_id: number; name: string }
   >({
@@ -32,10 +32,10 @@ export const AddShowModal = (props: Props) => {
       });
       const json = await response.json();
       if (!response.ok) throw new Error(json.message);
-      return { tvshowId: json.tvshow_id };
+      return { tvshowUuid: json.tvshow_uuid as string };
     },
     onSuccess: (data, tvshow) => {
-      refresh({ tvshowId: data.tvshowId, name: tvshow.name });
+      refresh({ tvshowUuid: data.tvshowUuid, name: tvshow.name });
       showSuccess({ title: 'Nice!', message: `You're now following ${tvshow.name}` });
       queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
     },

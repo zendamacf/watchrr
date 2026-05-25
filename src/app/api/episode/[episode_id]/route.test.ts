@@ -31,7 +31,7 @@ describe('PUT /api/episode/[episode_id]', () => {
     expect(response.status).toBe(401);
   });
 
-  it('marks an episode as watched', async () => {
+  it('marks an episode as watched by legacy numeric id', async () => {
     const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_501, name: 'Episode Show' },
@@ -45,6 +45,26 @@ describe('PUT /api/episode/[episode_id]', () => {
       nextPut(apiRoutes.episodeById(episode.id)),
       routeParams({ episode_id: String(episode.id) }),
     );
+    expect(response.status).toBe(200);
+
+    const [row] = await db
+      .select()
+      .from(watched_episodes)
+      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
+    expect(row).toBeDefined();
+  });
+
+  it('marks an episode as watched by uuid', async () => {
+    const { tvshowId } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 998_503, name: 'Episode Show UUID' },
+    });
+    const episode = await seedEpisode({
+      tvshowId,
+      overrides: { moviedb_id: 998_504, name: 'Ep to watch UUID' },
+    });
+
+    const response = await PUT(nextPut(apiRoutes.episodeById(episode.uuid)), routeParams({ episode_id: episode.uuid }));
     expect(response.status).toBe(200);
 
     const [row] = await db

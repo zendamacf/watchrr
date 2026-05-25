@@ -32,13 +32,29 @@ describe('/api/movie/[movie_id]', () => {
       expect(response.status).toBe(401);
     });
 
-    it('marks a subscribed movie as watched', async () => {
+    it('marks a subscribed movie as watched by legacy numeric id', async () => {
       const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_301, name: 'Watch Me' },
         watched: false,
       });
       const response = await PUT(nextPut(apiRoutes.movieById(movieId)), routeParams({ movie_id: String(movieId) }));
+      expect(response.status).toBe(200);
+
+      const [row] = await db
+        .select()
+        .from(subscribed_movies)
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
+      expect(row?.watched).toBe(true);
+    });
+
+    it('marks a subscribed movie as watched by uuid', async () => {
+      const { movieId, movie } = await seedSubscribedMovie({
+        watcherId: userId,
+        movie: { moviedb_id: 998_303, name: 'Watch Me UUID' },
+        watched: false,
+      });
+      const response = await PUT(nextPut(apiRoutes.movieById(movie.uuid)), routeParams({ movie_id: movie.uuid }));
       expect(response.status).toBe(200);
 
       const [row] = await db
@@ -61,15 +77,12 @@ describe('/api/movie/[movie_id]', () => {
       expect(response.status).toBe(401);
     });
 
-    it('removes the subscription', async () => {
-      const { movieId } = await seedSubscribedMovie({
+    it('removes the subscription by uuid', async () => {
+      const { movieId, movie } = await seedSubscribedMovie({
         watcherId: userId,
-        movie: { moviedb_id: 998_302, name: 'Unsubscribe Me' },
+        movie: { moviedb_id: 998_304, name: 'Unsubscribe Me UUID' },
       });
-      const response = await DELETE(
-        nextDelete(apiRoutes.movieById(movieId)),
-        routeParams({ movie_id: String(movieId) }),
-      );
+      const response = await DELETE(nextDelete(apiRoutes.movieById(movie.uuid)), routeParams({ movie_id: movie.uuid }));
       expect(response.status).toBe(200);
 
       const rows = await db

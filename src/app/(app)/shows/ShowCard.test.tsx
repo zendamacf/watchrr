@@ -58,7 +58,7 @@ describe('ShowCard', () => {
     const buttons = screen.getAllByRole('button');
     await user.click(buttons[0]!);
 
-    expect(mockRefresh).toHaveBeenCalledWith({ tvshowId: show.id, name: show.name });
+    expect(mockRefresh).toHaveBeenCalledWith({ tvshowUuid: show.uuid, name: show.name });
   });
 
   it('unsubscribes when confirm modal is confirmed', async () => {

@@ -32,6 +32,13 @@ describe('apiRoutes', () => {
     expect(apiRoutes.tvshowById('7')).toBe('/api/tvshow/7/');
   });
 
+  it('media routes accept UUID path segments', () => {
+    const uuid = '00000000-0000-4000-8000-000000000001';
+    expect(apiRoutes.movieById(uuid)).toBe(`/api/movie/${uuid}/`);
+    expect(apiRoutes.tvshowRefresh(uuid)).toBe(`/api/tvshow/${uuid}/refresh`);
+    expect(apiRoutes.episodeById(uuid)).toBe(`/api/episode/${uuid}/`);
+  });
+
   it('movieRefresh and tvshowRefresh build refresh paths', () => {
     expect(apiRoutes.movieRefresh(1)).toBe('/api/movie/1/refresh');
     expect(apiRoutes.tvshowRefresh('99')).toBe('/api/tvshow/99/refresh');
