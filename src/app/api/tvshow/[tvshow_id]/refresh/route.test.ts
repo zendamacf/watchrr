@@ -46,4 +46,12 @@ describe('PUT /api/tvshow/[tvshow_id]/refresh', () => {
     expect(response.status).toBe(200);
     expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
   });
+
+  it('rethrows unexpected refresh errors', async () => {
+    const show = await seedTvShow({ moviedb_id: 998_452, name: 'Refresh Boom' });
+    mockRefreshTvShow.mockRejectedValue(new Error('TMDB down'));
+    await expect(PUT(nextPut(apiRoutes.tvshowRefresh(show.id)), routeParams({ tvshow_id: show.id }))).rejects.toThrow(
+      'TMDB down',
+    );
+  });
 });

@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
+import { apiRoutes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
@@ -81,6 +82,28 @@ describe('ShowCard', () => {
       expect(mockShowSuccess).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringContaining('Card Show') }),
       );
+    });
+  });
+
+  it('shows an error and rolls back when unsubscribe fails', async () => {
+    const { openConfirmModal } = await import('@mantine/modals');
+    vi.mocked(openConfirmModal).mockImplementation(({ onConfirm }) => {
+      onConfirm?.();
+      return 'test-modal-id';
+    });
+    stubFetch(mockFetchResponse({ message: 'Forbidden' }, { ok: false, status: 403 }));
+
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData([QueryKey.getShows], [show]);
+    renderWithProviders(<ShowCard show={show} />, { queryClient });
+
+    await user.click(screen.getByLabelText('Unsubscribe'));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.tvshowById(show.id), { method: 'delete' });
+      expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Forbidden' }));
+      expect(queryClient.getQueryData([QueryKey.getShows])).toEqual([show]);
     });
   });
 });

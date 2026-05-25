@@ -58,4 +58,42 @@ describe('MovieCard', () => {
       );
     });
   });
+
+  it('shows an error and rolls back when mark watched fails', async () => {
+    stubFetch(mockFetchResponse({ message: 'Not found' }, { ok: false, status: 404 }));
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData([QueryKey.getMovies], [movie]);
+    renderWithProviders(<MovieCard movie={movie} />, { queryClient });
+
+    await user.click(screen.getByLabelText('Mark watched'));
+
+    await waitFor(() => {
+      expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Not found' }));
+      expect(queryClient.getQueryData([QueryKey.getMovies])).toEqual([movie]);
+    });
+  });
+
+  it('unsubscribes when confirm modal is confirmed', async () => {
+    const { openConfirmModal } = await import('@mantine/modals');
+    vi.mocked(openConfirmModal).mockImplementation(({ onConfirm }) => {
+      onConfirm?.();
+      return 'test-modal-id';
+    });
+
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData([QueryKey.getMovies], [movie]);
+    renderWithProviders(<MovieCard movie={movie} />, { queryClient });
+
+    await user.click(screen.getByLabelText('Unsubscribe'));
+
+    await waitFor(() => {
+      expect(openConfirmModal).toHaveBeenCalled();
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.movieById(movie.id), { method: 'delete' });
+      expect(mockShowSuccess).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('Card Movie') }),
+      );
+    });
+  });
 });
