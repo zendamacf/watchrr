@@ -39,7 +39,7 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
     await expect(response.json()).resolves.toEqual({ message: 'Could not find movie' });
   });
 
-  it('refreshes the movie by uuid', async () => {
+  it('refreshes the movie by id', async () => {
     const movie = await seedMovie({ moviedb_id: 998_351, name: 'Refresh Target' });
     mockRefreshMovie.mockResolvedValue(undefined);
     const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: movie.id }));

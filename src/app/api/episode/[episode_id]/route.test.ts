@@ -33,7 +33,7 @@ describe('PUT /api/episode/[episode_id]', () => {
     expect(response.status).toBe(401);
   });
 
-  it('marks an episode as watched by uuid', async () => {
+  it('marks an episode as watched by id', async () => {
     const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_501, name: 'Episode Show' },

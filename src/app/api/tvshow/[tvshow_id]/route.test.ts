@@ -33,7 +33,7 @@ describe('DELETE /api/tvshow/[tvshow_id]', () => {
     expect(response.status).toBe(401);
   });
 
-  it('removes the subscription by uuid', async () => {
+  it('removes the subscription by id', async () => {
     const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_401, name: 'Drop Show' },

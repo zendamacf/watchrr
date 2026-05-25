@@ -39,7 +39,7 @@ describe('PUT /api/tvshow/[tvshow_id]/refresh', () => {
     await expect(response.json()).resolves.toEqual({ message: 'Could not find show' });
   });
 
-  it('refreshes the show by uuid', async () => {
+  it('refreshes the show by id', async () => {
     const show = await seedTvShow({ moviedb_id: 998_451, name: 'Refresh Show' });
     mockRefreshTvShow.mockResolvedValue(undefined);
     const response = await PUT(nextPut(apiRoutes.tvshowRefresh(show.id)), routeParams({ tvshow_id: show.id }));

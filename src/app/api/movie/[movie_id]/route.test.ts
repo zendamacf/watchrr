@@ -34,7 +34,7 @@ describe('/api/movie/[movie_id]', () => {
       expect(response.status).toBe(401);
     });
 
-    it('marks a subscribed movie as watched by uuid', async () => {
+    it('marks a subscribed movie as watched by id', async () => {
       const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_301, name: 'Watch Me' },
@@ -63,7 +63,7 @@ describe('/api/movie/[movie_id]', () => {
       expect(response.status).toBe(401);
     });
 
-    it('removes the subscription by uuid', async () => {
+    it('removes the subscription by id', async () => {
       const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_304, name: 'Unsubscribe Me' },
