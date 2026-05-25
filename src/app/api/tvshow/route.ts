@@ -64,10 +64,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await db
-    .insert(subscribed_tvshows)
-    .values({ watcher_id: user.id, tvshow_id: show.id, tvshow_uuid: show.uuid })
-    .onConflictDoNothing();
+  await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_uuid: show.uuid }).onConflictDoNothing();
 
   return NextResponse.json({ message: 'Success', tvshow_uuid: show.uuid }, { status: 201 });
 }

@@ -36,7 +36,7 @@ describe('/api/movie', () => {
         movie: { moviedb_id: 998_201, name: 'Unwatched Movie' },
         watched: false,
       });
-      const { movieId: watchedId } = await seedSubscribedMovie({
+      const { movieUuid: watchedUuid } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_202, name: 'Watched Movie' },
         watched: false,
@@ -44,7 +44,7 @@ describe('/api/movie', () => {
       await db
         .update(subscribed_movies)
         .set({ watched: true })
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, watchedId)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, watchedUuid)));
 
       const response = await GET();
       expect(response.status).toBe(200);
@@ -100,7 +100,7 @@ describe('/api/movie', () => {
     });
 
     it('resets watched to false when re-subscribing', async () => {
-      const { movieId } = await seedSubscribedMovie({
+      const { movieUuid } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_206, name: 'Re-subscribe' },
         watched: true,
@@ -111,7 +111,7 @@ describe('/api/movie', () => {
       const [row] = await db
         .select()
         .from(subscribed_movies)
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, movieUuid)));
       expect(row?.watched).toBe(false);
     });
   });

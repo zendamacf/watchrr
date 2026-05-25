@@ -32,16 +32,15 @@ export async function seedTvShow(overrides: Partial<typeof testShow> = {}): Prom
 export async function seedSubscribedTvShow(options: {
   watcherId: string;
   show?: Partial<typeof testShow>;
-}): Promise<{ show: Show; tvshowId: number }> {
+}): Promise<{ show: Show; tvshowUuid: string }> {
   const show = await seedTvShow(options.show ?? {});
   await db
     .insert(subscribed_tvshows)
     .values({
       watcher_id: options.watcherId,
-      tvshow_id: show.id,
       tvshow_uuid: show.uuid,
     })
     .onConflictDoNothing();
 
-  return { show, tvshowId: show.id };
+  return { show, tvshowUuid: show.uuid };
 }

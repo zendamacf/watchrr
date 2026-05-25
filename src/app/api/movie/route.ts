@@ -73,9 +73,9 @@ export async function POST(request: NextRequest) {
 
   await db
     .insert(subscribed_movies)
-    .values({ watcher_id: user.id, movie_id: movie.id, movie_uuid: movie.uuid })
+    .values({ watcher_id: user.id, movie_uuid: movie.uuid })
     .onConflictDoUpdate({
-      target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
+      target: [subscribed_movies.movie_uuid, subscribed_movies.watcher_id],
       set: { watched: false },
     });
 

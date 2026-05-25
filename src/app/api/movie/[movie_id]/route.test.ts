@@ -10,6 +10,8 @@ import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedSubscribedMovie, seedUser } from '@/test/seeds';
 import { DELETE, PUT } from './route';
 
+const unknownUuid = '00000000-0000-4000-8000-000000000098';
+
 describe('/api/movie/[movie_id]', () => {
   let userId: string;
 
@@ -21,74 +23,61 @@ describe('/api/movie/[movie_id]', () => {
   });
 
   describe('PUT', () => {
-    it('returns 400 for an invalid movie id', async () => {
+    it('returns 400 for a non-UUID movie id', async () => {
       const response = await PUT(nextPut(apiRoutes.movieById('abc')), routeParams({ movie_id: 'abc' }));
       expect(response.status).toBe(400);
     });
 
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
-      const response = await PUT(nextPut(apiRoutes.movieById(1)), routeParams({ movie_id: '1' }));
+      const response = await PUT(nextPut(apiRoutes.movieById(unknownUuid)), routeParams({ movie_id: unknownUuid }));
       expect(response.status).toBe(401);
     });
 
-    it('marks a subscribed movie as watched by legacy numeric id', async () => {
-      const { movieId } = await seedSubscribedMovie({
+    it('marks a subscribed movie as watched by uuid', async () => {
+      const { movieUuid } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_301, name: 'Watch Me' },
         watched: false,
       });
-      const response = await PUT(nextPut(apiRoutes.movieById(movieId)), routeParams({ movie_id: String(movieId) }));
+      const response = await PUT(nextPut(apiRoutes.movieById(movieUuid)), routeParams({ movie_id: movieUuid }));
       expect(response.status).toBe(200);
 
       const [row] = await db
         .select()
         .from(subscribed_movies)
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
-      expect(row?.watched).toBe(true);
-    });
-
-    it('marks a subscribed movie as watched by uuid', async () => {
-      const { movieId, movie } = await seedSubscribedMovie({
-        watcherId: userId,
-        movie: { moviedb_id: 998_303, name: 'Watch Me UUID' },
-        watched: false,
-      });
-      const response = await PUT(nextPut(apiRoutes.movieById(movie.uuid)), routeParams({ movie_id: movie.uuid }));
-      expect(response.status).toBe(200);
-
-      const [row] = await db
-        .select()
-        .from(subscribed_movies)
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, movieUuid)));
       expect(row?.watched).toBe(true);
     });
   });
 
   describe('DELETE', () => {
-    it('returns 400 for an invalid movie id', async () => {
+    it('returns 400 for a non-UUID movie id', async () => {
       const response = await DELETE(nextDelete(apiRoutes.movieById('nope')), routeParams({ movie_id: 'nope' }));
       expect(response.status).toBe(400);
     });
 
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
-      const response = await DELETE(nextDelete(apiRoutes.movieById(1)), routeParams({ movie_id: '1' }));
+      const response = await DELETE(
+        nextDelete(apiRoutes.movieById(unknownUuid)),
+        routeParams({ movie_id: unknownUuid }),
+      );
       expect(response.status).toBe(401);
     });
 
     it('removes the subscription by uuid', async () => {
-      const { movieId, movie } = await seedSubscribedMovie({
+      const { movieUuid } = await seedSubscribedMovie({
         watcherId: userId,
-        movie: { moviedb_id: 998_304, name: 'Unsubscribe Me UUID' },
+        movie: { moviedb_id: 998_304, name: 'Unsubscribe Me' },
       });
-      const response = await DELETE(nextDelete(apiRoutes.movieById(movie.uuid)), routeParams({ movie_id: movie.uuid }));
+      const response = await DELETE(nextDelete(apiRoutes.movieById(movieUuid)), routeParams({ movie_id: movieUuid }));
       expect(response.status).toBe(200);
 
       const rows = await db
         .select()
         .from(subscribed_movies)
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, movieUuid)));
       expect(rows).toHaveLength(0);
     });
   });

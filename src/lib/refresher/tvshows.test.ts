@@ -128,7 +128,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/b.jpg',
     });
     await seedEpisode({
-      tvshowId: show.id,
+      tvshowUuid: show.uuid,
       overrides: {
         moviedb_id: 900_101,
         season: 1,
@@ -173,7 +173,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/b.jpg',
     });
     await seedEpisode({
-      tvshowId: show.id,
+      tvshowUuid: show.uuid,
       overrides: {
         moviedb_id: 900_201,
         season: 2,

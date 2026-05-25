@@ -1,28 +1,22 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
-import { episodes, tvshows } from '@/lib/db/schema';
+import { episodes } from '@/lib/db/schema';
 import { testEpisode } from '@/test/fixtures/episode';
 import type { Episode } from '@/types';
 
 export async function seedEpisode(options: {
-  tvshowId: number;
+  tvshowUuid: string;
   overrides?: Partial<typeof testEpisode>;
 }): Promise<Episode> {
-  const values = { ...testEpisode, tvshow_id: options.tvshowId, ...options.overrides };
+  const values = { ...testEpisode, tvshow_uuid: options.tvshowUuid, ...options.overrides };
 
   const [existing] = await db.select().from(episodes).where(eq(episodes.moviedb_id, values.moviedb_id)).limit(1);
   if (existing) return existing;
 
-  const [show] = await db.select({ uuid: tvshows.uuid }).from(tvshows).where(eq(tvshows.id, values.tvshow_id)).limit(1);
-  if (!show) {
-    throw new Error(`TV show ${values.tvshow_id} not found for episode seed`);
-  }
-
   const [inserted] = await db
     .insert(episodes)
     .values({
-      tvshow_id: values.tvshow_id,
-      tvshow_uuid: show.uuid,
+      tvshow_uuid: values.tvshow_uuid,
       season: values.season,
       episode: values.episode,
       name: values.name,
