@@ -10,6 +10,8 @@
 ```bash
 npm test                 # all unit + UI tests
 npm run test:coverage    # coverage report + threshold checks
+npm run test:e2e         # Playwright e2e (requires build in CI; see E2E below)
+npm run test:e2e:ui      # Playwright UI mode (local debugging)
 ```
 
 Open `coverage/index.html` after a coverage run for per-file detail.
@@ -20,6 +22,7 @@ Open `coverage/index.html` after a coverage run for per-file detail.
 |------|----------|--------|
 | Unit tests | `src/**/*.test.ts` | Node; API routes, lib, seeds |
 | UI tests | `src/**/*.test.tsx` | happy-dom; components, hooks |
+| E2E tests | [`e2e/`](../../e2e/) | Playwright; full browser flows |
 | Seeds | [`src/test/seeds/`](src/test/seeds/) | Idempotent inserts |
 | Mocks | [`src/test/mocks/`](src/test/mocks/) | Import subpaths directly (see below) |
 | Render helpers | [`src/test/render.tsx`](src/test/render.tsx), [`src/test/renderHook.tsx`](src/test/renderHook.tsx) | Mantine + React Query |
@@ -55,8 +58,28 @@ Configured in [`vitest.config.mts`](vitest.config.mts):
 - Shared `src/components/**` (auth forms are tested but excluded from the coverage denominator until component coverage is tracked here)
 - Instrumentation, Sentry wiring, Drizzle schema, TMDB client bootstrap
 
-Full user flows across pages are a better fit for future E2E (see [TODO.md](TODO.md)).
+Full user flows across pages are covered by E2E (see below), not Vitest coverage %.
+
+## E2E (Playwright)
+
+**Prerequisites:** same `.env` as unit tests (`DATABASE_URL` required). `AUTH_JWT_SECRET` and `THEMOVIEDB_ACCESS_TOKEN` default in [`e2e/global-setup.ts`](../../e2e/global-setup.ts) when missing.
+
+**Local:**
+
+```bash
+npx playwright install chromium   # once per machine
+npm run build                     # optional if reusing dev server
+npm run test:e2e                  # starts dev server unless one is already on :3000
+```
+
+Uses `e2e-login@example.com` (seeded in global setup; see [`e2eEmails`](fixtures/user.ts)).
+
+**CI:** [`.github/workflows/pr-e2e-tests.yml`](../../.github/workflows/pr-e2e-tests.yml) — Neon `*-e2e` branch, migrate, build, Playwright, artifact upload, PR comment via `daun/playwright-report-summary`.
+
+Phase 2 (later): add-media flows with Playwright `route` mocks for TMDB (do not hit real API in CI).
 
 ## CI
 
-[`.github/workflows/pr-checks.yml`](.github/workflows/pr-checks.yml) runs lint, typecheck, migrations on a Neon preview branch, `npm run test:coverage`, and posts a coverage summary comment on the PR. Vitest thresholds must pass for the job to succeed.
+- [`.github/workflows/pr-linting.yml`](../../.github/workflows/pr-linting.yml) — lint and typecheck.
+- [`.github/workflows/pr-tests.yml`](../../.github/workflows/pr-tests.yml) — Vitest coverage on Neon `*-tests` branch; coverage PR comment.
+- [`.github/workflows/pr-e2e-tests.yml`](../../.github/workflows/pr-e2e-tests.yml) — Playwright e2e on Neon `*-e2e` branch; test-results PR comment.
