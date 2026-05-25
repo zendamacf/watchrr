@@ -35,29 +35,31 @@ export default defineConfig({
         'src/lib/sentry/**',
       ],
       thresholds: {
-        lines: 90,
-        statements: 90,
-        branches: 80,
-        functions: 90,
+        lines: 95,
+        statements: 92,
+        branches: 82,
+        functions: 98,
         'src/lib/auth/**': {
           lines: 95,
           branches: 90,
         },
         'src/lib/refresher/**': {
-          lines: 80,
+          lines: 95,
         },
         'src/lib/themoviedb/**': {
           lines: 95,
         },
         'src/app/api/**': {
-          lines: 85,
+          lines: 90,
+          branches: 80,
         },
         'src/app/(app)/**': {
-          lines: 85,
-          branches: 75,
+          lines: 90,
+          branches: 78,
         },
         'src/hooks/**': {
           lines: 90,
+          branches: 75,
         },
       },
     },
