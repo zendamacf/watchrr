@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiRoutes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { fetchRequestUrl, mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testTmdbMovie } from '@/test/fixtures/movie';
 import { renderWithProviders } from '@/test/render';
 import { AddMovieModal } from './AddMovieModal';
@@ -28,8 +28,8 @@ describe('AddMovieModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers({ shouldAdvanceTime: true });
-    stubFetch((input, init) => {
-      const url = typeof input === 'string' ? input : input.url;
+    stubFetch((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = fetchRequestUrl(input);
       if (url.includes('/api/movie/search') && init?.method !== 'POST') {
         return Promise.resolve(mockFetchResponse([testTmdbMovie]));
       }
@@ -73,8 +73,8 @@ describe('AddMovieModal', () => {
   });
 
   it('shows an error when subscribe fails', async () => {
-    stubFetch((input, init) => {
-      const url = typeof input === 'string' ? input : input.url;
+    stubFetch((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = fetchRequestUrl(input);
       if (url.includes('/api/movie/search')) {
         return Promise.resolve(mockFetchResponse([testTmdbMovie]));
       }

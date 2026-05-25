@@ -34,7 +34,7 @@ describe('EpisodeList', () => {
   });
 
   it('shows a loader while episodes are loading', () => {
-    stubFetch(() => new Promise(() => {}));
+    stubFetch(() => new Promise<Response>(() => {}));
     const { container } = renderWithProviders(<EpisodeList />);
     expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
   });

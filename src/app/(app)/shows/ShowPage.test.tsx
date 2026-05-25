@@ -30,7 +30,7 @@ describe('ShowPage', () => {
   });
 
   it('shows a loader while shows are loading', () => {
-    stubFetch(() => new Promise(() => {}));
+    stubFetch(() => new Promise<Response>(() => {}));
     const { container } = renderWithProviders(<ShowPage />);
     expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
   });

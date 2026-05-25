@@ -30,7 +30,7 @@ describe('MoviePage', () => {
   });
 
   it('shows a loader while movies are loading', () => {
-    stubFetch(() => new Promise(() => {}));
+    stubFetch(() => new Promise<Response>(() => {}));
     const { container } = renderWithProviders(<MoviePage />);
     expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
   });
