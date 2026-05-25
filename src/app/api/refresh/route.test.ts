@@ -2,7 +2,7 @@ import '@/test/mocks/refresher';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from '@/test/mocks/refresher';
-import { seedSubscribedMovie, seedSubscribedTvShow, seedUser } from '@/test/seeds';
+import { seedSubscribedMovie, seedSubscribedMovies, seedSubscribedTvShow, seedUser } from '@/test/seeds';
 import { GET } from './route';
 
 describe('GET /api/refresh', () => {
@@ -33,15 +33,14 @@ describe('GET /api/refresh', () => {
 
   it('refreshes unwatched movies in chunks of 30', async () => {
     const user = await seedUser({ email: 'vitest-cron-chunk@example.com', password: seedPassword });
-    const seededMovieIds: string[] = [];
-    for (let i = 0; i < 31; i++) {
-      const { movie } = await seedSubscribedMovie({
-        watcherId: user.id,
-        movie: { moviedb_id: 997_000 + i, name: `Chunk Movie ${i}` },
-        watched: false,
-      });
-      seededMovieIds.push(movie.id);
-    }
+    const { movieIds: seededMovieIds } = await seedSubscribedMovies({
+      watcherId: user.id,
+      movies: Array.from({ length: 31 }, (_, i) => ({
+        moviedb_id: 997_000 + i,
+        name: `Chunk Movie ${i}`,
+      })),
+      watched: false,
+    });
 
     mockRefreshMovie.mockClear();
     await GET();
@@ -51,5 +50,5 @@ describe('GET /api/refresh', () => {
       expect(refreshedIds).toContain(movieId);
     }
     expect(refreshedIds.filter((id) => seededMovieIds.includes(id))).toHaveLength(31);
-  }, 60_000);
+  });
 });
