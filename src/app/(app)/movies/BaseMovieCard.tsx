@@ -16,11 +16,11 @@ import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import type { Movie } from '@/types';
+import type { MovieCard } from '@/types';
 import { DateFormat } from '@/utils/dates';
 
 type Props = {
-  movie: Omit<Movie, 'releasedate'> & { releaseDate: DateTime | null };
+  movie: Omit<MovieCard, 'releasedate'> & { releaseDate: DateTime | null };
   releaseDate?: boolean;
   description?: boolean;
   actions?: ReactNode;

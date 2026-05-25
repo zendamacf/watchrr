@@ -2,6 +2,7 @@ import type { Movie } from '@/types';
 
 export const testMovie: Movie = {
   id: 1,
+  uuid: '00000000-0000-4000-8000-000000000002',
   name: 'Test Movie',
   releasedate: '2024-01-15',
   moviedb_id: 550,

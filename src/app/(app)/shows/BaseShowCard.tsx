@@ -15,10 +15,10 @@ import {
 import type { ReactNode } from 'react';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import type { Show } from '@/types';
+import type { ShowCard } from '@/types';
 
 type Props = {
-  show: Show;
+  show: ShowCard;
   actions?: ReactNode;
 } & CardProps;
 

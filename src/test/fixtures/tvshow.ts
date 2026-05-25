@@ -2,6 +2,7 @@ import type { Show } from '@/types';
 
 export const testShow: Show = {
   id: 1,
+  uuid: '00000000-0000-4000-8000-000000000001',
   name: 'Test Show',
   moviedb_id: 1399,
   country: 'US',

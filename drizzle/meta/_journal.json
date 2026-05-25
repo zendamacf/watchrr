@@ -8,6 +8,13 @@
       "when": 1779521525442,
       "tag": "0000_colossal_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779691859169,
+      "tag": "0001_add_entity_uuids",
+      "breakpoints": true
     }
   ]
 }
