@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { TMDBMovie } from '@/lib/themoviedb/movies';
 import { BaseMovieCard } from './BaseMovieCard';
@@ -17,7 +18,7 @@ export const AddMovieModal = (props: Props) => {
   const queryClient = useQueryClient();
   const { mutate: add, isPending: pendingAdd } = useMutation<unknown, Error, { moviedb_id: number; name: string }>({
     mutationFn: async (movie) => {
-      const response = await fetch(apiRoutes.movie, {
+      const response = await apiFetch(apiRoutes.movie, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -43,7 +44,7 @@ export const AddMovieModal = (props: Props) => {
       queryKey={QueryKey.searchMovies}
       queryFn={async (search) => {
         const params = new URLSearchParams({ q: search.trim() });
-        const response = await fetch(apiRoutes.movieSearch(params), { method: 'get' });
+        const response = await apiFetch(apiRoutes.movieSearch(params), { method: 'get' });
         if (response.ok) return await response.json();
         throw new Error((await response.json()).message);
       }}

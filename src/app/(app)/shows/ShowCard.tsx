@@ -7,6 +7,7 @@ import { RefreshCcw, X } from 'lucide-react';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { Show, ShowsResponse } from '@/types';
 import { BaseShowCard } from './BaseShowCard';
@@ -25,7 +26,7 @@ export const ShowCard = ({ show }: Props) => {
   const queryClient = useQueryClient();
   const { mutate: remove, isPending: removePending } = useMutation<unknown, Error, string, MutationContext>({
     mutationFn: async (tvshowId) => {
-      const response = await fetch(apiRoutes.tvshowById(tvshowId), { method: 'delete' });
+      const response = await apiFetch(apiRoutes.tvshowById(tvshowId), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: async (tvshowId) => {

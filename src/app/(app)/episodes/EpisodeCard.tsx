@@ -7,6 +7,7 @@ import { Check, ClipboardCheck, Copy } from 'lucide-react';
 import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
@@ -28,7 +29,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation<unknown, Error, string, MutationContext>({
     mutationFn: async (episodeId) => {
-      const response = await fetch(apiRoutes.episodeById(episodeId), { method: 'put' });
+      const response = await apiFetch(apiRoutes.episodeById(episodeId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: async (episodeId) => {
