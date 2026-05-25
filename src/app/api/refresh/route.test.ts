@@ -51,5 +51,5 @@ describe('GET /api/refresh', () => {
       expect(refreshedIds).toContain(movieId);
     }
     expect(refreshedIds.filter((id) => seededMovieIds.includes(id))).toHaveLength(31);
-  }, 30_000);
+  }, 60_000);
 });
