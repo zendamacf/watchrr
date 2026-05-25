@@ -38,6 +38,7 @@ Mock TMDB and refresher from their modules, not [`src/test/mocks/index.ts`](src/
 ```ts
 import '@/test/mocks/themoviedb';
 import '@/test/mocks/refresher'; // only in route tests that call refreshMovie/refreshTvShow
+import '@/test/mocks/refresh-db'; // GET /api/refresh — stubs selectDistinct so cron tests do not scan the whole DB
 ```
 
 **UI components** — [`renderWithProviders`](src/test/render.tsx) (QueryClient, Mantine, modals).
