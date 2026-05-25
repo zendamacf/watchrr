@@ -38,10 +38,8 @@ export async function POST(request: NextRequest) {
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  let tvshow_id: number;
-  const [existing] = await db.select().from(tvshows).where(eq(tvshows.moviedb_id, moviedb_id));
-  if (existing) tvshow_id = existing.id;
-  else {
+  let show = (await db.select().from(tvshows).where(eq(tvshows.moviedb_id, moviedb_id)))[0];
+  if (!show) {
     const found = await getTvShow(moviedb_id);
     if (!found) {
       return NextResponse.json({ message: 'Could not find show' }, { status: 404 });
@@ -58,14 +56,19 @@ export async function POST(request: NextRequest) {
         description: found.description,
       })
       .onConflictDoNothing({ target: tvshows.moviedb_id })
-      .returning({ tvshow_id: tvshows.id });
-    if (!inserted) {
+      .returning();
+    show = inserted ?? (await db.select().from(tvshows).where(eq(tvshows.moviedb_id, moviedb_id)))[0];
+    if (!show) {
       throw new Error(`Failed to insert show ${moviedb_id}`);
     }
-    tvshow_id = inserted.tvshow_id;
   }
 
-  await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_id }).onConflictDoNothing();
+  await db
+    .insert(subscribed_tvshows)
+    .values({ watcher_id: user.id, tvshow_id: show.id, tvshow_uuid: show.uuid })
+    .onConflictDoNothing();
+
+  const tvshow_id = show.id;
 
   return NextResponse.json({ message: 'Success', tvshow_id }, { status: 201 });
 }

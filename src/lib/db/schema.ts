@@ -46,6 +46,9 @@ export const episodes = pgTable('episodes', {
   tvshow_id: integer()
     .notNull()
     .references(() => tvshows.id, { onDelete: 'cascade' }),
+  tvshow_uuid: uuid('tvshow_uuid')
+    .notNull()
+    .references(() => tvshows.uuid, { onDelete: 'cascade' }),
   season: integer().notNull(),
   episode: integer().notNull(),
   name: text().notNull(),
@@ -61,11 +64,17 @@ export const subscribed_tvshows = pgTable(
     tvshow_id: integer()
       .notNull()
       .references(() => tvshows.id, { onDelete: 'cascade' }),
+    tvshow_uuid: uuid('tvshow_uuid')
+      .notNull()
+      .references(() => tvshows.uuid, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
-  (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
+  (t) => [
+    primaryKey({ columns: [t.tvshow_id, t.watcher_id] }),
+    uniqueIndex('subscribed_tvshows_tvshow_uuid_watcher_id_idx').on(t.tvshow_uuid, t.watcher_id),
+  ],
 );
 
 export const watched_episodes = pgTable(
@@ -74,11 +83,17 @@ export const watched_episodes = pgTable(
     episode_id: integer()
       .notNull()
       .references(() => episodes.id, { onDelete: 'cascade' }),
+    episode_uuid: uuid('episode_uuid')
+      .notNull()
+      .references(() => episodes.uuid, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
-  (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
+  (t) => [
+    primaryKey({ columns: [t.episode_id, t.watcher_id] }),
+    uniqueIndex('watched_episodes_episode_uuid_watcher_id_idx').on(t.episode_uuid, t.watcher_id),
+  ],
 );
 
 export const movies = pgTable('movies', {
@@ -98,12 +113,18 @@ export const subscribed_movies = pgTable(
     movie_id: integer()
       .notNull()
       .references(() => movies.id, { onDelete: 'cascade' }),
+    movie_uuid: uuid('movie_uuid')
+      .notNull()
+      .references(() => movies.uuid, { onDelete: 'cascade' }),
     watcher_id: uuid()
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     watched: boolean().notNull().default(false),
   },
-  (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
+  (t) => [
+    primaryKey({ columns: [t.movie_id, t.watcher_id] }),
+    uniqueIndex('subscribed_movies_movie_uuid_watcher_id_idx').on(t.movie_uuid, t.watcher_id),
+  ],
 );
 
 export function lower(email: AnyPgColumn): SQL {

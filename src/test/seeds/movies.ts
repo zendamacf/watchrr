@@ -40,6 +40,7 @@ export async function seedSubscribedMovie(options: {
     .values({
       watcher_id: options.watcherId,
       movie_id: movie.id,
+      movie_uuid: movie.uuid,
       watched: options.watched ?? false,
     })
     .onConflictDoNothing();

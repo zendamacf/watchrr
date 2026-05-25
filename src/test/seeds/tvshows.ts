@@ -39,6 +39,7 @@ export async function seedSubscribedTvShow(options: {
     .values({
       watcher_id: options.watcherId,
       tvshow_id: show.id,
+      tvshow_uuid: show.uuid,
     })
     .onConflictDoNothing();
 

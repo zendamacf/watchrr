@@ -81,6 +81,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
     } else {
       await db.insert(episodes).values({
         tvshow_id: dbShow.id,
+        tvshow_uuid: dbShow.uuid,
         season: apiEpisode.seasonNumber,
         episode: apiEpisode.episodeNumber,
         name: apiEpisode.name,
