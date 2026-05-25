@@ -24,9 +24,6 @@ jobs:
   test:
     needs: setup
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-tests
-      cancel-in-progress: false
 
     steps:
       - name: Create Neon Branch

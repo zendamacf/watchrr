@@ -24,9 +24,6 @@ jobs:
   e2e:
     needs: setup
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-e2e
-      cancel-in-progress: false
 
     steps:
       - name: Create Neon Branch
