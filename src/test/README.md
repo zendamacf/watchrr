@@ -57,6 +57,8 @@ Configured in [`vitest.config.mts`](vitest.config.mts):
 - App Router `page.tsx` / `layout.tsx`
 - Shared `src/components/**` (auth forms are tested but excluded from the coverage denominator until component coverage is tracked here)
 - Instrumentation, Sentry wiring, Drizzle schema, TMDB client bootstrap
+- `src/lib/db/index.ts` — DB client bootstrap (requires `DATABASE_URL` at import)
+- `src/lib/refresher/movies.ts` and `tvshows.ts` — TMDB + DB sync pipelines (exercised via route tests with mocks and dedicated refresher unit tests, not line-tracked here)
 
 Full user flows across pages are covered by E2E (see below), not Vitest coverage %.
 
