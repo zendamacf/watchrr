@@ -7,6 +7,7 @@ import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { FloatingButton } from '@/components/FloatingButton';
 import { QueryKey } from '@/components/QueryProvider';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { MoviesResponse } from '@/types';
 import { AddMovieModal } from './AddMovieModal';
@@ -19,7 +20,7 @@ export const MoviePage = () => {
   const { isLoading, isError, data } = useQuery<MoviesResponse>({
     queryKey: [QueryKey.getMovies],
     queryFn: async () => {
-      const response = await fetch(apiRoutes.movie, { method: 'get' });
+      const response = await apiFetch(apiRoutes.movie, { method: 'get' });
       if (response.ok) return await response.json();
       throw new Error((await response.json()).message);
     },

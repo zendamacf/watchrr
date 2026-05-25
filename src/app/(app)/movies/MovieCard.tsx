@@ -7,6 +7,7 @@ import { Check, X } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { Movie, MoviesResponse } from '@/types';
 import { BaseMovieCard } from './BaseMovieCard';
@@ -36,7 +37,7 @@ export const MovieCard = ({ movie }: Props) => {
 
   const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, string, MutationContext>({
     mutationFn: async (movieId) => {
-      const response = await fetch(apiRoutes.movieById(movieId), { method: 'put' });
+      const response = await apiFetch(apiRoutes.movieById(movieId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: (movieId) =>
@@ -47,7 +48,7 @@ export const MovieCard = ({ movie }: Props) => {
 
   const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, string, MutationContext>({
     mutationFn: async (movieId) => {
-      const response = await fetch(apiRoutes.movieById(movieId), { method: 'delete' });
+      const response = await apiFetch(apiRoutes.movieById(movieId), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
     onMutate: (movieId) =>

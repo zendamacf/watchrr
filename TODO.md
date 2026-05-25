@@ -1,6 +1,5 @@
 # TODO
 
-* Logout on 401 response from API.
 * Use device theme as default.
 
 ## Maybe
@@ -9,6 +8,7 @@
 
 ## Done
 
+* Logout on 401 response from API.
 * Increase test coverage.
 * Add auth endpoint for logging in
 * Add middleware for autenticating JWT token

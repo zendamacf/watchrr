@@ -7,6 +7,7 @@ import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { FloatingButton } from '@/components/FloatingButton';
 import { QueryKey } from '@/components/QueryProvider';
+import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { ShowsResponse } from '@/types';
 import { AddShowModal } from './AddShowModal';
@@ -19,7 +20,7 @@ export const ShowPage = () => {
   const { isLoading, isError, data } = useQuery<ShowsResponse>({
     queryKey: [QueryKey.getShows],
     queryFn: async () => {
-      const response = await fetch(apiRoutes.tvshow, { method: 'get' });
+      const response = await apiFetch(apiRoutes.tvshow, { method: 'get' });
       if (response.ok) return await response.json();
       throw new Error((await response.json()).message);
     },
