@@ -33,16 +33,16 @@ export async function seedSubscribedMovie(options: {
   watcherId: string;
   movie?: Partial<typeof testMovie>;
   watched?: boolean;
-}): Promise<{ movie: Movie; movieUuid: string }> {
+}): Promise<{ movie: Movie; movieId: string }> {
   const movie = await seedMovie(options.movie ?? {});
   await db
     .insert(subscribed_movies)
     .values({
       watcher_id: options.watcherId,
-      movie_uuid: movie.uuid,
+      movie_id: movie.id,
       watched: options.watched ?? false,
     })
     .onConflictDoNothing();
 
-  return { movie, movieUuid: movie.uuid };
+  return { movie, movieId: movie.id };
 }

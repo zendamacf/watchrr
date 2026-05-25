@@ -34,7 +34,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const movie: Movie = { ...testMovie, uuid: '00000000-0000-4000-8000-000000000087', name: 'Card Movie' };
+const movie: Movie = { ...testMovie, id: '00000000-0000-4000-8000-000000000087', name: 'Card Movie' };
 
 describe('MovieCard', () => {
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe('MovieCard', () => {
     await user.click(buttons[0]!);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(apiRoutes.movieById(movie.uuid), { method: 'put' });
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.movieById(movie.id), { method: 'put' });
       expect(mockShowSuccess).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringContaining('Card Movie') }),
       );

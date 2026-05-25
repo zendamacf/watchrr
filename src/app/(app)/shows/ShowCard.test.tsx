@@ -41,7 +41,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const show: Show = { ...testShow, uuid: '00000000-0000-4000-8000-000000000088', name: 'Card Show' };
+const show: Show = { ...testShow, id: '00000000-0000-4000-8000-000000000088', name: 'Card Show' };
 
 describe('ShowCard', () => {
   beforeEach(() => {
@@ -58,7 +58,7 @@ describe('ShowCard', () => {
     const buttons = screen.getAllByRole('button');
     await user.click(buttons[0]!);
 
-    expect(mockRefresh).toHaveBeenCalledWith({ tvshowUuid: show.uuid, name: show.name });
+    expect(mockRefresh).toHaveBeenCalledWith({ tvshowId: show.id, name: show.name });
   });
 
   it('unsubscribes when confirm modal is confirmed', async () => {

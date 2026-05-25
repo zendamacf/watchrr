@@ -10,7 +10,7 @@ import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedEpisode, seedSubscribedTvShow, seedUser } from '@/test/seeds';
 import { PUT } from './route';
 
-const unknownUuid = '00000000-0000-4000-8000-000000000095';
+const unknownId = '00000000-0000-4000-8000-000000000095';
 
 describe('PUT /api/episode/[episode_id]', () => {
   let userId: string;
@@ -29,27 +29,27 @@ describe('PUT /api/episode/[episode_id]', () => {
 
   it('returns 401 when not authenticated', async () => {
     mockGuardUser.mockResolvedValue(null);
-    const response = await PUT(nextPut(apiRoutes.episodeById(unknownUuid)), routeParams({ episode_id: unknownUuid }));
+    const response = await PUT(nextPut(apiRoutes.episodeById(unknownId)), routeParams({ episode_id: unknownId }));
     expect(response.status).toBe(401);
   });
 
   it('marks an episode as watched by uuid', async () => {
-    const { tvshowUuid } = await seedSubscribedTvShow({
+    const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_501, name: 'Episode Show' },
     });
     const episode = await seedEpisode({
-      tvshowUuid,
+      tvshowId,
       overrides: { moviedb_id: 998_502, name: 'Ep to watch' },
     });
 
-    const response = await PUT(nextPut(apiRoutes.episodeById(episode.uuid)), routeParams({ episode_id: episode.uuid }));
+    const response = await PUT(nextPut(apiRoutes.episodeById(episode.id)), routeParams({ episode_id: episode.id }));
     expect(response.status).toBe(200);
 
     const [row] = await db
       .select()
       .from(watched_episodes)
-      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_uuid, episode.uuid)));
+      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
     expect(row).toBeDefined();
   });
 });

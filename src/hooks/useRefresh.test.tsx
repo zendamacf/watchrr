@@ -30,10 +30,10 @@ describe('useRefresh', () => {
   describe('useRefreshMovie', () => {
     it('calls the movie refresh API and shows success notification', async () => {
       const { result } = renderHookWithProviders(() => useRefreshMovie());
-      result.current.refresh({ movieUuid: testMovie.uuid, name: 'Fight Club' });
+      result.current.refresh({ movieId: testMovie.id, name: 'Fight Club' });
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith(apiRoutes.movieRefresh(testMovie.uuid), { method: 'put' });
+        expect(fetch).toHaveBeenCalledWith(apiRoutes.movieRefresh(testMovie.id), { method: 'put' });
       });
       await waitFor(() => {
         expect(mockShow).toHaveBeenCalledWith(
@@ -55,7 +55,7 @@ describe('useRefresh', () => {
     it('updates the loading notification on API error', async () => {
       stubFetch(mockFetchResponse({ message: 'Could not find movie' }, { ok: false, status: 404 }));
       const { result } = renderHookWithProviders(() => useRefreshMovie());
-      result.current.refresh({ movieUuid: testMovie.uuid, name: 'Missing' });
+      result.current.refresh({ movieId: testMovie.id, name: 'Missing' });
 
       await waitFor(() => {
         expect(mockUpdate).toHaveBeenCalledWith(
@@ -72,10 +72,10 @@ describe('useRefresh', () => {
   describe('useRefreshShow', () => {
     it('calls the tvshow refresh API and shows success notification', async () => {
       const { result } = renderHookWithProviders(() => useRefreshShow());
-      result.current.refresh({ tvshowUuid: testShow.uuid, name: 'Breaking Bad' });
+      result.current.refresh({ tvshowId: testShow.id, name: 'Breaking Bad' });
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledWith(apiRoutes.tvshowRefresh(testShow.uuid), { method: 'put' });
+        expect(fetch).toHaveBeenCalledWith(apiRoutes.tvshowRefresh(testShow.id), { method: 'put' });
       });
       await waitFor(() => {
         expect(mockUpdate).toHaveBeenCalledWith(
@@ -90,7 +90,7 @@ describe('useRefresh', () => {
     it('updates the loading notification on API error', async () => {
       stubFetch(mockFetchResponse({ message: 'Could not find show' }, { ok: false, status: 404 }));
       const { result } = renderHookWithProviders(() => useRefreshShow());
-      result.current.refresh({ tvshowUuid: testShow.uuid, name: 'Missing Show' });
+      result.current.refresh({ tvshowId: testShow.id, name: 'Missing Show' });
 
       await waitFor(() => {
         expect(mockUpdate).toHaveBeenCalledWith(

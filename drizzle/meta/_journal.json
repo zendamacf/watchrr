@@ -36,6 +36,13 @@
       "when": 1779694382064,
       "tag": "0004_drop_serial_primary_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779695000000,
+      "tag": "0005_rename_uuid_columns_to_id",
+      "breakpoints": true
     }
   ]
 }

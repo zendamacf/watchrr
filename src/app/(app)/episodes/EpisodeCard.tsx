@@ -27,15 +27,15 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
 
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation<unknown, Error, string, MutationContext>({
-    mutationFn: async (episodeUuid) => {
-      const response = await fetch(apiRoutes.episodeById(episodeUuid), { method: 'put' });
+    mutationFn: async (episodeId) => {
+      const response = await fetch(apiRoutes.episodeById(episodeId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: async (episodeUuid) => {
+    onMutate: async (episodeId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
       const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
       queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.filter((o) => o.episodes.uuid !== episodeUuid),
+        old?.filter((o) => o.episodes.id !== episodeId),
       );
       showSuccess({
         title: 'Nice!',
@@ -52,7 +52,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   });
 
   return (
-    <BackdropCard key={episode.episodes.uuid} style={{ width: '100%' }} backdrop={episode.tvshows.backdrop_slug}>
+    <BackdropCard key={episode.episodes.id} style={{ width: '100%' }} backdrop={episode.tvshows.backdrop_slug}>
       <Title order={3} lineClamp={1}>
         {episode.tvshows.name}
       </Title>
@@ -81,7 +81,7 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
               </ActionIcon>
             )}
           </CopyButton>
-          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.uuid)}>
+          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.id)}>
             <Check size={'20'} />
           </ActionIcon>
         </Group>

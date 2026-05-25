@@ -24,14 +24,14 @@ export const ShowCard = ({ show }: Props) => {
 
   const queryClient = useQueryClient();
   const { mutate: remove, isPending: removePending } = useMutation<unknown, Error, string, MutationContext>({
-    mutationFn: async (tvshowUuid) => {
-      const response = await fetch(apiRoutes.tvshowById(tvshowUuid), { method: 'delete' });
+    mutationFn: async (tvshowId) => {
+      const response = await fetch(apiRoutes.tvshowById(tvshowId), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: async (tvshowUuid) => {
+    onMutate: async (tvshowId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getShows] });
       const previousShows = queryClient.getQueryData<ShowsResponse>([QueryKey.getShows]);
-      queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) => old?.filter((o) => o.uuid !== tvshowUuid));
+      queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) => old?.filter((o) => o.id !== tvshowId));
       showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
       return { previousShows };
     },
@@ -42,14 +42,14 @@ export const ShowCard = ({ show }: Props) => {
     },
   });
 
-  const confirmUnsubscribe = (tvshowUuid: string) =>
+  const confirmUnsubscribe = (tvshowId: string) =>
     openConfirmModal({
       title: 'Are you sure?',
       children: <Text size="sm">Do you want to stop following {show.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       centered: true,
-      onConfirm: () => remove(tvshowUuid),
+      onConfirm: () => remove(tvshowId),
     });
 
   return (
@@ -62,7 +62,7 @@ export const ShowCard = ({ show }: Props) => {
             aria-label="Refresh metadata"
             color={'blue'}
             loading={refreshPending}
-            onClick={() => refresh({ tvshowUuid: show.uuid, name: show.name })}
+            onClick={() => refresh({ tvshowId: show.id, name: show.name })}
           >
             <RefreshCcw size={'20'} />
           </ActionIcon>
@@ -70,7 +70,7 @@ export const ShowCard = ({ show }: Props) => {
             aria-label="Unsubscribe"
             color={'red'}
             loading={removePending}
-            onClick={() => confirmUnsubscribe(show.uuid)}
+            onClick={() => confirmUnsubscribe(show.id)}
           >
             <X size={'20'} />
           </ActionIcon>

@@ -20,7 +20,7 @@ export async function GET() {
         db
           .select()
           .from(subscribed_tvshows)
-          .where(and(eq(subscribed_tvshows.tvshow_uuid, tvshows.uuid), eq(subscribed_tvshows.watcher_id, user.id))),
+          .where(and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id))),
       ),
     )
     .orderBy(tvshows.name);
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_uuid: show.uuid }).onConflictDoNothing();
+  await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_id: show.id }).onConflictDoNothing();
 
-  return NextResponse.json({ message: 'Success', tvshow_uuid: show.uuid }, { status: 201 });
+  return NextResponse.json({ message: 'Success', tvshow_id: show.id }, { status: 201 });
 }

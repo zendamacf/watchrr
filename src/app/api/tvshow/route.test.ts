@@ -38,7 +38,7 @@ describe('/api/tvshow', () => {
       const response = await GET();
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(data.some((s: { uuid: string }) => s.uuid === show.uuid)).toBe(true);
+      expect(data.some((s: { id: string }) => s.id === show.id)).toBe(true);
     });
   });
 
@@ -65,7 +65,7 @@ describe('/api/tvshow', () => {
       const response = await POST(nextPost(apiRoutes.tvshow, { moviedb_id: show.moviedb_id }));
       expect(response.status).toBe(201);
       const body = await response.json();
-      expect(body.tvshow_uuid).toBe(show.uuid);
+      expect(body.tvshow_id).toBe(show.id);
       expect(mockGetTvShow).not.toHaveBeenCalled();
     });
 
@@ -88,7 +88,7 @@ describe('/api/tvshow', () => {
       const [row] = await db
         .select()
         .from(subscribed_tvshows)
-        .where(and(eq(subscribed_tvshows.watcher_id, userId), eq(subscribed_tvshows.tvshow_uuid, body.tvshow_uuid)));
+        .where(and(eq(subscribed_tvshows.watcher_id, userId), eq(subscribed_tvshows.tvshow_id, body.tvshow_id)));
       expect(row).toBeDefined();
     });
   });

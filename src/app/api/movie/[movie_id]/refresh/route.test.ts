@@ -10,7 +10,7 @@ import { mockRefreshMovie, resetRefresherMocks } from '@/test/mocks/refresher';
 import { seedMovie, seedUser } from '@/test/seeds';
 import { PUT } from './route';
 
-const unknownUuid = '00000000-0000-4000-8000-000000000096';
+const unknownId = '00000000-0000-4000-8000-000000000096';
 
 describe('PUT /api/movie/[movie_id]/refresh', () => {
   beforeEach(async () => {
@@ -27,14 +27,14 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
 
   it('returns 401 when not authenticated', async () => {
     mockGuardUser.mockResolvedValue(null);
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(unknownUuid)), routeParams({ movie_id: unknownUuid }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(unknownId)), routeParams({ movie_id: unknownId }));
     expect(response.status).toBe(401);
   });
 
   it('returns 404 when the movie cannot be refreshed', async () => {
     const movie = await seedMovie({ moviedb_id: 998_350, name: 'Missing Refresh' });
     mockRefreshMovie.mockRejectedValue(new ResourceNotFound());
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.uuid)), routeParams({ movie_id: movie.uuid }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: movie.id }));
     expect(response.status).toBe(404);
     await expect(response.json()).resolves.toEqual({ message: 'Could not find movie' });
   });
@@ -42,8 +42,8 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
   it('refreshes the movie by uuid', async () => {
     const movie = await seedMovie({ moviedb_id: 998_351, name: 'Refresh Target' });
     mockRefreshMovie.mockResolvedValue(undefined);
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.uuid)), routeParams({ movie_id: movie.uuid }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: movie.id }));
     expect(response.status).toBe(200);
-    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.uuid);
+    expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
   });
 });

@@ -28,7 +28,7 @@ export const users = pgTable(
 );
 
 export const tvshows = pgTable('tvshows', {
-  uuid: uuid('uuid').defaultRandom().primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: text().notNull(),
   moviedb_id: integer().notNull().unique(),
   country: text(),
@@ -38,10 +38,10 @@ export const tvshows = pgTable('tvshows', {
 });
 
 export const episodes = pgTable('episodes', {
-  uuid: uuid('uuid').defaultRandom().primaryKey(),
-  tvshow_uuid: uuid('tvshow_uuid')
+  id: uuid('id').defaultRandom().primaryKey(),
+  tvshow_id: uuid('tvshow_id')
     .notNull()
-    .references(() => tvshows.uuid, { onDelete: 'cascade' }),
+    .references(() => tvshows.id, { onDelete: 'cascade' }),
   season: integer().notNull(),
   episode: integer().notNull(),
   name: text().notNull(),
@@ -54,31 +54,31 @@ export const episodes = pgTable('episodes', {
 export const subscribed_tvshows = pgTable(
   'subscribed_tvshows',
   {
-    tvshow_uuid: uuid('tvshow_uuid')
+    tvshow_id: uuid('tvshow_id')
       .notNull()
-      .references(() => tvshows.uuid, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+      .references(() => tvshows.id, { onDelete: 'cascade' }),
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
-  (t) => [primaryKey({ columns: [t.tvshow_uuid, t.watcher_id] })],
+  (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
 );
 
 export const watched_episodes = pgTable(
   'watched_episodes',
   {
-    episode_uuid: uuid('episode_uuid')
+    episode_id: uuid('episode_id')
       .notNull()
-      .references(() => episodes.uuid, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+      .references(() => episodes.id, { onDelete: 'cascade' }),
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
-  (t) => [primaryKey({ columns: [t.episode_uuid, t.watcher_id] })],
+  (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
 );
 
 export const movies = pgTable('movies', {
-  uuid: uuid('uuid').defaultRandom().primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: text().notNull(),
   releasedate: date(),
   moviedb_id: integer().notNull().unique(),
@@ -90,15 +90,15 @@ export const movies = pgTable('movies', {
 export const subscribed_movies = pgTable(
   'subscribed_movies',
   {
-    movie_uuid: uuid('movie_uuid')
+    movie_id: uuid('movie_id')
       .notNull()
-      .references(() => movies.uuid, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+      .references(() => movies.id, { onDelete: 'cascade' }),
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     watched: boolean().notNull().default(false),
   },
-  (t) => [primaryKey({ columns: [t.movie_uuid, t.watcher_id] })],
+  (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
 );
 
 export function lower(email: AnyPgColumn): SQL {

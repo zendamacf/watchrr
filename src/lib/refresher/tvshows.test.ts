@@ -56,9 +56,9 @@ describe('refreshTvShow', () => {
     mockGetTvShow.mockResolvedValue(tmdbShow(SHOW_UNCHANGED));
     mockGetAllEpisodes.mockResolvedValue([]);
 
-    await refreshTvShow(show.uuid);
+    await refreshTvShow(show.id);
 
-    const [after] = await db.select().from(tvshows).where(eq(tvshows.uuid, show.uuid));
+    const [after] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
     expect(after?.name).toBe('Synced Show');
   });
 
@@ -101,9 +101,9 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.uuid);
+    await refreshTvShow(show.id);
 
-    const [afterShow] = await db.select().from(tvshows).where(eq(tvshows.uuid, show.uuid));
+    const [afterShow] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
     expect(afterShow).toMatchObject({
       name: 'New Show Name',
       description: 'New overview',
@@ -112,7 +112,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/new-back.jpg',
     });
 
-    const afterEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_uuid, show.uuid));
+    const afterEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
     expect(afterEpisodes).toHaveLength(2);
     expect(afterEpisodes.map((e) => e.moviedb_id).sort()).toEqual([900_001, 900_002]);
     expect(afterEpisodes.find((e) => e.moviedb_id === 900_001)?.name).toBe('Premiere');
@@ -128,7 +128,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/b.jpg',
     });
     await seedEpisode({
-      tvshowUuid: show.uuid,
+      tvshowId: show.id,
       overrides: {
         moviedb_id: 900_101,
         season: 1,
@@ -152,7 +152,7 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.uuid);
+    await refreshTvShow(show.id);
 
     const [afterEpisode] = await db.select().from(episodes).where(eq(episodes.moviedb_id, 900_101));
     expect(afterEpisode).toMatchObject({
@@ -173,7 +173,7 @@ describe('refreshTvShow', () => {
       backdrop_slug: '/b.jpg',
     });
     await seedEpisode({
-      tvshowUuid: show.uuid,
+      tvshowId: show.id,
       overrides: {
         moviedb_id: 900_201,
         season: 2,
@@ -205,9 +205,9 @@ describe('refreshTvShow', () => {
       },
     ]);
 
-    await refreshTvShow(show.uuid);
+    await refreshTvShow(show.id);
 
-    const episodeRows = await db.select().from(episodes).where(eq(episodes.tvshow_uuid, show.uuid));
+    const episodeRows = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
     expect(episodeRows).toHaveLength(1);
     expect(episodeRows[0]?.name).toBe('Stable Episode');
   });

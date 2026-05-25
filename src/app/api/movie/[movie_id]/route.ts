@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { isUuid, resolveMovieUuid } from '@/lib/db/resolve-id';
+import { isUuid, resolveMovieId } from '@/lib/db/resolve-id';
 import { subscribed_movies } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
 
@@ -15,13 +15,13 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
   const param = (await params).movie_id;
   if (!isUuid(param)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const movieUuid = await resolveMovieUuid(param);
-  if (!movieUuid) return NextResponse.json({ message: 'Not found' }, { status: 404 });
+  const movieId = await resolveMovieId(param);
+  if (!movieId) return NextResponse.json({ message: 'Not found' }, { status: 404 });
 
   await db
     .update(subscribed_movies)
     .set({ watched: true })
-    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_uuid, movieUuid)));
+    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, movieId)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }
@@ -36,12 +36,12 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   const param = (await params).movie_id;
   if (!isUuid(param)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const movieUuid = await resolveMovieUuid(param);
-  if (!movieUuid) return NextResponse.json({ message: 'Not found' }, { status: 404 });
+  const movieId = await resolveMovieId(param);
+  if (!movieId) return NextResponse.json({ message: 'Not found' }, { status: 404 });
 
   await db
     .delete(subscribed_movies)
-    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_uuid, movieUuid)));
+    .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, movieId)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }

@@ -13,8 +13,8 @@ import { getMovie, type TMDBMovie } from '../themoviedb/movies';
 import { ResourceNotFound } from './errors';
 import { type DiffLookup, dateCompare, getDiff } from './utils';
 
-export const refreshMovie = async (movieUuid: string) => {
-  const [dbMovie] = await db.select().from(movies).where(eq(movies.uuid, movieUuid));
+export const refreshMovie = async (movieId: string) => {
+  const [dbMovie] = await db.select().from(movies).where(eq(movies.id, movieId));
   if (!dbMovie) throw new ResourceNotFound();
 
   console.log(`[MOVIE][${dbMovie.name}] Refreshing`);
@@ -40,7 +40,7 @@ export const refreshMovie = async (movieUuid: string) => {
         poster_slug: apiMovie.poster,
         backdrop_slug: apiMovie.backdrop,
       })
-      .where(eq(movies.uuid, movieUuid));
+      .where(eq(movies.id, movieId));
   }
   console.log(`[MOVIE][${dbMovie.name}] Finished refreshing`);
 };

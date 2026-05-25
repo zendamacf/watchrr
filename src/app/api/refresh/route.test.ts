@@ -33,23 +33,23 @@ describe('GET /api/refresh', () => {
 
   it('refreshes unwatched movies in chunks of 30', async () => {
     const user = await seedUser({ email: 'vitest-cron-chunk@example.com', password: seedPassword });
-    const seededMovieUuids: string[] = [];
+    const seededMovieIds: string[] = [];
     for (let i = 0; i < 31; i++) {
       const { movie } = await seedSubscribedMovie({
         watcherId: user.id,
         movie: { moviedb_id: 997_000 + i, name: `Chunk Movie ${i}` },
         watched: false,
       });
-      seededMovieUuids.push(movie.uuid);
+      seededMovieIds.push(movie.id);
     }
 
     mockRefreshMovie.mockClear();
     await GET();
 
-    const refreshedUuids = mockRefreshMovie.mock.calls.map((call) => call[0] as string);
-    for (const movieUuid of seededMovieUuids) {
-      expect(refreshedUuids).toContain(movieUuid);
+    const refreshedIds = mockRefreshMovie.mock.calls.map((call) => call[0] as string);
+    for (const movieId of seededMovieIds) {
+      expect(refreshedIds).toContain(movieId);
     }
-    expect(refreshedUuids.filter((uuid) => seededMovieUuids.includes(uuid))).toHaveLength(31);
+    expect(refreshedIds.filter((id) => seededMovieIds.includes(id))).toHaveLength(31);
   }, 30_000);
 });

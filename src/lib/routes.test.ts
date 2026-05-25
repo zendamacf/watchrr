@@ -26,12 +26,12 @@ describe('apiRoutes', () => {
   });
 
   it('media routes use UUID path segments', () => {
-    const uuid = '00000000-0000-4000-8000-000000000001';
-    expect(apiRoutes.movieById(uuid)).toBe(`/api/movie/${uuid}/`);
-    expect(apiRoutes.movieRefresh(uuid)).toBe(`/api/movie/${uuid}/refresh`);
-    expect(apiRoutes.tvshowById(uuid)).toBe(`/api/tvshow/${uuid}/`);
-    expect(apiRoutes.tvshowRefresh(uuid)).toBe(`/api/tvshow/${uuid}/refresh`);
-    expect(apiRoutes.episodeById(uuid)).toBe(`/api/episode/${uuid}/`);
+    const id = '00000000-0000-4000-8000-000000000001';
+    expect(apiRoutes.movieById(id)).toBe(`/api/movie/${id}/`);
+    expect(apiRoutes.movieRefresh(id)).toBe(`/api/movie/${id}/refresh`);
+    expect(apiRoutes.tvshowById(id)).toBe(`/api/tvshow/${id}/`);
+    expect(apiRoutes.tvshowRefresh(id)).toBe(`/api/tvshow/${id}/refresh`);
+    expect(apiRoutes.episodeById(id)).toBe(`/api/episode/${id}/`);
   });
 
   it('exposes static auth and resource paths', () => {

@@ -23,7 +23,7 @@ export async function GET() {
           .from(subscribed_movies)
           .where(
             and(
-              eq(subscribed_movies.movie_uuid, movies.uuid),
+              eq(subscribed_movies.movie_id, movies.id),
               eq(subscribed_movies.watcher_id, user.id),
               eq(subscribed_movies.watched, false),
             ),
@@ -72,11 +72,11 @@ export async function POST(request: NextRequest) {
 
   await db
     .insert(subscribed_movies)
-    .values({ watcher_id: user.id, movie_uuid: movie.uuid })
+    .values({ watcher_id: user.id, movie_id: movie.id })
     .onConflictDoUpdate({
-      target: [subscribed_movies.movie_uuid, subscribed_movies.watcher_id],
+      target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
       set: { watched: false },
     });
 
-  return NextResponse.json({ message: 'Success', movie_uuid: movie.uuid }, { status: 201 });
+  return NextResponse.json({ message: 'Success', movie_id: movie.id }, { status: 201 });
 }

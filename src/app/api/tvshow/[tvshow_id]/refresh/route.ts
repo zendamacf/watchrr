@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { isUuid, resolveTvshowUuid } from '@/lib/db/resolve-id';
+import { isUuid, resolveTvshowId } from '@/lib/db/resolve-id';
 import { ResourceNotFound } from '@/lib/refresher/errors';
 import { refreshTvShow } from '@/lib/refresher/tvshows';
 import { guardUser } from '@/utils/auth';
@@ -14,11 +14,11 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
   const param = (await params).tvshow_id;
   if (!isUuid(param)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const tvshowUuid = await resolveTvshowUuid(param);
-  if (!tvshowUuid) return NextResponse.json({ message: 'Could not find show' }, { status: 404 });
+  const tvshowId = await resolveTvshowId(param);
+  if (!tvshowId) return NextResponse.json({ message: 'Could not find show' }, { status: 404 });
 
   try {
-    await refreshTvShow(tvshowUuid);
+    await refreshTvShow(tvshowId);
   } catch (e) {
     if (e instanceof ResourceNotFound) return NextResponse.json({ message: 'Could not find show' }, { status: 404 });
     throw e;

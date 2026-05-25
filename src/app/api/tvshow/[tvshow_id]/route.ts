@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { isUuid, resolveTvshowUuid } from '@/lib/db/resolve-id';
+import { isUuid, resolveTvshowId } from '@/lib/db/resolve-id';
 import { subscribed_tvshows } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
 
@@ -15,12 +15,12 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
   const param = (await params).tvshow_id;
   if (!isUuid(param)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const tvshowUuid = await resolveTvshowUuid(param);
-  if (!tvshowUuid) return NextResponse.json({ message: 'Not found' }, { status: 404 });
+  const tvshowId = await resolveTvshowId(param);
+  if (!tvshowId) return NextResponse.json({ message: 'Not found' }, { status: 404 });
 
   await db
     .delete(subscribed_tvshows)
-    .where(and(eq(subscribed_tvshows.watcher_id, user.id), eq(subscribed_tvshows.tvshow_uuid, tvshowUuid)));
+    .where(and(eq(subscribed_tvshows.watcher_id, user.id), eq(subscribed_tvshows.tvshow_id, tvshowId)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });
 }

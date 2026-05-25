@@ -36,7 +36,7 @@ describe('/api/movie', () => {
         movie: { moviedb_id: 998_201, name: 'Unwatched Movie' },
         watched: false,
       });
-      const { movieUuid: watchedUuid } = await seedSubscribedMovie({
+      const { movieId: watchedId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_202, name: 'Watched Movie' },
         watched: false,
@@ -44,12 +44,12 @@ describe('/api/movie', () => {
       await db
         .update(subscribed_movies)
         .set({ watched: true })
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, watchedUuid)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, watchedId)));
 
       const response = await GET();
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(data.some((m: { uuid: string }) => m.uuid === unwatched.uuid)).toBe(true);
+      expect(data.some((m: { id: string }) => m.id === unwatched.id)).toBe(true);
       expect(data.every((m: { name: string }) => m.name !== 'Watched Movie')).toBe(true);
     });
   });
@@ -77,7 +77,7 @@ describe('/api/movie', () => {
       const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: movie.moviedb_id }));
       expect(response.status).toBe(201);
       const body = await response.json();
-      expect(body.movie_uuid).toBe(movie.uuid);
+      expect(body.movie_id).toBe(movie.id);
       expect(mockGetMovie).not.toHaveBeenCalled();
     });
 
@@ -94,12 +94,12 @@ describe('/api/movie', () => {
       const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: moviedbId }));
       expect(response.status).toBe(201);
       const body = await response.json();
-      expect(body.movie_uuid).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+      expect(body.movie_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
       expect(mockGetMovie).toHaveBeenCalledWith(moviedbId);
     });
 
     it('resets watched to false when re-subscribing', async () => {
-      const { movieUuid } = await seedSubscribedMovie({
+      const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_206, name: 'Re-subscribe' },
         watched: true,
@@ -110,7 +110,7 @@ describe('/api/movie', () => {
       const [row] = await db
         .select()
         .from(subscribed_movies)
-        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_uuid, movieUuid)));
+        .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
       expect(row?.watched).toBe(false);
     });
   });

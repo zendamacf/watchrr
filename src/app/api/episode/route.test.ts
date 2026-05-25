@@ -22,12 +22,12 @@ describe('GET /api/episode', () => {
   });
 
   it('returns unwatched episodes for subscribed shows', async () => {
-    const { tvshowUuid } = await seedSubscribedTvShow({
+    const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_701, name: 'Episodes Show' },
     });
     await seedEpisode({
-      tvshowUuid,
+      tvshowId,
       overrides: { moviedb_id: 998_702, name: 'Unwatched Ep', season: 1, episode: 1 },
     });
 

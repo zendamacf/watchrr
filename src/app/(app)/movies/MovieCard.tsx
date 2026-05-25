@@ -21,10 +21,10 @@ export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
   const queryClient = useQueryClient();
 
-  const onMutate = async (movieUuid: string, callback?: () => void): Promise<MutationContext> => {
+  const onMutate = async (movieId: string, callback?: () => void): Promise<MutationContext> => {
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
     const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
-    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.uuid !== movieUuid));
+    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movieId));
     if (callback) callback();
     return { previousMovies };
   };
@@ -35,37 +35,37 @@ export const MovieCard = ({ movie }: Props) => {
   };
 
   const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, string, MutationContext>({
-    mutationFn: async (movieUuid) => {
-      const response = await fetch(apiRoutes.movieById(movieUuid), { method: 'put' });
+    mutationFn: async (movieId) => {
+      const response = await fetch(apiRoutes.movieById(movieId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movieUuid) =>
-      onMutate(movieUuid, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
+    onMutate: (movieId) =>
+      onMutate(movieId, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
   const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, string, MutationContext>({
-    mutationFn: async (movieUuid) => {
-      const response = await fetch(apiRoutes.movieById(movieUuid), { method: 'delete' });
+    mutationFn: async (movieId) => {
+      const response = await fetch(apiRoutes.movieById(movieId), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movieUuid) =>
-      onMutate(movieUuid, () =>
+    onMutate: (movieId) =>
+      onMutate(movieId, () =>
         showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` }),
       ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const confirmUnsubscribe = (movieUuid: string) =>
+  const confirmUnsubscribe = (movieId: string) =>
     openConfirmModal({
       title: 'Are you sure?',
       children: <Text size="sm">Do you want to stop following {movie.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       centered: true,
-      onConfirm: () => remove(movieUuid),
+      onConfirm: () => remove(movieId),
     });
 
   return (
@@ -79,14 +79,14 @@ export const MovieCard = ({ movie }: Props) => {
       description
       actions={
         <>
-          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.uuid)}>
+          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>
             <Check size={'20'} />
           </ActionIcon>
           <ActionIcon
             aria-label="Unsubscribe"
             color={'red'}
             loading={pendingRemove}
-            onClick={() => confirmUnsubscribe(movie.uuid)}
+            onClick={() => confirmUnsubscribe(movie.id)}
           >
             <X size={'20'} />
           </ActionIcon>

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { isUuid, resolveMovieUuid } from '@/lib/db/resolve-id';
+import { isUuid, resolveMovieId } from '@/lib/db/resolve-id';
 import { ResourceNotFound } from '@/lib/refresher/errors';
 import { refreshMovie } from '@/lib/refresher/movies';
 import { guardUser } from '@/utils/auth';
@@ -14,11 +14,11 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
   const param = (await params).movie_id;
   if (!isUuid(param)) return NextResponse.json({ message: 'Missing ID' }, { status: 400 });
 
-  const movieUuid = await resolveMovieUuid(param);
-  if (!movieUuid) return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
+  const movieId = await resolveMovieId(param);
+  if (!movieId) return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
 
   try {
-    await refreshMovie(movieUuid);
+    await refreshMovie(movieId);
   } catch (e) {
     if (e instanceof ResourceNotFound) return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
     throw e;
