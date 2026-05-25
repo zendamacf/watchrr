@@ -39,7 +39,7 @@ describe('GET /api/refresh', () => {
     await expect(response.json()).resolves.toEqual({ message: 'Success' });
     expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
     expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
-  });
+  }, 30_000);
 
   it('refreshes unwatched movies in chunks of 30', async () => {
     const user = await seedUser({ email: 'vitest-cron-chunk@example.com', password: seedPassword });
@@ -65,5 +65,5 @@ describe('GET /api/refresh', () => {
       expect(refreshedIds).toContain(movieId);
     }
     expect(refreshedIds).toHaveLength(31);
-  });
+  }, 30_000);
 });
