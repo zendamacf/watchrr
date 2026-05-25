@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { movies, subscribed_movies } from '@/lib/db/schema';
 import { testMovie } from '@/test/fixtures/movie';
@@ -33,7 +33,7 @@ export async function seedSubscribedMovie(options: {
   watcherId: string;
   movie?: Partial<typeof testMovie>;
   watched?: boolean;
-}): Promise<{ movie: Movie; movieId: number }> {
+}): Promise<{ movie: Movie; movieId: string }> {
   const movie = await seedMovie(options.movie ?? {});
   await db
     .insert(subscribed_movies)
@@ -45,4 +45,48 @@ export async function seedSubscribedMovie(options: {
     .onConflictDoNothing();
 
   return { movie, movieId: movie.id };
+}
+
+/**
+ * Insert many movies and subscriptions in two round trips (idempotent on moviedb_id / PK).
+ */
+export async function seedSubscribedMovies(options: {
+  watcherId: string;
+  movies: Partial<typeof testMovie>[];
+  watched?: boolean;
+}): Promise<{ movies: Movie[]; movieIds: string[] }> {
+  const rows = options.movies.map((overrides, i) => {
+    const merged = { ...testMovie, ...overrides };
+    return {
+      name: merged.name ?? `Test Movie ${i}`,
+      moviedb_id: merged.moviedb_id,
+      releasedate: merged.releasedate,
+      poster_slug: merged.poster_slug,
+      backdrop_slug: merged.backdrop_slug,
+      description: merged.description,
+    };
+  });
+
+  const moviedbIds = rows.map((r) => r.moviedb_id);
+
+  await db.insert(movies).values(rows).onConflictDoNothing({ target: movies.moviedb_id });
+
+  const seeded = await db.select().from(movies).where(inArray(movies.moviedb_id, moviedbIds));
+
+  if (seeded.length !== moviedbIds.length) {
+    throw new Error(`Expected ${moviedbIds.length} movies, found ${seeded.length}`);
+  }
+
+  await db
+    .insert(subscribed_movies)
+    .values(
+      seeded.map((movie) => ({
+        watcher_id: options.watcherId,
+        movie_id: movie.id,
+        watched: options.watched ?? false,
+      })),
+    )
+    .onConflictDoNothing();
+
+  return { movies: seeded, movieIds: seeded.map((m) => m.id) };
 }

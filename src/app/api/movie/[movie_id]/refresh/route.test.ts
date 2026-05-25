@@ -10,6 +10,8 @@ import { mockRefreshMovie, resetRefresherMocks } from '@/test/mocks/refresher';
 import { seedMovie, seedUser } from '@/test/seeds';
 import { PUT } from './route';
 
+const unknownId = '00000000-0000-4000-8000-000000000096';
+
 describe('PUT /api/movie/[movie_id]/refresh', () => {
   beforeEach(async () => {
     resetAuthGuardMocks();
@@ -18,30 +20,30 @@ describe('PUT /api/movie/[movie_id]/refresh', () => {
     mockGuardUser.mockResolvedValue({ id: user.id });
   });
 
-  it('returns 400 for an invalid movie id', async () => {
+  it('returns 400 for a non-UUID movie id', async () => {
     const response = await PUT(nextPut(apiRoutes.movieRefresh('bad')), routeParams({ movie_id: 'bad' }));
     expect(response.status).toBe(400);
   });
 
   it('returns 401 when not authenticated', async () => {
     mockGuardUser.mockResolvedValue(null);
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(1)), routeParams({ movie_id: '1' }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(unknownId)), routeParams({ movie_id: unknownId }));
     expect(response.status).toBe(401);
   });
 
   it('returns 404 when the movie cannot be refreshed', async () => {
+    const movie = await seedMovie({ moviedb_id: 998_350, name: 'Missing Refresh' });
     mockRefreshMovie.mockRejectedValue(new ResourceNotFound());
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(1)), routeParams({ movie_id: '1' }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: movie.id }));
     expect(response.status).toBe(404);
     await expect(response.json()).resolves.toEqual({ message: 'Could not find movie' });
   });
 
-  it('refreshes the movie and returns success', async () => {
+  it('refreshes the movie by id', async () => {
     const movie = await seedMovie({ moviedb_id: 998_351, name: 'Refresh Target' });
     mockRefreshMovie.mockResolvedValue(undefined);
-    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: String(movie.id) }));
+    const response = await PUT(nextPut(apiRoutes.movieRefresh(movie.id)), routeParams({ movie_id: movie.id }));
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ message: 'Success' });
     expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
   });
 });

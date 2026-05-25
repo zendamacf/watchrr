@@ -40,7 +40,7 @@ describe('refreshTvShow', () => {
   });
 
   it('throws ResourceNotFound when the show row does not exist', async () => {
-    await expect(refreshTvShow(99_999_999)).rejects.toBeInstanceOf(ResourceNotFound);
+    await expect(refreshTvShow('00000000-0000-4000-8000-000000009999')).rejects.toBeInstanceOf(ResourceNotFound);
     expect(mockGetTvShow).not.toHaveBeenCalled();
   });
 

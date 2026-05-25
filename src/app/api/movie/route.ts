@@ -45,10 +45,8 @@ export async function POST(request: NextRequest) {
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  let movie_id: number;
-  const [existing] = await db.select().from(movies).where(eq(movies.moviedb_id, moviedb_id));
-  if (existing) movie_id = existing.id;
-  else {
+  let movie = (await db.select().from(movies).where(eq(movies.moviedb_id, moviedb_id)))[0];
+  if (!movie) {
     const found = await getMovie(moviedb_id);
     if (!found) {
       return NextResponse.json({ message: 'Could not find movie' }, { status: 404 });
@@ -65,20 +63,20 @@ export async function POST(request: NextRequest) {
         description: found.description,
       })
       .onConflictDoNothing({ target: movies.moviedb_id })
-      .returning({ movie_id: movies.id });
-    if (!inserted) {
-      throw new Error(`Failed to insert show ${moviedb_id}`);
+      .returning();
+    movie = inserted ?? (await db.select().from(movies).where(eq(movies.moviedb_id, moviedb_id)))[0];
+    if (!movie) {
+      throw new Error(`Failed to insert movie ${moviedb_id}`);
     }
-    movie_id = inserted.movie_id;
   }
 
   await db
     .insert(subscribed_movies)
-    .values({ watcher_id: user.id, movie_id })
+    .values({ watcher_id: user.id, movie_id: movie.id })
     .onConflictDoUpdate({
       target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
       set: { watched: false },
     });
 
-  return NextResponse.json({ message: 'Success', movie_id }, { status: 201 });
+  return NextResponse.json({ message: 'Success', movie_id: movie.id }, { status: 201 });
 }

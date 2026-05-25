@@ -10,6 +10,8 @@ import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedSubscribedMovie, seedUser } from '@/test/seeds';
 import { DELETE, PUT } from './route';
 
+const unknownId = '00000000-0000-4000-8000-000000000098';
+
 describe('/api/movie/[movie_id]', () => {
   let userId: string;
 
@@ -21,24 +23,24 @@ describe('/api/movie/[movie_id]', () => {
   });
 
   describe('PUT', () => {
-    it('returns 400 for an invalid movie id', async () => {
+    it('returns 400 for a non-UUID movie id', async () => {
       const response = await PUT(nextPut(apiRoutes.movieById('abc')), routeParams({ movie_id: 'abc' }));
       expect(response.status).toBe(400);
     });
 
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
-      const response = await PUT(nextPut(apiRoutes.movieById(1)), routeParams({ movie_id: '1' }));
+      const response = await PUT(nextPut(apiRoutes.movieById(unknownId)), routeParams({ movie_id: unknownId }));
       expect(response.status).toBe(401);
     });
 
-    it('marks a subscribed movie as watched', async () => {
+    it('marks a subscribed movie as watched by id', async () => {
       const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
         movie: { moviedb_id: 998_301, name: 'Watch Me' },
         watched: false,
       });
-      const response = await PUT(nextPut(apiRoutes.movieById(movieId)), routeParams({ movie_id: String(movieId) }));
+      const response = await PUT(nextPut(apiRoutes.movieById(movieId)), routeParams({ movie_id: movieId }));
       expect(response.status).toBe(200);
 
       const [row] = await db
@@ -50,26 +52,23 @@ describe('/api/movie/[movie_id]', () => {
   });
 
   describe('DELETE', () => {
-    it('returns 400 for an invalid movie id', async () => {
+    it('returns 400 for a non-UUID movie id', async () => {
       const response = await DELETE(nextDelete(apiRoutes.movieById('nope')), routeParams({ movie_id: 'nope' }));
       expect(response.status).toBe(400);
     });
 
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
-      const response = await DELETE(nextDelete(apiRoutes.movieById(1)), routeParams({ movie_id: '1' }));
+      const response = await DELETE(nextDelete(apiRoutes.movieById(unknownId)), routeParams({ movie_id: unknownId }));
       expect(response.status).toBe(401);
     });
 
-    it('removes the subscription', async () => {
+    it('removes the subscription by id', async () => {
       const { movieId } = await seedSubscribedMovie({
         watcherId: userId,
-        movie: { moviedb_id: 998_302, name: 'Unsubscribe Me' },
+        movie: { moviedb_id: 998_304, name: 'Unsubscribe Me' },
       });
-      const response = await DELETE(
-        nextDelete(apiRoutes.movieById(movieId)),
-        routeParams({ movie_id: String(movieId) }),
-      );
+      const response = await DELETE(nextDelete(apiRoutes.movieById(movieId)), routeParams({ movie_id: movieId }));
       expect(response.status).toBe(200);
 
       const rows = await db

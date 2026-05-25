@@ -19,55 +19,53 @@ type MutationContext = { previousMovies: MoviesResponse | undefined };
 
 export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
+  const queryClient = useQueryClient();
 
-  const onMutate = async (movie_id: number, callback?: () => void): Promise<MutationContext> => {
-    // Cancel ongoing refetch to not overwrite optimistic update
+  const onMutate = async (movieId: string, callback?: () => void): Promise<MutationContext> => {
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
     const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
-    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movie_id));
+    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movieId));
     if (callback) callback();
-    return { previousMovies }; // Context for rollback
+    return { previousMovies };
   };
 
   const onError = (error: Error, _vars: unknown, context: MutationContext | undefined) => {
     showError({ title: 'An error occurred', message: error.message });
-    // Revert optimistic update
-    queryClient.setQueryData([QueryKey.getEpisodes], context?.previousMovies);
+    queryClient.setQueryData([QueryKey.getMovies], context?.previousMovies);
   };
 
-  const queryClient = useQueryClient();
-  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (movie_id) => {
-      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'put' });
+  const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (movieId) => {
+      const response = await fetch(apiRoutes.movieById(movieId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movie_id) =>
-      onMutate(movie_id, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
+    onMutate: (movieId) =>
+      onMutate(movieId, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (movie_id) => {
-      const response = await fetch(apiRoutes.movieById(movie_id), { method: 'delete' });
+  const { mutate: remove, isPending: pendingRemove } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (movieId) => {
+      const response = await fetch(apiRoutes.movieById(movieId), { method: 'delete' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: (movie_id) =>
-      onMutate(movie_id, () =>
+    onMutate: (movieId) =>
+      onMutate(movieId, () =>
         showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` }),
       ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
     onError,
   });
 
-  const confirmUnsubscribe = (movie_id: number) =>
+  const confirmUnsubscribe = (movieId: string) =>
     openConfirmModal({
       title: 'Are you sure?',
       children: <Text size="sm">Do you want to stop following {movie.name}?</Text>,
       labels: { confirm: 'Confirm', cancel: 'Cancel' },
       confirmProps: { color: 'red' },
       centered: true,
-      onConfirm: () => remove(movie_id),
+      onConfirm: () => remove(movieId),
     });
 
   return (

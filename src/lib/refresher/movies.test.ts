@@ -38,7 +38,7 @@ describe('refreshMovie', () => {
   });
 
   it('throws ResourceNotFound when the movie row does not exist', async () => {
-    await expect(refreshMovie(99_999_999)).rejects.toBeInstanceOf(ResourceNotFound);
+    await expect(refreshMovie('00000000-0000-4000-8000-000000009998')).rejects.toBeInstanceOf(ResourceNotFound);
     expect(mockGetMovie).not.toHaveBeenCalled();
   });
 

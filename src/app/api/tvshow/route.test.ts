@@ -38,7 +38,7 @@ describe('/api/tvshow', () => {
       const response = await GET();
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(data.some((s: { id: number }) => s.id === show.id)).toBe(true);
+      expect(data.some((s: { id: string }) => s.id === show.id)).toBe(true);
     });
   });
 

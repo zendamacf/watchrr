@@ -41,7 +41,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const show: Show = { ...testShow, id: 88_002, name: 'Card Show' };
+const show: Show = { ...testShow, id: '00000000-0000-4000-8000-000000000088', name: 'Card Show' };
 
 describe('ShowCard', () => {
   beforeEach(() => {

@@ -8,7 +8,7 @@ export const useRefreshMovie = () => {
   const { mutate: refresh, isPending: refreshPending } = useMutation<
     unknown,
     Error,
-    { movieId: number; name: string },
+    { movieId: string; name: string },
     { notificationId: string }
   >({
     mutationFn: async ({ movieId }) => {
@@ -49,7 +49,7 @@ export const useRefreshShow = () => {
   const { mutate: refresh, isPending: refreshPending } = useMutation<
     unknown,
     Error,
-    { tvshowId: number; name: string },
+    { tvshowId: string; name: string },
     { notificationId: string }
   >({
     mutationFn: async ({ tvshowId }) => {

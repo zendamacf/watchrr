@@ -14,15 +14,15 @@ export const apiRoutes = {
     logout: '/api/auth/logout',
   },
   episode: '/api/episode',
-  episodeById: (episodeId: number | string) => `/api/episode/${episodeId}/`,
+  episodeById: (episodeId: string) => `/api/episode/${episodeId}/`,
   movie: '/api/movie',
   movieSearch: (searchParams: URLSearchParams | string) =>
     `/api/movie/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
-  movieById: (movieId: number | string) => `/api/movie/${movieId}/`,
-  movieRefresh: (movieId: number | string) => `/api/movie/${movieId}/refresh`,
+  movieById: (movieId: string) => `/api/movie/${movieId}/`,
+  movieRefresh: (movieId: string) => `/api/movie/${movieId}/refresh`,
   tvshow: '/api/tvshow',
   tvshowSearch: (searchParams: URLSearchParams | string) =>
     `/api/tvshow/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
-  tvshowById: (tvshowId: number | string) => `/api/tvshow/${tvshowId}/`,
-  tvshowRefresh: (tvshowId: number | string) => `/api/tvshow/${tvshowId}/refresh`,
+  tvshowById: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
+  tvshowRefresh: (tvshowId: string) => `/api/tvshow/${tvshowId}/refresh`,
 } as const;

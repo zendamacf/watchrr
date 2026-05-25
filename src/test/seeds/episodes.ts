@@ -5,7 +5,7 @@ import { testEpisode } from '@/test/fixtures/episode';
 import type { Episode } from '@/types';
 
 export async function seedEpisode(options: {
-  tvshowId: number;
+  tvshowId: string;
   overrides?: Partial<typeof testEpisode>;
 }): Promise<Episode> {
   const values = { ...testEpisode, tvshow_id: options.tvshowId, ...options.overrides };

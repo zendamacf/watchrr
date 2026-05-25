@@ -10,6 +10,8 @@ import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedSubscribedTvShow, seedUser } from '@/test/seeds';
 import { DELETE } from './route';
 
+const unknownId = '00000000-0000-4000-8000-000000000099';
+
 describe('DELETE /api/tvshow/[tvshow_id]', () => {
   let userId: string;
 
@@ -20,26 +22,23 @@ describe('DELETE /api/tvshow/[tvshow_id]', () => {
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 
-  it('returns 400 for an invalid tvshow id', async () => {
+  it('returns 400 for a non-UUID tvshow id', async () => {
     const response = await DELETE(nextDelete(apiRoutes.tvshowById('bad')), routeParams({ tvshow_id: 'bad' }));
     expect(response.status).toBe(400);
   });
 
   it('returns 401 when not authenticated', async () => {
     mockGuardUser.mockResolvedValue(null);
-    const response = await DELETE(nextDelete(apiRoutes.tvshowById(1)), routeParams({ tvshow_id: '1' }));
+    const response = await DELETE(nextDelete(apiRoutes.tvshowById(unknownId)), routeParams({ tvshow_id: unknownId }));
     expect(response.status).toBe(401);
   });
 
-  it('removes the subscription', async () => {
+  it('removes the subscription by id', async () => {
     const { tvshowId } = await seedSubscribedTvShow({
       watcherId: userId,
       show: { moviedb_id: 998_401, name: 'Drop Show' },
     });
-    const response = await DELETE(
-      nextDelete(apiRoutes.tvshowById(tvshowId)),
-      routeParams({ tvshow_id: String(tvshowId) }),
-    );
+    const response = await DELETE(nextDelete(apiRoutes.tvshowById(tvshowId)), routeParams({ tvshow_id: tvshowId }));
     expect(response.status).toBe(200);
 
     const rows = await db

@@ -32,7 +32,7 @@ export async function seedTvShow(overrides: Partial<typeof testShow> = {}): Prom
 export async function seedSubscribedTvShow(options: {
   watcherId: string;
   show?: Partial<typeof testShow>;
-}): Promise<{ show: Show; tvshowId: number }> {
+}): Promise<{ show: Show; tvshowId: string }> {
   const show = await seedTvShow(options.show ?? {});
   await db
     .insert(subscribed_tvshows)

@@ -26,17 +26,16 @@ export const EpisodeCard = ({ episode, showDate }: Props) => {
   const episodeNumber = `S${String(episode.episodes.season).padStart(2, '0')}E${String(episode.episodes.episode).padStart(2, '0')}`;
 
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation<unknown, Error, number, MutationContext>({
-    mutationFn: async (episode_id) => {
-      const response = await fetch(apiRoutes.episodeById(episode_id), { method: 'put' });
+  const { mutate, isPending } = useMutation<unknown, Error, string, MutationContext>({
+    mutationFn: async (episodeId) => {
+      const response = await fetch(apiRoutes.episodeById(episodeId), { method: 'put' });
       if (!response.ok) throw new Error((await response.json()).message);
     },
-    onMutate: async (episode_id) => {
-      // Cancel ongoing refetch to not overwrite optimistic update
+    onMutate: async (episodeId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
       const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
       queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.filter((o) => o.episodes.id !== episode_id),
+        old?.filter((o) => o.episodes.id !== episodeId),
       );
       showSuccess({
         title: 'Nice!',

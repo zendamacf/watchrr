@@ -6,7 +6,6 @@ import {
   integer,
   pgTable,
   primaryKey,
-  serial,
   text,
   timestamp,
   uniqueIndex,
@@ -29,7 +28,7 @@ export const users = pgTable(
 );
 
 export const tvshows = pgTable('tvshows', {
-  id: serial().primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: text().notNull(),
   moviedb_id: integer().notNull().unique(),
   country: text(),
@@ -39,8 +38,8 @@ export const tvshows = pgTable('tvshows', {
 });
 
 export const episodes = pgTable('episodes', {
-  id: serial().primaryKey(),
-  tvshow_id: integer()
+  id: uuid('id').defaultRandom().primaryKey(),
+  tvshow_id: uuid('tvshow_id')
     .notNull()
     .references(() => tvshows.id, { onDelete: 'cascade' }),
   season: integer().notNull(),
@@ -55,10 +54,10 @@ export const episodes = pgTable('episodes', {
 export const subscribed_tvshows = pgTable(
   'subscribed_tvshows',
   {
-    tvshow_id: integer()
+    tvshow_id: uuid('tvshow_id')
       .notNull()
       .references(() => tvshows.id, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
@@ -68,10 +67,10 @@ export const subscribed_tvshows = pgTable(
 export const watched_episodes = pgTable(
   'watched_episodes',
   {
-    episode_id: integer()
+    episode_id: uuid('episode_id')
       .notNull()
       .references(() => episodes.id, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
@@ -79,7 +78,7 @@ export const watched_episodes = pgTable(
 );
 
 export const movies = pgTable('movies', {
-  id: serial().primaryKey(),
+  id: uuid('id').defaultRandom().primaryKey(),
   name: text().notNull(),
   releasedate: date(),
   moviedb_id: integer().notNull().unique(),
@@ -91,10 +90,10 @@ export const movies = pgTable('movies', {
 export const subscribed_movies = pgTable(
   'subscribed_movies',
   {
-    movie_id: integer()
+    movie_id: uuid('movie_id')
       .notNull()
       .references(() => movies.id, { onDelete: 'cascade' }),
-    watcher_id: uuid()
+    watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     watched: boolean().notNull().default(false),

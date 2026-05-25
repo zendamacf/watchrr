@@ -49,7 +49,7 @@ describe('/api/movie', () => {
       const response = await GET();
       expect(response.status).toBe(200);
       const data = await response.json();
-      expect(data.some((m: { id: number }) => m.id === unwatched.id)).toBe(true);
+      expect(data.some((m: { id: string }) => m.id === unwatched.id)).toBe(true);
       expect(data.every((m: { name: string }) => m.name !== 'Watched Movie')).toBe(true);
     });
   });
@@ -94,7 +94,7 @@ describe('/api/movie', () => {
       const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: moviedbId }));
       expect(response.status).toBe(201);
       const body = await response.json();
-      expect(body.movie_id).toBeGreaterThan(0);
+      expect(body.movie_id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
       expect(mockGetMovie).toHaveBeenCalledWith(moviedbId);
     });
 

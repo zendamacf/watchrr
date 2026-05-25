@@ -25,21 +25,13 @@ describe('apiRoutes', () => {
     expect(apiRoutes.tvshowSearch(params)).toBe('/api/tvshow/search?q=breaking+bad');
   });
 
-  it('movieById and tvshowById accept numeric and string ids', () => {
-    expect(apiRoutes.movieById(42)).toBe('/api/movie/42/');
-    expect(apiRoutes.movieById('42')).toBe('/api/movie/42/');
-    expect(apiRoutes.tvshowById(7)).toBe('/api/tvshow/7/');
-    expect(apiRoutes.tvshowById('7')).toBe('/api/tvshow/7/');
-  });
-
-  it('movieRefresh and tvshowRefresh build refresh paths', () => {
-    expect(apiRoutes.movieRefresh(1)).toBe('/api/movie/1/refresh');
-    expect(apiRoutes.tvshowRefresh('99')).toBe('/api/tvshow/99/refresh');
-  });
-
-  it('episodeById builds episode paths', () => {
-    expect(apiRoutes.episodeById(5)).toBe('/api/episode/5/');
-    expect(apiRoutes.episodeById('5')).toBe('/api/episode/5/');
+  it('media routes use UUID path segments', () => {
+    const id = '00000000-0000-4000-8000-000000000001';
+    expect(apiRoutes.movieById(id)).toBe(`/api/movie/${id}/`);
+    expect(apiRoutes.movieRefresh(id)).toBe(`/api/movie/${id}/refresh`);
+    expect(apiRoutes.tvshowById(id)).toBe(`/api/tvshow/${id}/`);
+    expect(apiRoutes.tvshowRefresh(id)).toBe(`/api/tvshow/${id}/refresh`);
+    expect(apiRoutes.episodeById(id)).toBe(`/api/episode/${id}/`);
   });
 
   it('exposes static auth and resource paths', () => {

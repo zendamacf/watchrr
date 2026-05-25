@@ -12,8 +12,8 @@ import { type DiffLookup, dateCompare, getDiff } from './utils';
  *
  * @throws {ResourceNotFound} if the TV Show cannot be found.
  */
-export const refreshTvShow = async (tvshow_id: number) => {
-  const [dbShow] = await db.select().from(tvshows).where(eq(tvshows.id, tvshow_id));
+export const refreshTvShow = async (tvshowId: string) => {
+  const [dbShow] = await db.select().from(tvshows).where(eq(tvshows.id, tvshowId));
   if (!dbShow) throw new ResourceNotFound();
 
   console.log(`[SHOW][${dbShow.name}] Refreshing`);
@@ -37,7 +37,7 @@ export const refreshTvShow = async (tvshow_id: number) => {
         poster_slug: apiShow.poster,
         backdrop_slug: apiShow.backdrop,
       })
-      .where(eq(tvshows.id, tvshow_id));
+      .where(eq(tvshows.id, tvshowId));
   }
 
   console.log(`[SHOW][${dbShow.name}] Refreshing episodes`);

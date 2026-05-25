@@ -17,7 +17,7 @@ export const AddShowModal = (props: Props) => {
 
   const queryClient = useQueryClient();
   const { mutate: add, isPending: pendingAdd } = useMutation<
-    { tvshowId: number },
+    { tvshowId: string },
     Error,
     { moviedb_id: number; name: string }
   >({
@@ -32,7 +32,7 @@ export const AddShowModal = (props: Props) => {
       });
       const json = await response.json();
       if (!response.ok) throw new Error(json.message);
-      return { tvshowId: json.tvshow_id };
+      return { tvshowId: json.tvshow_id as string };
     },
     onSuccess: (data, tvshow) => {
       refresh({ tvshowId: data.tvshowId, name: tvshow.name });

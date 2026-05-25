@@ -34,7 +34,7 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const movie: Movie = { ...testMovie, id: 88_001, name: 'Card Movie' };
+const movie: Movie = { ...testMovie, id: '00000000-0000-4000-8000-000000000087', name: 'Card Movie' };
 
 describe('MovieCard', () => {
   beforeEach(() => {

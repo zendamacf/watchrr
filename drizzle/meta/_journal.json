@@ -8,6 +8,41 @@
       "when": 1779521525442,
       "tag": "0000_colossal_onslaught",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779691859169,
+      "tag": "0001_add_entity_uuids",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779692321705,
+      "tag": "0002_add_uuid_foreign_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779694031135,
+      "tag": "0003_drop_integer_foreign_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779694382064,
+      "tag": "0004_drop_serial_primary_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1779695000000,
+      "tag": "0005_rename_uuid_columns_to_id",
+      "breakpoints": true
     }
   ]
 }
