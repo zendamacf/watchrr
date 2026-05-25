@@ -4,11 +4,5 @@
       "path": "/api/refresh",
       "schedule": "0 2 * * *"
     }
-  ],
-  "git": {
-    "deploymentEnabled": {
-      "main": true,
-      "*": false
-    }
-  }
+  ]
 }
