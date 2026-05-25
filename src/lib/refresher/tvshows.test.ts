@@ -58,7 +58,7 @@ describe('refreshTvShow', () => {
 
     await refreshTvShow(show.uuid);
 
-    const [after] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
+    const [after] = await db.select().from(tvshows).where(eq(tvshows.uuid, show.uuid));
     expect(after?.name).toBe('Synced Show');
   });
 
@@ -103,7 +103,7 @@ describe('refreshTvShow', () => {
 
     await refreshTvShow(show.uuid);
 
-    const [afterShow] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
+    const [afterShow] = await db.select().from(tvshows).where(eq(tvshows.uuid, show.uuid));
     expect(afterShow).toMatchObject({
       name: 'New Show Name',
       description: 'New overview',

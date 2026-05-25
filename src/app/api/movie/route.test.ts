@@ -50,7 +50,6 @@ describe('/api/movie', () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.some((m: { uuid: string }) => m.uuid === unwatched.uuid)).toBe(true);
-      expect(data.every((m: { id?: number }) => m.id === undefined)).toBe(true);
       expect(data.every((m: { name: string }) => m.name !== 'Watched Movie')).toBe(true);
     });
   });

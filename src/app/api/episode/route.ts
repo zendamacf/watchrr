@@ -1,7 +1,6 @@
 import { and, eq, notExists } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { toPublicEpisode, toPublicShow } from '@/lib/db/public-media';
 import { episodes, subscribed_tvshows, tvshows, watched_episodes } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
 
@@ -30,11 +29,5 @@ export async function GET() {
     )
     .orderBy(episodes.airdate, tvshows.name, episodes.season, episodes.episode);
 
-  return NextResponse.json(
-    data.map((row) => ({
-      episodes: toPublicEpisode(row.episodes),
-      tvshows: toPublicShow(row.tvshows),
-    })),
-    { status: 200 },
-  );
+  return NextResponse.json(data, { status: 200 });
 }

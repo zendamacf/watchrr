@@ -8,11 +8,11 @@ import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { apiRoutes } from '@/lib/routes';
-import type { ShowPublic, ShowsResponse } from '@/types';
+import type { Show, ShowsResponse } from '@/types';
 import { BaseShowCard } from './BaseShowCard';
 
 type Props = {
-  show: ShowPublic;
+  show: Show;
 };
 
 type MutationContext = { previousShows: ShowsResponse | undefined };

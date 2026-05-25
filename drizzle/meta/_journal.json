@@ -29,6 +29,13 @@
       "when": 1779694031135,
       "tag": "0003_drop_integer_foreign_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1779694382064,
+      "tag": "0004_drop_serial_primary_keys",
+      "breakpoints": true
     }
   ]
 }

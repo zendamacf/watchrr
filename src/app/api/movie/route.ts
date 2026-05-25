@@ -2,7 +2,6 @@ import { and, eq, exists } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { toPublicMovie } from '@/lib/db/public-media';
 import { movies, subscribed_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
@@ -33,7 +32,7 @@ export async function GET() {
     )
     .orderBy(movies.releasedate, movies.name);
 
-  return NextResponse.json(data.map(toPublicMovie), { status: 200 });
+  return NextResponse.json(data, { status: 200 });
 }
 
 /**

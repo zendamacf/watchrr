@@ -1,7 +1,6 @@
 import type { Episode } from '@/types';
 
 export const testEpisode: Episode = {
-  id: 1,
   uuid: '00000000-0000-4000-8000-000000000003',
   tvshow_uuid: '00000000-0000-4000-8000-000000000001',
   season: 1,

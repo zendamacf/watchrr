@@ -1,10 +1,10 @@
 'use client';
 
 import { SimpleGrid } from '@mantine/core';
-import type { MoviePublic } from '@/types';
+import type { Movie } from '@/types';
 import { MovieCard } from './MovieCard';
 
-type Props = { movies: MoviePublic[] };
+type Props = { movies: Movie[] };
 
 export const MovieList = ({ movies }: Props) => {
   return (

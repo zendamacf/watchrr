@@ -1,7 +1,6 @@
 import { and, eq, exists } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { toPublicShow } from '@/lib/db/public-media';
 import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { guardUser } from '@/utils/auth';
@@ -26,7 +25,7 @@ export async function GET() {
     )
     .orderBy(tvshows.name);
 
-  return NextResponse.json(data.map(toPublicShow), { status: 200 });
+  return NextResponse.json(data, { status: 200 });
 }
 
 /**

@@ -6,7 +6,6 @@ import {
   integer,
   pgTable,
   primaryKey,
-  serial,
   text,
   timestamp,
   uniqueIndex,
@@ -29,9 +28,7 @@ export const users = pgTable(
 );
 
 export const tvshows = pgTable('tvshows', {
-  id: serial().primaryKey(),
-  /** Stable public identifier; serial `id` kept until Phase 5. */
-  uuid: uuid('uuid').defaultRandom().notNull().unique(),
+  uuid: uuid('uuid').defaultRandom().primaryKey(),
   name: text().notNull(),
   moviedb_id: integer().notNull().unique(),
   country: text(),
@@ -41,8 +38,7 @@ export const tvshows = pgTable('tvshows', {
 });
 
 export const episodes = pgTable('episodes', {
-  id: serial().primaryKey(),
-  uuid: uuid('uuid').defaultRandom().notNull().unique(),
+  uuid: uuid('uuid').defaultRandom().primaryKey(),
   tvshow_uuid: uuid('tvshow_uuid')
     .notNull()
     .references(() => tvshows.uuid, { onDelete: 'cascade' }),
@@ -82,8 +78,7 @@ export const watched_episodes = pgTable(
 );
 
 export const movies = pgTable('movies', {
-  id: serial().primaryKey(),
-  uuid: uuid('uuid').defaultRandom().notNull().unique(),
+  uuid: uuid('uuid').defaultRandom().primaryKey(),
   name: text().notNull(),
   releasedate: date(),
   moviedb_id: integer().notNull().unique(),

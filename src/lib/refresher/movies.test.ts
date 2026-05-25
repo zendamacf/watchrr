@@ -56,7 +56,7 @@ describe('refreshMovie', () => {
     await refreshMovie(movie.uuid);
 
     expect(mockGetMovie).toHaveBeenCalledWith(MOVIedb_UNCHANGED);
-    const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
+    const [after] = await db.select().from(movies).where(eq(movies.uuid, movie.uuid));
     expect(after).toMatchObject({
       name: 'Synced Title',
       description: 'Synced description',
@@ -87,7 +87,7 @@ describe('refreshMovie', () => {
 
     await refreshMovie(movie.uuid);
 
-    const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
+    const [after] = await db.select().from(movies).where(eq(movies.uuid, movie.uuid));
     expect(after).toMatchObject({
       name: 'Fresh Title',
       description: 'Fresh description',

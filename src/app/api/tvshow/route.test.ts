@@ -39,7 +39,6 @@ describe('/api/tvshow', () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.some((s: { uuid: string }) => s.uuid === show.uuid)).toBe(true);
-      expect(data.every((s: { id?: number }) => s.id === undefined)).toBe(true);
     });
   });
 
