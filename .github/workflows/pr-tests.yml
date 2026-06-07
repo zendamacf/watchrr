@@ -36,11 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Node 25 enables Web Storage by default, which conflicts with happy-dom in
-      # Vitest UI tests (broken localStorage, `--localstorage-file` warnings).
       - uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 25
           cache: 'npm'
 
       - name: Install dependencies
