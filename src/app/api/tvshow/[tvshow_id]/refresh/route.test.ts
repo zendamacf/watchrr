@@ -1,6 +1,6 @@
 import '@/test/mocks/auth';
 import '@/test/mocks/refresher';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { ResourceNotFound } from '@/lib/refresher/errors';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
@@ -13,11 +13,17 @@ import { PUT } from './route';
 const unknownId = '00000000-0000-4000-8000-000000000097';
 
 describe('PUT /api/tvshow/[tvshow_id]/refresh', () => {
-  beforeEach(async () => {
+  let userId: string;
+
+  beforeAll(async () => {
+    const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
+    userId = user.id;
+  });
+
+  beforeEach(() => {
     resetAuthGuardMocks();
     resetRefresherMocks();
-    const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
-    mockGuardUser.mockResolvedValue({ id: user.id });
+    mockGuardUser.mockResolvedValue({ id: userId });
   });
 
   it('returns 400 for a non-UUID tvshow id', async () => {

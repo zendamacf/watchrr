@@ -1,6 +1,6 @@
 import '@/test/mocks/auth';
 import '@/test/mocks/themoviedb';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextGet } from '@/test/helpers/api-request';
@@ -10,11 +10,17 @@ import { seedUser } from '@/test/seeds';
 import { GET } from './route';
 
 describe('GET /api/tvshow/search', () => {
-  beforeEach(async () => {
+  let userId: string;
+
+  beforeAll(async () => {
+    const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
+    userId = user.id;
+  });
+
+  beforeEach(() => {
     resetAuthGuardMocks();
     resetThemoviedbMocks();
-    const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
-    mockGuardUser.mockResolvedValue({ id: user.id });
+    mockGuardUser.mockResolvedValue({ id: userId });
   });
 
   it('returns an empty array when q is missing or blank', async () => {

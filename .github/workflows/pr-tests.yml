@@ -11,39 +11,36 @@ permissions:
   pull-requests: write
 
 jobs:
-  setup:
-    name: setup
-    outputs:
-      branch: ${{ steps.branch_name.outputs.current_branch }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get branch name
-        id: branch_name
-        uses: tj-actions/branch-names@v8
-
   test:
-    needs: setup
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: watchrr
+          POSTGRES_PASSWORD: watchrr
+          POSTGRES_DB: watchrr
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://watchrr:watchrr@localhost:5432/watchrr
+
     steps:
-      - name: Create Neon Branch
-        id: create-branch
-        uses: neondatabase/create-branch-action@v6
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch_name: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}-tests
-          api_key: ${{ secrets.NEON_API_KEY }}
-          database: watchrr
-
-      - name: Set DATABASE_URL
-        run: echo "DATABASE_URL=${{ steps.create-branch.outputs.db_url_pooled }}" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v3
 
+      # Node 25 enables Web Storage by default, which conflicts with happy-dom in
+      # Vitest UI tests (broken localStorage, `--localstorage-file` warnings).
       - uses: actions/setup-node@v3
         with:
-          node-version: 25
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -51,14 +48,6 @@ jobs:
 
       - name: Run Migrations
         run: npm run db:migrate
-
-      - name: Post Schema Diff to PR
-        uses: neondatabase/schema-diff-action@v1
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          compare_branch: preview/pr-${{ github.event.number }}-${{ needs.setup.outputs.branch }}-tests
-          api_key: ${{ secrets.NEON_API_KEY }}
-          database: watchrr
 
       - name: Test
         run: npm run test:coverage

@@ -1,6 +1,6 @@
 import '@/test/mocks/auth';
 import { and, eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
 import { watched_episodes } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
@@ -15,10 +15,13 @@ const unknownId = '00000000-0000-4000-8000-000000000095';
 describe('PUT /api/episode/[episode_id]', () => {
   let userId: string;
 
-  beforeEach(async () => {
-    resetAuthGuardMocks();
+  beforeAll(async () => {
     const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
     userId = user.id;
+  });
+
+  beforeEach(() => {
+    resetAuthGuardMocks();
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 
