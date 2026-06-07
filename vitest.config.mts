@@ -11,6 +11,7 @@ export default defineConfig({
     },
   },
   test: {
+    maxWorkers: 4,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov', 'json-summary'],
@@ -72,7 +73,6 @@ export default defineConfig({
           envFile: '.env',
           setupFiles: ['./vitest.setup.ts'],
           include: ['src/**/*.test.ts'],
-          fileParallelism: false,
         },
       },
       {

@@ -1,7 +1,7 @@
 import '@/test/mocks/auth';
 import '@/test/mocks/themoviedb';
 import { and, eq } from 'drizzle-orm';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
 import { subscribed_movies } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
@@ -15,11 +15,14 @@ import { GET, POST } from './route';
 describe('/api/movie', () => {
   let userId: string;
 
-  beforeEach(async () => {
-    resetAuthGuardMocks();
-    resetThemoviedbMocks();
+  beforeAll(async () => {
     const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
     userId = user.id;
+  });
+
+  beforeEach(() => {
+    resetAuthGuardMocks();
+    resetThemoviedbMocks();
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 

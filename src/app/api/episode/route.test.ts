@@ -1,5 +1,5 @@
 import '@/test/mocks/auth';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedEpisode, seedSubscribedTvShow, seedUser } from '@/test/seeds';
@@ -8,10 +8,13 @@ import { GET } from './route';
 describe('GET /api/episode', () => {
   let userId: string;
 
-  beforeEach(async () => {
-    resetAuthGuardMocks();
+  beforeAll(async () => {
     const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
     userId = user.id;
+  });
+
+  beforeEach(() => {
+    resetAuthGuardMocks();
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 
