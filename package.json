@@ -24,7 +24,7 @@
     "*": "npm run lint:fix && npm run format"
   },
   "dependencies": {
-    "@mantine/core": "^8.1.2",
+    "@mantine/core": "^9.3.2",
     "@mantine/hooks": "^8.1.2",
     "@mantine/modals": "^8.1.2",
     "@mantine/notifications": "^8.1.2",
