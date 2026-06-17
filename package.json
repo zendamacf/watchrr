@@ -59,7 +59,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.1.7",
-    "drizzle-kit": "^0.31.1",
+    "drizzle-kit": "^0.31.10",
     "happy-dom": "^20.10.5",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.5",
