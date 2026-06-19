@@ -1,7 +1,10 @@
-name: PR Tests
+name: Tests
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-tests
@@ -50,8 +53,13 @@ jobs:
       - name: Test
         run: npm run test:coverage
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Post coverage comment
-        if: success()
+        if: success() && github.event_name == 'pull_request'
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           json-summary-path: coverage/coverage-summary.json
