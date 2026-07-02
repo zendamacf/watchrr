@@ -3,5 +3,11 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 5
+      interval: daily
+    groups:
+      mantine:
+        patterns:
+          - "@mantine/*"
+      everything-else:
+        patterns:
+          - "*"
