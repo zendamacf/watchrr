@@ -28,7 +28,7 @@
     "@mantine/hooks": "^9.4.1",
     "@mantine/modals": "^9.4.1",
     "@mantine/notifications": "^9.4.1",
-    "@sentry/nextjs": "^10.63.0",
+    "@sentry/nextjs": "^10.64.0",
     "@tanstack/react-query": "^5.101.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
