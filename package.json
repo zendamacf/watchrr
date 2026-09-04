@@ -34,7 +34,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "bcrypt": "^6.0.0",
     "classnames": "^2.5.1",
-    "countries-and-timezones": "^3.9.0",
+    "countries-and-timezones": "^3.10.0",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.8",
     "lodash.chunk": "^4.2.0",
