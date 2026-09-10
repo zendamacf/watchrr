@@ -9,18 +9,33 @@ export type SeededUser = {
   password: string;
 };
 
+function isUniqueViolation(error: unknown): boolean {
+  let current: unknown = error;
+  while (current != null && typeof current === 'object') {
+    if ('code' in current && (current as { code: string }).code === '23505') {
+      return true;
+    }
+    current = 'cause' in current ? (current as { cause: unknown }).cause : null;
+  }
+  return false;
+}
+
+async function findUserByEmail(email: string) {
+  const [user] = await db
+    .select({ id: users.id, email: users.email })
+    .from(users)
+    .where(eq(lower(users.email), email))
+    .limit(1);
+  return user;
+}
+
 /**
  * Insert a user or return the existing row for this email (idempotent across test runs).
  */
 export async function seedUser(options: { email: string; password: string }): Promise<SeededUser> {
   const email = options.email.trim().toLowerCase();
 
-  const [existing] = await db
-    .select({ id: users.id, email: users.email })
-    .from(users)
-    .where(eq(lower(users.email), email))
-    .limit(1);
-
+  const existing = await findUserByEmail(email);
   if (existing) {
     return { id: existing.id, email: existing.email, password: options.password };
   }
@@ -28,27 +43,15 @@ export async function seedUser(options: { email: string; password: string }): Pr
   const passwordHash = await hashPassword(options.password);
 
   try {
-    const [user] = await db
-      .insert(users)
-      .values({ email, passwordHash })
-      .returning({ id: users.id, email: users.email });
-    if (!user) {
-      throw new Error(`Failed to seed user ${email}`);
-    }
-    return { id: user.id, email: user.email, password: options.password };
+    await db.insert(users).values({ email, passwordHash }).onConflictDoNothing();
   } catch (error) {
-    const isDuplicate =
-      typeof error === 'object' && error !== null && 'code' in error && (error as { code: string }).code === '23505';
-    if (!isDuplicate) throw error;
-
-    const [user] = await db
-      .select({ id: users.id, email: users.email })
-      .from(users)
-      .where(eq(lower(users.email), email))
-      .limit(1);
-    if (!user) {
-      throw new Error(`Failed to seed user ${email}`);
-    }
-    return { id: user.id, email: user.email, password: options.password };
+    if (!isUniqueViolation(error)) throw error;
   }
+
+  const user = await findUserByEmail(email);
+  if (!user) {
+    throw new Error(`Failed to seed user ${email}`);
+  }
+
+  return { id: user.id, email: user.email, password: options.password };
 }
