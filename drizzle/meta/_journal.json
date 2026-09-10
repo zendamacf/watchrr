@@ -43,6 +43,13 @@
       "when": 1779695000000,
       "tag": "0005_rename_uuid_columns_to_id",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789041539124,
+      "tag": "0006_broken_sasquatch",
+      "breakpoints": true
     }
   ]
 }

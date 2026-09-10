@@ -6,6 +6,7 @@ import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
+import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
 import type { EpisodesResponse } from '@/types';
@@ -34,9 +35,14 @@ const parsedEpisode: ParsedEpisode = {
   episodes: {
     ...testEpisode,
     local_date: DateTime.fromSQL('2030-06-01'),
+    original_local_date: DateTime.fromSQL('2030-06-01'),
     in_past: false,
+    is_snoozed: false,
+    delay_days: 0,
+    snoozed_until: null,
   },
   tvshows: testShow,
+  subscription: testSubscription,
 };
 
 describe('EpisodeCard', () => {
@@ -48,7 +54,13 @@ describe('EpisodeCard', () => {
   it('marks an episode as watched via the API', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    const episodes: EpisodesResponse = [parsedEpisode];
+    const episodes: EpisodesResponse = [
+      {
+        episodes: parsedEpisode.episodes,
+        tvshows: parsedEpisode.tvshows,
+        subscription: parsedEpisode.subscription,
+      },
+    ];
     queryClient.setQueryData([QueryKey.getEpisodes], episodes);
     renderWithProviders(<EpisodeCard episode={parsedEpisode} showDate />, { queryClient });
 
@@ -67,7 +79,13 @@ describe('EpisodeCard', () => {
     stubFetch(mockFetchResponse({ message: 'Server error' }, { ok: false, status: 500 }));
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    const episodes: EpisodesResponse = [parsedEpisode];
+    const episodes: EpisodesResponse = [
+      {
+        episodes: parsedEpisode.episodes,
+        tvshows: parsedEpisode.tvshows,
+        subscription: parsedEpisode.subscription,
+      },
+    ];
     queryClient.setQueryData([QueryKey.getEpisodes], episodes);
     renderWithProviders(<EpisodeCard episode={parsedEpisode} />, { queryClient });
 

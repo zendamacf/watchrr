@@ -5,7 +5,7 @@ import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
-import { PastEpisodes } from './PastEpisodes';
+import { SnoozedEpisodes } from './SnoozedEpisodes';
 import type { ParsedEpisode } from './types';
 
 vi.mock('./GroupedEpisodes', () => ({
@@ -18,17 +18,17 @@ const parsedEpisode: ParsedEpisode = {
     local_date: DateTime.fromSQL('2020-01-01'),
     original_local_date: DateTime.fromSQL('2020-01-01'),
     in_past: true,
-    is_snoozed: false,
+    is_snoozed: true,
     delay_days: 0,
-    snoozed_until: null,
+    snoozed_until: '2099-12-01',
   },
   tvshows: testShow,
-  subscription: testSubscription,
+  subscription: { ...testSubscription, snoozed_until: '2099-12-01' },
 };
 
-describe('PastEpisodes', () => {
-  it('shows past episode count in the accordion control', () => {
-    renderWithProviders(<PastEpisodes episodes={[parsedEpisode, parsedEpisode]} />);
-    expect(screen.getByText('2 Past Episodes')).toBeInTheDocument();
+describe('SnoozedEpisodes', () => {
+  it('shows snoozed episode count in the accordion control', () => {
+    renderWithProviders(<SnoozedEpisodes episodes={[parsedEpisode, parsedEpisode]} />);
+    expect(screen.getByText('2 Snoozed Episodes')).toBeInTheDocument();
   });
 });

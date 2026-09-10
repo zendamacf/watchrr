@@ -12,17 +12,24 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import type { Show, ShowCard } from '@/types';
+import type { Show, ShowCard, ShowSubscription } from '@/types';
+import { DateFormat } from '@/utils/dates';
+import { isShowSnoozed } from '@/utils/episode-schedule';
 
 type Props = {
   show: Show | ShowCard;
+  subscription?: ShowSubscription;
   actions?: ReactNode;
 } & CardProps;
 
-export const BaseShowCard = ({ show, actions, ...props }: Props) => {
+export const BaseShowCard = ({ show, subscription, actions, ...props }: Props) => {
+  const delayDays = subscription?.delay_days ?? 0;
+  const snoozed = isShowSnoozed(subscription?.snoozed_until);
+
   return (
     <BackdropCard {...props} style={{ width: '100%' }} backdrop={show.backdrop_slug}>
       <Group h={'100%'} align={'center'}>
@@ -49,9 +56,21 @@ export const BaseShowCard = ({ show, actions, ...props }: Props) => {
             </Popover>
           </Stack>
           <Group justify={'space-between'}>
-            <Badge color={'blue'} variant={'outline'}>
-              {show.country}
-            </Badge>
+            <Group gap="xs">
+              <Badge color={'blue'} variant={'outline'}>
+                {show.country}
+              </Badge>
+              {delayDays > 0 && (
+                <Badge color="blue" variant="outline">
+                  {delayDays}d delay
+                </Badge>
+              )}
+              {snoozed && subscription?.snoozed_until && (
+                <Badge color="orange" variant="outline">
+                  Snoozed until {DateTime.fromSQL(subscription.snoozed_until).toFormat(DateFormat.DMY)}
+                </Badge>
+              )}
+            </Group>
             {actions && (
               <Group justify={'end'} gap={'xs'}>
                 {actions}

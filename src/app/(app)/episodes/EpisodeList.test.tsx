@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
+import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
 import type { EpisodesResponse } from '@/types';
@@ -14,6 +15,12 @@ vi.mock('./PastEpisodes', () => ({
   ),
 }));
 
+vi.mock('./SnoozedEpisodes', () => ({
+  SnoozedEpisodes: ({ episodes }: { episodes: unknown[] }) => (
+    <div data-testid="snoozed-episodes">{episodes.length} snoozed</div>
+  ),
+}));
+
 vi.mock('./GroupedEpisodes', () => ({
   GroupedEpisodes: () => <div data-testid="grouped-episodes" />,
 }));
@@ -21,11 +28,24 @@ vi.mock('./GroupedEpisodes', () => ({
 const futureEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, airdate: '2099-12-01', name: 'Future Pilot' },
   tvshows: { ...testShow, name: 'Future Show', country: 'US' },
+  subscription: testSubscription,
 };
 
 const pastEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, id: '00000000-0000-4000-8000-000000000090', airdate: '2020-01-01', name: 'Old Pilot' },
   tvshows: { ...testShow, name: 'Past Show', country: 'US' },
+  subscription: testSubscription,
+};
+
+const snoozedEpisode: EpisodesResponse[number] = {
+  episodes: {
+    ...testEpisode,
+    id: '00000000-0000-4000-8000-000000000091',
+    airdate: '2020-01-01',
+    name: 'Snoozed Pilot',
+  },
+  tvshows: { ...testShow, name: 'Snoozed Show', country: 'US' },
+  subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
 };
 
 describe('EpisodeList', () => {
@@ -44,6 +64,17 @@ describe('EpisodeList', () => {
     renderWithProviders(<EpisodeList />);
     await waitFor(() => {
       expect(screen.getByText('An error occurred')).toBeInTheDocument();
+    });
+  });
+
+  it('shows snoozed episodes separately from the main schedule', async () => {
+    stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('snoozed-episodes')).toHaveTextContent('1 snoozed');
+      expect(screen.getByText('1 episode snoozed')).toBeInTheDocument();
+      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
     });
   });
 

@@ -13,15 +13,21 @@ export async function GET() {
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const data = await db
-    .select()
+    .select({
+      id: tvshows.id,
+      name: tvshows.name,
+      moviedb_id: tvshows.moviedb_id,
+      country: tvshows.country,
+      poster_slug: tvshows.poster_slug,
+      backdrop_slug: tvshows.backdrop_slug,
+      description: tvshows.description,
+      delay_days: subscribed_tvshows.delay_days,
+      snoozed_until: subscribed_tvshows.snoozed_until,
+    })
     .from(tvshows)
-    .where(
-      exists(
-        db
-          .select()
-          .from(subscribed_tvshows)
-          .where(and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id))),
-      ),
+    .innerJoin(
+      subscribed_tvshows,
+      and(eq(subscribed_tvshows.tvshow_id, tvshows.id), eq(subscribed_tvshows.watcher_id, user.id)),
     )
     .orderBy(tvshows.name);
 

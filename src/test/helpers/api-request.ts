@@ -18,6 +18,14 @@ export function nextPost(path: string, body: unknown) {
   });
 }
 
+export function nextPatch(path: string, body: unknown) {
+  return new NextRequest(new URL(path, 'http://localhost'), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
 export function nextPut(path: string) {
   return new NextRequest(new URL(path, 'http://localhost'), { method: 'PUT' });
 }

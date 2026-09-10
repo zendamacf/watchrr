@@ -24,5 +24,6 @@ export const apiRoutes = {
   tvshowSearch: (searchParams: URLSearchParams | string) =>
     `/api/tvshow/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   tvshowById: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
+  tvshowPreferences: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
   tvshowRefresh: (tvshowId: string) => `/api/tvshow/${tvshowId}/refresh`,
 } as const;
