@@ -67,6 +67,27 @@ describe('EpisodeList', () => {
     });
   });
 
+  it('treats delayed episodes as future when the effective date has not passed', async () => {
+    const delayedPastAirdate: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000092',
+        airdate: '2026-09-01',
+        name: 'Delayed Pilot',
+      },
+      tvshows: { ...testShow, name: 'Delayed Show', country: 'US' },
+      subscription: { delay_days: 14, snoozed_until: null },
+    };
+
+    stubFetch(mockFetchResponse([delayedPastAirdate]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
+      expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
+    });
+  });
+
   it('shows snoozed episodes separately from the main schedule', async () => {
     stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
     renderWithProviders(<EpisodeList />);

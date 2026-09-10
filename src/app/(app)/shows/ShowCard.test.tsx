@@ -56,6 +56,15 @@ describe('ShowCard', () => {
     stubFetch(mockFetchResponse({ message: 'Success' }));
   });
 
+  it('opens show options when the settings action is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ShowCard show={show} />);
+
+    await user.click(screen.getByLabelText('Show settings'));
+    expect(screen.getByText('Release delay')).toBeInTheDocument();
+    expect(screen.getByText('Snooze')).toBeInTheDocument();
+  });
+
   it('calls refresh when the refresh action is clicked', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();

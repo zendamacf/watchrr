@@ -31,4 +31,9 @@ describe('SnoozedEpisodes', () => {
     renderWithProviders(<SnoozedEpisodes episodes={[parsedEpisode, parsedEpisode]} />);
     expect(screen.getByText('2 Snoozed Episodes')).toBeInTheDocument();
   });
+
+  it('uses singular copy for one snoozed episode', () => {
+    renderWithProviders(<SnoozedEpisodes episodes={[parsedEpisode]} />);
+    expect(screen.getByText('1 Snoozed Episode')).toBeInTheDocument();
+  });
 });

@@ -107,4 +107,91 @@ describe('EpisodeCard', () => {
 
     expect(mockShowInfo).toHaveBeenCalledWith(expect.objectContaining({ message: 'Copied' }));
   });
+
+  it('shows a delay badge for delayed scheduled episodes', () => {
+    const delayedEpisode: ParsedEpisode = {
+      ...parsedEpisode,
+      episodes: {
+        ...parsedEpisode.episodes,
+        delay_days: 14,
+        original_local_date: DateTime.fromSQL('2026-01-01'),
+      },
+      subscription: { delay_days: 14, snoozed_until: null },
+    };
+
+    renderWithProviders(<EpisodeCard episode={delayedEpisode} />);
+    expect(screen.getByText('14d delay')).toBeInTheDocument();
+  });
+
+  it('wakes a snoozed show and invalidates episode queries', async () => {
+    const snoozedEpisode: ParsedEpisode = {
+      ...parsedEpisode,
+      episodes: {
+        ...parsedEpisode.episodes,
+        is_snoozed: true,
+        snoozed_until: '2099-12-01',
+      },
+      subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
+    };
+
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient();
+    renderWithProviders(<EpisodeCard episode={snoozedEpisode} variant="snoozed" />, { queryClient });
+
+    expect(screen.getByText(/Snoozed until/)).toBeInTheDocument();
+    await user.click(screen.getByLabelText('Wake show'));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        apiRoutes.tvshowPreferences(testShow.id),
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify({ snoozed_until: null }),
+        }),
+      );
+      expect(mockShowSuccess).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining(testShow.name) }),
+      );
+    });
+  });
+
+  it('shows an error when waking a snoozed show fails', async () => {
+    stubFetch(mockFetchResponse({ message: 'Server error' }, { ok: false, status: 500 }));
+    const snoozedEpisode: ParsedEpisode = {
+      ...parsedEpisode,
+      episodes: {
+        ...parsedEpisode.episodes,
+        is_snoozed: true,
+        snoozed_until: '2099-12-01',
+      },
+      subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
+    };
+
+    const user = userEvent.setup();
+    renderWithProviders(<EpisodeCard episode={snoozedEpisode} variant="snoozed" />);
+    await user.click(screen.getByLabelText('Wake show'));
+
+    await waitFor(() => {
+      expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Server error' }));
+    });
+  });
+
+  it('opens show settings from a snoozed episode card', async () => {
+    const snoozedEpisode: ParsedEpisode = {
+      ...parsedEpisode,
+      episodes: {
+        ...parsedEpisode.episodes,
+        is_snoozed: true,
+        snoozed_until: '2099-12-01',
+      },
+      subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
+    };
+
+    const user = userEvent.setup();
+    renderWithProviders(<EpisodeCard episode={snoozedEpisode} variant="snoozed" />);
+    await user.click(screen.getByLabelText('Show settings'));
+
+    expect(screen.getByText('Release delay')).toBeInTheDocument();
+    expect(screen.getByText('Snooze')).toBeInTheDocument();
+  });
 });
