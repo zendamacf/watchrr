@@ -1,36 +1,24 @@
 'use client';
 
-import { Alert, Anchor, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
+import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
-import { useQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { QueryKey } from '@/components/QueryProvider';
-import { apiFetch } from '@/lib/api/fetch';
-import { apiRoutes } from '@/lib/routes';
-import type { EpisodesResponse } from '@/types';
+import { useEpisodesQuery } from '@/hooks/useEpisodes';
 import { DateFormat } from '@/utils/dates';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
 import { parseEpisodeDate } from './parseEpisodeDate';
-import { SnoozedEpisodes } from './SnoozedEpisodes';
 import type { ParsedEpisode } from './types';
 
 export const EpisodeList = () => {
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data } = useQuery<EpisodesResponse>({
-    queryKey: [QueryKey.getEpisodes],
-    queryFn: async () => {
-      const response = await apiFetch(apiRoutes.episode, { method: 'get' });
-      if (response.ok) return await response.json();
-      throw new Error((await response.json()).message);
-    },
-  });
+  const { isLoading, isError, data } = useEpisodesQuery();
 
-  const { pastEpisodes, futureDates, snoozedEpisodes } = useMemo(() => {
-    if (!data) return { pastEpisodes: [], futureDates: {}, snoozedEpisodes: [] };
+  const { pastEpisodes, futureDates } = useMemo(() => {
+    if (!data) return { pastEpisodes: [], futureDates: {} };
     const trimmedSearch = search.trim().toLowerCase();
     const converted = data
       .filter(
@@ -62,7 +50,6 @@ export const EpisodeList = () => {
         };
       });
 
-    const snoozedEpisodes = converted.filter((r) => r.episodes.is_snoozed);
     const scheduledEpisodes = converted.filter((r) => !r.episodes.is_snoozed);
     const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past);
     const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past);
@@ -73,7 +60,7 @@ export const EpisodeList = () => {
       return acc;
     }, {});
 
-    return { pastEpisodes, futureDates, snoozedEpisodes };
+    return { pastEpisodes, futureDates };
   }, [search, data]);
 
   if (isLoading)
@@ -94,19 +81,6 @@ export const EpisodeList = () => {
       />
       <Space h={'md'} />
       <Stack gap={'xl'}>
-        {!!snoozedEpisodes.length && (
-          <Alert
-            color="orange"
-            variant="light"
-            title={`${snoozedEpisodes.length} episode${snoozedEpisodes.length === 1 ? '' : 's'} snoozed`}
-          >
-            These episodes are hidden from your schedule until their snooze ends.{' '}
-            <Anchor href="#snoozed-episodes">View snoozed episodes</Anchor>
-          </Alert>
-        )}
-
-        {!!snoozedEpisodes.length && <SnoozedEpisodes episodes={snoozedEpisodes} />}
-
         {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} />}
 
         {Object.entries(futureDates).map(([date, episodes]) => (

@@ -15,12 +15,6 @@ vi.mock('./PastEpisodes', () => ({
   ),
 }));
 
-vi.mock('./SnoozedEpisodes', () => ({
-  SnoozedEpisodes: ({ episodes }: { episodes: unknown[] }) => (
-    <div data-testid="snoozed-episodes">{episodes.length} snoozed</div>
-  ),
-}));
-
 vi.mock('./GroupedEpisodes', () => ({
   GroupedEpisodes: () => <div data-testid="grouped-episodes" />,
 }));
@@ -88,14 +82,14 @@ describe('EpisodeList', () => {
     });
   });
 
-  it('shows snoozed episodes separately from the main schedule', async () => {
+  it('excludes snoozed episodes from the main schedule', async () => {
     stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
     renderWithProviders(<EpisodeList />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('snoozed-episodes')).toHaveTextContent('1 snoozed');
-      expect(screen.getByText('1 episode snoozed')).toBeInTheDocument();
       expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
+      expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
+      expect(screen.queryByText(/snoozed/i)).not.toBeInTheDocument();
     });
   });
 
