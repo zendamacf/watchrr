@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
@@ -26,6 +27,23 @@ describe('SnoozedIndicator', () => {
       expect(screen.getByLabelText('2 snoozed episodes')).toBeInTheDocument();
       expect(screen.getByText('2')).toBeInTheDocument();
     });
+  });
+
+  it('opens a modal listing snoozed episodes when clicked', async () => {
+    stubFetch(mockFetchResponse([snoozedEpisode]));
+    const user = userEvent.setup();
+    renderWithProviders(<SnoozedIndicator />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('1 snoozed episode')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByLabelText('1 snoozed episode'));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Test Show')).toBeInTheDocument();
+    expect(screen.getByText(/S01E01/)).toBeInTheDocument();
+    expect(screen.getByText(/Snoozed until/)).toBeInTheDocument();
   });
 
   it('renders nothing when there are no snoozed episodes', async () => {

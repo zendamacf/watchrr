@@ -19,8 +19,19 @@ export function useEpisodesQuery() {
   });
 }
 
-export function useSnoozedEpisodeCount() {
-  const { data } = useEpisodesQuery();
+export function useSnoozedEpisodes() {
+  const { data, isLoading, isError } = useEpisodesQuery();
 
-  return useMemo(() => data?.filter((row) => isShowSnoozed(row.subscription.snoozed_until)).length ?? 0, [data]);
+  const episodes = useMemo(
+    () => data?.filter((row) => isShowSnoozed(row.subscription.snoozed_until)) ?? [],
+    [data],
+  );
+
+  return { episodes, isLoading, isError };
+}
+
+export function useSnoozedEpisodeCount() {
+  const { episodes } = useSnoozedEpisodes();
+
+  return episodes.length;
 }

@@ -6,7 +6,7 @@ import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderHookWithProviders } from '@/test/renderHook';
 import type { EpisodesResponse } from '@/types';
-import { useSnoozedEpisodeCount } from './useEpisodes';
+import { useSnoozedEpisodeCount, useSnoozedEpisodes } from './useEpisodes';
 
 const snoozedEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, id: '00000000-0000-4000-8000-000000000091', name: 'Snoozed Pilot' },
@@ -40,6 +40,22 @@ describe('useSnoozedEpisodeCount', () => {
 
     await waitFor(() => {
       expect(result.current).toBe(0);
+    });
+  });
+});
+
+describe('useSnoozedEpisodes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns only snoozed episodes', async () => {
+    stubFetch(mockFetchResponse([snoozedEpisode, snoozedEpisode, scheduledEpisode]));
+    const { result } = renderHookWithProviders(() => useSnoozedEpisodes());
+
+    await waitFor(() => {
+      expect(result.current.episodes).toHaveLength(2);
+      expect(result.current.episodes.every((row) => row.subscription.snoozed_until)).toBe(true);
     });
   });
 });
