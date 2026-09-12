@@ -8,6 +8,7 @@ import { SignOutButton } from '@/components/auth/SignOutButton';
 import { routes } from '@/lib/routes';
 import { Logo } from '../Logo';
 import classes from './SiteHeader.module.css';
+import { SnoozedIndicator } from './SnoozedIndicator';
 import { ThemeToggle } from './ThemeToggle';
 
 export function SiteHeader() {
@@ -52,11 +53,15 @@ function MainNav({ drawerOpened, toggleDrawer }: { drawerOpened: boolean; toggle
         </Group>
 
         <Group h="100%" visibleFrom="sm">
+          <SnoozedIndicator />
           <ThemeToggle />
           <SignOutButton className={classes.link} />
         </Group>
 
-        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
+        <Group h="100%" gap="xs" hiddenFrom="sm">
+          <SnoozedIndicator />
+          <Burger opened={drawerOpened} onClick={toggleDrawer} />
+        </Group>
       </Group>
     </header>
   );
@@ -94,7 +99,7 @@ function MobileNav({ drawerOpened, closeDrawer }: { drawerOpened: boolean; close
 
         <Divider my="sm" />
 
-        <Stack justify="center" px="md">
+        <Stack justify="center" px="md" gap="sm">
           <ThemeToggle />
           <SignOutButton className={classes.link} style={{ paddingLeft: 0 }} onSignedOut={closeDrawer} />
         </Stack>

@@ -6,7 +6,7 @@ import { apiRoutes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
-import type { Show } from '@/types';
+import type { SubscribedShow } from '@/types';
 import { ShowCard } from './ShowCard';
 
 const { mockRefresh, mockShowError, mockShowSuccess } = vi.hoisted(() => ({
@@ -42,12 +42,27 @@ vi.mock('@mantine/modals', async (importOriginal) => {
   };
 });
 
-const show: Show = { ...testShow, id: '00000000-0000-4000-8000-000000000088', name: 'Card Show' };
+const show: SubscribedShow = {
+  ...testShow,
+  id: '00000000-0000-4000-8000-000000000088',
+  name: 'Card Show',
+  delay_days: 0,
+  snoozed_until: null,
+};
 
 describe('ShowCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     stubFetch(mockFetchResponse({ message: 'Success' }));
+  });
+
+  it('opens show options when the settings action is clicked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ShowCard show={show} />);
+
+    await user.click(screen.getByLabelText('Show settings'));
+    expect(screen.getByText('Release delay')).toBeInTheDocument();
+    expect(screen.getByText('Snooze')).toBeInTheDocument();
   });
 
   it('calls refresh when the refresh action is clicked', async () => {
@@ -56,8 +71,7 @@ describe('ShowCard', () => {
     queryClient.setQueryData([QueryKey.getShows], [show]);
     renderWithProviders(<ShowCard show={show} />, { queryClient });
 
-    const buttons = screen.getAllByRole('button');
-    await user.click(buttons[0]!);
+    await user.click(screen.getByLabelText('Refresh metadata'));
 
     expect(mockRefresh).toHaveBeenCalledWith({ tvshowId: show.id, name: show.name });
   });
@@ -74,8 +88,7 @@ describe('ShowCard', () => {
     queryClient.setQueryData([QueryKey.getShows], [show]);
     renderWithProviders(<ShowCard show={show} />, { queryClient });
 
-    const buttons = screen.getAllByRole('button');
-    await user.click(buttons[1]!);
+    await user.click(screen.getByLabelText('Unsubscribe'));
 
     await waitFor(() => {
       expect(openConfirmModal).toHaveBeenCalled();

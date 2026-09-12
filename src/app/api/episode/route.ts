@@ -12,7 +12,14 @@ export async function GET() {
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const data = await db
-    .select()
+    .select({
+      episodes,
+      tvshows,
+      subscription: {
+        delay_days: subscribed_tvshows.delay_days,
+        snoozed_until: subscribed_tvshows.snoozed_until,
+      },
+    })
     .from(episodes)
     .innerJoin(tvshows, eq(tvshows.id, episodes.tvshow_id))
     .innerJoin(

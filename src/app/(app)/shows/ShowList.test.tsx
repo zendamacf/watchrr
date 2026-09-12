@@ -11,8 +11,8 @@ vi.mock('./ShowCard', () => ({
 describe('ShowList', () => {
   it('renders a card per show', () => {
     const shows = [
-      { ...testShow, id: '00000000-0000-4000-8000-000000000093', name: 'Show A' },
-      { ...testShow, id: '00000000-0000-4000-8000-000000000094', name: 'Show B' },
+      { ...testShow, id: '00000000-0000-4000-8000-000000000093', name: 'Show A', delay_days: 0, snoozed_until: null },
+      { ...testShow, id: '00000000-0000-4000-8000-000000000094', name: 'Show B', delay_days: 0, snoozed_until: null },
     ];
     renderWithProviders(<ShowList shows={shows} />);
     expect(screen.getByText('Show A')).toBeInTheDocument();

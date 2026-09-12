@@ -60,6 +60,8 @@ export const subscribed_tvshows = pgTable(
     watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
+    delay_days: integer('delay_days').notNull().default(0),
+    snoozed_until: date('snoozed_until'),
   },
   (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
 );

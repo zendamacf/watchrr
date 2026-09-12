@@ -1,25 +1,28 @@
 'use client';
 
 import { ActionIcon, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { RefreshCcw, X } from 'lucide-react';
+import { RefreshCcw, Settings, X } from 'lucide-react';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
-import type { Show, ShowsResponse } from '@/types';
+import type { ShowsResponse, SubscribedShow } from '@/types';
 import { BaseShowCard } from './BaseShowCard';
+import { ShowOptionsModal } from './ShowOptionsModal';
 
 type Props = {
-  show: Show;
+  show: SubscribedShow;
 };
 
 type MutationContext = { previousShows: ShowsResponse | undefined };
 
 export const ShowCard = ({ show }: Props) => {
   const { showError, showSuccess } = useAlert();
+  const [settingsOpened, { open: openSettings, close: closeSettings }] = useDisclosure(false);
 
   const { refresh, refreshPending } = useRefreshShow();
 
@@ -54,29 +57,36 @@ export const ShowCard = ({ show }: Props) => {
     });
 
   return (
-    <BaseShowCard
-      h={250}
-      show={show}
-      actions={
-        <>
-          <ActionIcon
-            aria-label="Refresh metadata"
-            color={'blue'}
-            loading={refreshPending}
-            onClick={() => refresh({ tvshowId: show.id, name: show.name })}
-          >
-            <RefreshCcw size={'20'} />
-          </ActionIcon>
-          <ActionIcon
-            aria-label="Unsubscribe"
-            color={'red'}
-            loading={removePending}
-            onClick={() => confirmUnsubscribe(show.id)}
-          >
-            <X size={'20'} />
-          </ActionIcon>
-        </>
-      }
-    />
+    <>
+      <ShowOptionsModal show={show} opened={settingsOpened} onClose={closeSettings} />
+      <BaseShowCard
+        h={250}
+        show={show}
+        subscription={show}
+        actions={
+          <>
+            <ActionIcon aria-label="Show settings" color={'grey'} onClick={openSettings}>
+              <Settings size={'20'} />
+            </ActionIcon>
+            <ActionIcon
+              aria-label="Refresh metadata"
+              color={'blue'}
+              loading={refreshPending}
+              onClick={() => refresh({ tvshowId: show.id, name: show.name })}
+            >
+              <RefreshCcw size={'20'} />
+            </ActionIcon>
+            <ActionIcon
+              aria-label="Unsubscribe"
+              color={'red'}
+              loading={removePending}
+              onClick={() => confirmUnsubscribe(show.id)}
+            >
+              <X size={'20'} />
+            </ActionIcon>
+          </>
+        }
+      />
+    </>
   );
 };

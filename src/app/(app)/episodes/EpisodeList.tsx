@@ -2,31 +2,20 @@
 
 import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
-import { useQuery } from '@tanstack/react-query';
-import { getTimezonesForCountry } from 'countries-and-timezones';
 import { Search } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
-import { QueryKey } from '@/components/QueryProvider';
-import { apiFetch } from '@/lib/api/fetch';
-import { apiRoutes } from '@/lib/routes';
-import type { EpisodesResponse } from '@/types';
+import { useEpisodesQuery } from '@/hooks/useEpisodes';
 import { DateFormat } from '@/utils/dates';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
+import { parseEpisodeDate } from './parseEpisodeDate';
 import type { ParsedEpisode } from './types';
 
 export const EpisodeList = () => {
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data } = useQuery<EpisodesResponse>({
-    queryKey: [QueryKey.getEpisodes],
-    queryFn: async () => {
-      const response = await apiFetch(apiRoutes.episode, { method: 'get' });
-      if (response.ok) return await response.json();
-      throw new Error((await response.json()).message);
-    },
-  });
+  const { isLoading, isError, data } = useEpisodesQuery();
 
   const { pastEpisodes, futureDates } = useMemo(() => {
     if (!data) return { pastEpisodes: [], futureDates: {} };
@@ -37,26 +26,33 @@ export const EpisodeList = () => {
           r.tvshows.name.toLowerCase().includes(trimmedSearch) || r.episodes.name.toLowerCase().includes(trimmedSearch),
       )
       .map<ParsedEpisode>((r) => {
-        let localDate: DateTime;
-        // Convert to user timezone
-        const timezones = r.tvshows.country ? getTimezonesForCountry(r.tvshows.country) : [];
-        if (timezones?.length) {
-          // Just get first, with dates we don't have to be too accurate
-          const [tz] = timezones;
-          // Convert from original timezone to user's
-          const dt = DateTime.fromSQL(r.episodes.airdate, { zone: tz?.name })
-            // Hardcode at 8PM, as moviedb doesn't store airtimes
-            .set({ hour: 20 })
-            // TODO: Pull this from user config
-            .setZone('Pacific/Auckland');
-          localDate = dt;
-        } else localDate = DateTime.fromSQL(r.episodes.airdate);
-        const inPast = localDate.startOf('day') < DateTime.now().startOf('day');
-        return { ...r, episodes: { ...r.episodes, local_date: localDate, in_past: inPast } };
+        const delayDays = r.subscription.delay_days ?? 0;
+        const snoozedUntil = r.subscription.snoozed_until;
+        const isSnoozed =
+          !!snoozedUntil && DateTime.fromSQL(snoozedUntil).startOf('day') >= DateTime.now().startOf('day');
+        const { originalLocalDate, effectiveLocalDate, inPast } = parseEpisodeDate(
+          r.episodes.airdate,
+          r.tvshows.country,
+          delayDays,
+        );
+
+        return {
+          ...r,
+          episodes: {
+            ...r.episodes,
+            local_date: effectiveLocalDate,
+            original_local_date: originalLocalDate,
+            in_past: inPast,
+            is_snoozed: isSnoozed,
+            delay_days: delayDays,
+            snoozed_until: snoozedUntil,
+          },
+        };
       });
 
-    const pastEpisodes = converted.filter((r) => r.episodes.in_past);
-    const futureEpisodes = converted.filter((r) => !r.episodes.in_past);
+    const scheduledEpisodes = converted.filter((r) => !r.episodes.is_snoozed);
+    const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past);
+    const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past);
     const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
       const date = curr.episodes.local_date.toFormat(DateFormat.YMD);
       if (!acc[date]) acc[date] = [];

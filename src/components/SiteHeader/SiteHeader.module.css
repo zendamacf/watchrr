@@ -33,3 +33,17 @@
   /* Override dark theme */
   color: var(--primary);
 }
+
+.snoozed-indicator-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--mantine-radius-default);
+  color: light-dark(var(--mantine-color-orange-7), var(--mantine-color-orange-4));
+
+  @mixin hover {
+    background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+  }
+}

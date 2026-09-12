@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
+import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
 import type { EpisodesResponse } from '@/types';
@@ -21,11 +22,24 @@ vi.mock('./GroupedEpisodes', () => ({
 const futureEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, airdate: '2099-12-01', name: 'Future Pilot' },
   tvshows: { ...testShow, name: 'Future Show', country: 'US' },
+  subscription: testSubscription,
 };
 
 const pastEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, id: '00000000-0000-4000-8000-000000000090', airdate: '2020-01-01', name: 'Old Pilot' },
   tvshows: { ...testShow, name: 'Past Show', country: 'US' },
+  subscription: testSubscription,
+};
+
+const snoozedEpisode: EpisodesResponse[number] = {
+  episodes: {
+    ...testEpisode,
+    id: '00000000-0000-4000-8000-000000000091',
+    airdate: '2020-01-01',
+    name: 'Snoozed Pilot',
+  },
+  tvshows: { ...testShow, name: 'Snoozed Show', country: 'US' },
+  subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
 };
 
 describe('EpisodeList', () => {
@@ -44,6 +58,38 @@ describe('EpisodeList', () => {
     renderWithProviders(<EpisodeList />);
     await waitFor(() => {
       expect(screen.getByText('An error occurred')).toBeInTheDocument();
+    });
+  });
+
+  it('treats delayed episodes as future when the effective date has not passed', async () => {
+    const delayedPastAirdate: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000092',
+        airdate: '2026-09-01',
+        name: 'Delayed Pilot',
+      },
+      tvshows: { ...testShow, name: 'Delayed Show', country: 'US' },
+      subscription: { delay_days: 14, snoozed_until: null },
+    };
+
+    stubFetch(mockFetchResponse([delayedPastAirdate]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
+      expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
+    });
+  });
+
+  it('excludes snoozed episodes from the main schedule', async () => {
+    stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
+      expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
+      expect(screen.queryByText(/snoozed/i)).not.toBeInTheDocument();
     });
   });
 
