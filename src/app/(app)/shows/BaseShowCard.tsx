@@ -18,7 +18,7 @@ import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import type { Show, ShowCard, ShowSubscription } from '@/types';
 import { DateFormat } from '@/utils/dates';
-import { isShowSnoozed } from '@/utils/episode-schedule';
+import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
 
 type Props = {
   show: Show | ShowCard;
@@ -61,14 +61,30 @@ export const BaseShowCard = ({ show, subscription, actions, ...props }: Props) =
                 {show.country}
               </Badge>
               {delayDays > 0 && (
-                <Badge color="blue" variant="outline">
-                  {delayDays}d delay
-                </Badge>
+                <Popover width="unset">
+                  <PopoverTarget>
+                    <Badge color={DELAY_UI_COLOR} variant="outline" size="sm" style={{ cursor: 'help' }}>
+                      {delayDays}d
+                    </Badge>
+                  </PopoverTarget>
+                  <PopoverDropdown>
+                    <Text size="sm">{delayDays} day delay</Text>
+                  </PopoverDropdown>
+                </Popover>
               )}
               {snoozed && subscription?.snoozed_until && (
-                <Badge color="orange" variant="outline">
-                  Snoozed until {DateTime.fromSQL(subscription.snoozed_until).toFormat(DateFormat.DMY)}
-                </Badge>
+                <Popover width="unset">
+                  <PopoverTarget>
+                    <Badge color="orange" variant="outline" size="sm" style={{ cursor: 'help' }}>
+                      Snoozed
+                    </Badge>
+                  </PopoverTarget>
+                  <PopoverDropdown>
+                    <Text size="sm">
+                      Snoozed until {DateTime.fromSQL(subscription.snoozed_until).toFormat(DateFormat.DMY)}
+                    </Text>
+                  </PopoverDropdown>
+                </Popover>
               )}
             </Group>
             {actions && (

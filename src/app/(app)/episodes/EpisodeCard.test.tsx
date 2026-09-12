@@ -120,7 +120,7 @@ describe('EpisodeCard', () => {
     };
 
     renderWithProviders(<EpisodeCard episode={delayedEpisode} />);
-    expect(screen.getByText('14d delay')).toBeInTheDocument();
+    expect(screen.getByText('14d')).toBeInTheDocument();
   });
 
   it('wakes a snoozed show and invalidates episode queries', async () => {
