@@ -22,10 +22,7 @@ export function useEpisodesQuery() {
 export function useSnoozedEpisodes() {
   const { data, isLoading, isError } = useEpisodesQuery();
 
-  const episodes = useMemo(
-    () => data?.filter((row) => isShowSnoozed(row.subscription.snoozed_until)) ?? [],
-    [data],
-  );
+  const episodes = useMemo(() => data?.filter((row) => isShowSnoozed(row.subscription.snoozed_until)) ?? [], [data]);
 
   return { episodes, isLoading, isError };
 }
