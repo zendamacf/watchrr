@@ -21,7 +21,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse, ShowSubscription, SubscribedShow } from '@/types';
-import { MAX_DELAY_DAYS } from '@/utils/episode-schedule';
+import { MAX_DELAY_DAYS, DELAY_UI_COLOR, SNOOZE_UI_COLOR } from '@/utils/episode-schedule';
 
 type Props = {
   show: SubscribedShow;
@@ -122,6 +122,7 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
           </Text>
           <Switch
             label="Enable delay"
+            color={DELAY_UI_COLOR}
             checked={delayEnabled}
             onChange={(event) => setDelayEnabled(event.currentTarget.checked)}
           />
@@ -136,7 +137,7 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
               />
               <Group gap="xs">
                 {DELAY_PRESETS.map((preset) => (
-                  <Button key={preset} variant="light" size="xs" onClick={() => setDelayDays(preset)}>
+                  <Button key={preset} variant="light" color={DELAY_UI_COLOR} size="xs" onClick={() => setDelayDays(preset)}>
                     {preset} days
                   </Button>
                 ))}
@@ -154,12 +155,14 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
           </Text>
           <Switch
             label="Snooze this show"
+            color={SNOOZE_UI_COLOR}
             checked={snoozeEnabled}
             onChange={(event) => setSnoozeEnabled(event.currentTarget.checked)}
           />
           {snoozeEnabled && (
             <Stack gap="xs">
               <SegmentedControl
+                color={SNOOZE_UI_COLOR}
                 value={snoozePreset}
                 onChange={(value) => setSnoozePreset(value as SnoozePreset)}
                 data={[

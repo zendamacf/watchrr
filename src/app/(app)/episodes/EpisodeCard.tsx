@@ -24,6 +24,7 @@ import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse, SubscribedShow } from '@/types';
 import { DateFormat } from '@/utils/dates';
+import { DELAY_UI_COLOR } from '@/utils/episode-schedule';
 import { ShowOptionsModal } from '../shows/ShowOptionsModal';
 import classes from './EpisodeCard.module.css';
 import type { ParsedEpisode } from './types';
@@ -109,8 +110,8 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
             {showDelayBadge && (
               <Popover width="unset">
                 <PopoverTarget>
-                  <Badge color="blue" variant="outline" style={{ cursor: 'help' }}>
-                    {episode.episodes.delay_days}d delay
+                  <Badge color={DELAY_UI_COLOR} variant="outline" style={{ cursor: 'help' }}>
+                    {episode.episodes.delay_days}d
                   </Badge>
                 </PopoverTarget>
                 <PopoverDropdown>

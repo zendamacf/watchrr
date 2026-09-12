@@ -21,7 +21,7 @@ describe('BaseShowCard', () => {
     renderWithProviders(
       <BaseShowCard show={testShow} subscription={{ delay_days: 14, snoozed_until: '2099-12-01' }} />,
     );
-    expect(screen.getByText('14d delay')).toBeInTheDocument();
-    expect(screen.getByText(/Snoozed until/)).toBeInTheDocument();
+    expect(screen.getByText('14d')).toBeInTheDocument();
+    expect(screen.getByText('Snoozed')).toBeInTheDocument();
   });
 });
