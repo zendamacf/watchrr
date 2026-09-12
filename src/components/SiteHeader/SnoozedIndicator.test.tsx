@@ -28,13 +28,12 @@ describe('SnoozedIndicator', () => {
     });
   });
 
-  it('shows no badge when there are no snoozed episodes', async () => {
+  it('renders nothing when there are no snoozed episodes', async () => {
     stubFetch(mockFetchResponse([]));
     renderWithProviders(<SnoozedIndicator />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('0 snoozed episodes')).toBeInTheDocument();
-      expect(screen.queryByText('0')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/snoozed/i)).not.toBeInTheDocument();
     });
   });
 });

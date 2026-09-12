@@ -58,7 +58,10 @@ function MainNav({ drawerOpened, toggleDrawer }: { drawerOpened: boolean; toggle
           <SignOutButton className={classes.link} />
         </Group>
 
-        <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />
+        <Group h="100%" gap="xs" hiddenFrom="sm">
+          <SnoozedIndicator />
+          <Burger opened={drawerOpened} onClick={toggleDrawer} />
+        </Group>
       </Group>
     </header>
   );
@@ -97,10 +100,7 @@ function MobileNav({ drawerOpened, closeDrawer }: { drawerOpened: boolean; close
         <Divider my="sm" />
 
         <Stack justify="center" px="md" gap="sm">
-          <Group gap="sm" px="md">
-            <SnoozedIndicator />
-            <ThemeToggle />
-          </Group>
+          <ThemeToggle />
           <SignOutButton className={classes.link} style={{ paddingLeft: 0 }} onSignedOut={closeDrawer} />
         </Stack>
       </ScrollArea>
