@@ -21,7 +21,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse, ShowSubscription, SubscribedShow } from '@/types';
-import { MAX_DELAY_DAYS, DELAY_UI_COLOR, SNOOZE_UI_COLOR } from '@/utils/episode-schedule';
+import { DELAY_UI_COLOR, MAX_DELAY_DAYS, SNOOZE_UI_COLOR } from '@/utils/episode-schedule';
 
 type Props = {
   show: SubscribedShow;
@@ -137,7 +137,13 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
               />
               <Group gap="xs">
                 {DELAY_PRESETS.map((preset) => (
-                  <Button key={preset} variant="light" color={DELAY_UI_COLOR} size="xs" onClick={() => setDelayDays(preset)}>
+                  <Button
+                    key={preset}
+                    variant="light"
+                    color={DELAY_UI_COLOR}
+                    size="xs"
+                    onClick={() => setDelayDays(preset)}
+                  >
                     {preset} days
                   </Button>
                 ))}

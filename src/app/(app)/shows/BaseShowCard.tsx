@@ -18,7 +18,7 @@ import { BackdropCard } from '@/components/BackdropCard';
 import { getImageUrl } from '@/lib/themoviedb/images';
 import type { Show, ShowCard, ShowSubscription } from '@/types';
 import { DateFormat } from '@/utils/dates';
-import { isShowSnoozed, DELAY_UI_COLOR } from '@/utils/episode-schedule';
+import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
 
 type Props = {
   show: Show | ShowCard;
