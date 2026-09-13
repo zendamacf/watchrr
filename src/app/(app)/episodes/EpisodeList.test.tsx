@@ -93,6 +93,39 @@ describe('EpisodeList', () => {
     });
   });
 
+  it('orders future date sections by effective airdate when delay shifts schedule', async () => {
+    const delayedEpisode: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000093',
+        airdate: '2099-09-01',
+        name: 'Delayed Pilot',
+      },
+      tvshows: { ...testShow, name: 'Delayed Show', country: 'US' },
+      subscription: { delay_days: 14, snoozed_until: null },
+    };
+    const normalEpisode: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000094',
+        airdate: '2099-09-10',
+        name: 'Normal Pilot',
+      },
+      tvshows: { ...testShow, name: 'Normal Show', country: 'US' },
+      subscription: { delay_days: 0, snoozed_until: null },
+    };
+
+    stubFetch(mockFetchResponse([delayedEpisode, normalEpisode]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      const headings = screen.getAllByRole('heading', { level: 2 });
+      expect(headings).toHaveLength(2);
+      expect(headings[0]).toHaveTextContent('10/09/2099');
+      expect(headings[1]).toHaveTextContent('15/09/2099');
+    });
+  });
+
   it('groups past and future episodes and filters by search', async () => {
     stubFetch(mockFetchResponse([pastEpisode, futureEpisode]));
     const user = userEvent.setup();

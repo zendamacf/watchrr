@@ -1,4 +1,4 @@
-import { and, eq, notExists } from 'drizzle-orm';
+import { and, asc, eq, notExists, sql } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { episodes, subscribed_tvshows, tvshows, watched_episodes } from '@/lib/db/schema';
@@ -34,7 +34,12 @@ export async function GET() {
           .where(and(eq(watched_episodes.episode_id, episodes.id), eq(watched_episodes.watcher_id, user.id))),
       ),
     )
-    .orderBy(episodes.airdate, tvshows.name, episodes.season, episodes.episode);
+    .orderBy(
+      asc(sql`${episodes.airdate} + ${subscribed_tvshows.delay_days}`),
+      tvshows.name,
+      episodes.season,
+      episodes.episode,
+    );
 
   return NextResponse.json(data, { status: 200 });
 }
