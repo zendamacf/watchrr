@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 import { useMemo } from 'react';
 import { useEpisodesQuery } from '@/hooks/useEpisodes';
 import { DateFormat } from '@/utils/dates';
+import { compareParsedEpisodes } from './compareParsedEpisodes';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
 import { parseEpisodeDate } from './parseEpisodeDate';
@@ -51,8 +52,8 @@ export const EpisodeList = () => {
       });
 
     const scheduledEpisodes = converted.filter((r) => !r.episodes.is_snoozed);
-    const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past);
-    const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past);
+    const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past).sort(compareParsedEpisodes);
+    const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past).sort(compareParsedEpisodes);
     const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
       const date = curr.episodes.local_date.toFormat(DateFormat.YMD);
       if (!acc[date]) acc[date] = [];
@@ -83,12 +84,14 @@ export const EpisodeList = () => {
       <Stack gap={'xl'}>
         {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} />}
 
-        {Object.entries(futureDates).map(([date, episodes]) => (
-          <Stack gap={'sm'} key={date}>
-            <Title order={2}>{DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}</Title>
-            <GroupedEpisodes episodes={episodes} />
-          </Stack>
-        ))}
+        {Object.entries(futureDates)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([date, episodes]) => (
+            <Stack gap={'sm'} key={date}>
+              <Title order={2}>{DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}</Title>
+              <GroupedEpisodes episodes={episodes} />
+            </Stack>
+          ))}
       </Stack>
     </>
   );

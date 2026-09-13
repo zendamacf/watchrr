@@ -7,7 +7,9 @@ import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
 import type { EpisodesResponse } from '@/types';
+import { DateFormat } from '@/utils/dates';
 import { EpisodeList } from './EpisodeList';
+import { parseEpisodeDate } from './parseEpisodeDate';
 
 vi.mock('./PastEpisodes', () => ({
   PastEpisodes: ({ episodes }: { episodes: unknown[] }) => (
@@ -90,6 +92,42 @@ describe('EpisodeList', () => {
       expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
       expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
       expect(screen.queryByText(/snoozed/i)).not.toBeInTheDocument();
+    });
+  });
+
+  it('orders future date sections by effective airdate when delay shifts schedule', async () => {
+    const delayedEpisode: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000093',
+        airdate: '2099-09-01',
+        name: 'Delayed Pilot',
+      },
+      tvshows: { ...testShow, name: 'Delayed Show', country: 'US' },
+      subscription: { delay_days: 14, snoozed_until: null },
+    };
+    const normalEpisode: EpisodesResponse[number] = {
+      episodes: {
+        ...testEpisode,
+        id: '00000000-0000-4000-8000-000000000094',
+        airdate: '2099-09-10',
+        name: 'Normal Pilot',
+      },
+      tvshows: { ...testShow, name: 'Normal Show', country: 'US' },
+      subscription: { delay_days: 0, snoozed_until: null },
+    };
+
+    const { effectiveLocalDate: earlierEffectiveDate } = parseEpisodeDate('2099-09-10', 'US', 0);
+    const { effectiveLocalDate: laterEffectiveDate } = parseEpisodeDate('2099-09-01', 'US', 14);
+
+    stubFetch(mockFetchResponse([delayedEpisode, normalEpisode]));
+    renderWithProviders(<EpisodeList />);
+
+    await waitFor(() => {
+      const headings = screen.getAllByRole('heading', { level: 2 });
+      expect(headings).toHaveLength(2);
+      expect(headings[0]).toHaveTextContent(earlierEffectiveDate.toFormat(DateFormat.DOW_DMY));
+      expect(headings[1]).toHaveTextContent(laterEffectiveDate.toFormat(DateFormat.DOW_DMY));
     });
   });
 
