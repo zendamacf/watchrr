@@ -7,7 +7,9 @@ import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
 import type { EpisodesResponse } from '@/types';
+import { DateFormat } from '@/utils/dates';
 import { EpisodeList } from './EpisodeList';
+import { parseEpisodeDate } from './parseEpisodeDate';
 
 vi.mock('./PastEpisodes', () => ({
   PastEpisodes: ({ episodes }: { episodes: unknown[] }) => (
@@ -115,14 +117,17 @@ describe('EpisodeList', () => {
       subscription: { delay_days: 0, snoozed_until: null },
     };
 
+    const { effectiveLocalDate: earlierEffectiveDate } = parseEpisodeDate('2099-09-10', 'US', 0);
+    const { effectiveLocalDate: laterEffectiveDate } = parseEpisodeDate('2099-09-01', 'US', 14);
+
     stubFetch(mockFetchResponse([delayedEpisode, normalEpisode]));
     renderWithProviders(<EpisodeList />);
 
     await waitFor(() => {
       const headings = screen.getAllByRole('heading', { level: 2 });
       expect(headings).toHaveLength(2);
-      expect(headings[0]).toHaveTextContent('10/09/2099');
-      expect(headings[1]).toHaveTextContent('15/09/2099');
+      expect(headings[0]).toHaveTextContent(earlierEffectiveDate.toFormat(DateFormat.DOW_DMY));
+      expect(headings[1]).toHaveTextContent(laterEffectiveDate.toFormat(DateFormat.DOW_DMY));
     });
   });
 
