@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
@@ -64,11 +65,12 @@ describe('EpisodeList', () => {
   });
 
   it('treats delayed episodes as future when the effective date has not passed', async () => {
+    const recentAirdate = DateTime.now().minus({ days: 5 }).toFormat('yyyy-MM-dd');
     const delayedPastAirdate: EpisodesResponse[number] = {
       episodes: {
         ...testEpisode,
         id: '00000000-0000-4000-8000-000000000092',
-        airdate: '2026-09-01',
+        airdate: recentAirdate,
         name: 'Delayed Pilot',
       },
       tvshows: { ...testShow, name: 'Delayed Show', country: 'US' },
