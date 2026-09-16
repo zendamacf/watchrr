@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: watchrr
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-watchrr}
+      POSTGRES_DB: watchrr
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U watchrr -d watchrr']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  app:
+    image: ${APP_IMAGE:-ghcr.io/zendamacf/watchrr:latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://watchrr:${DB_PASSWORD:-watchrr}@postgres:5432/watchrr
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET}
+      THEMOVIEDB_ACCESS_TOKEN: ${THEMOVIEDB_ACCESS_TOKEN}
+      CRON_SECRET: ${CRON_SECRET}
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - '${APP_PORT:-3000}:3000'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(\"http://127.0.0.1:3000/health\").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  cron:
+    image: alpine:3.20
+    profiles: ['production']
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      CRON_SECRET: ${CRON_SECRET}
+    volumes:
+      - ./docker/cron-refresh.sh:/usr/local/bin/cron-refresh.sh:ro
+      - ./docker/crontab:/etc/crontabs/root:ro
+    entrypoint: ['/bin/sh', '-c', 'crond -f -l 2']
+    restart: unless-stopped
+
+volumes:
+  pgdata:

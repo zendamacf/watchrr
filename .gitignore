@@ -16,9 +16,9 @@ npm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env
-
-# vercel
-.vercel
+.env.*
+!.env.example
+!.env.development.example
 
 # VSCode
 .vscode

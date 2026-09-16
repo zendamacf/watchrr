@@ -8,4 +8,5 @@ if (!process.env.DATABASE_URL) {
 
 process.env.AUTH_JWT_SECRET ??= 'test-jwt-secret';
 process.env.THEMOVIEDB_ACCESS_TOKEN ??= 'test-tmdb-token';
+process.env.CRON_SECRET ??= 'test-secret';
 process.env.BCRYPT_ROUNDS ??= '4';
