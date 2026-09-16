@@ -37,9 +37,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 26
           cache: 'npm'
@@ -63,3 +63,44 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           json-summary-path: coverage/coverage-summary.json
+
+  deploy-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create CI env file
+        run: |
+          {
+            echo 'DB_PASSWORD=watchrr'
+            echo 'AUTH_JWT_SECRET=ci-dummy-jwt-secret'
+            echo 'THEMOVIEDB_ACCESS_TOKEN=ci-dummy-tmdb-token'
+            echo 'CRON_SECRET=test-secret'
+            echo 'APP_IMAGE=watchrr:ci'
+          } > .env
+
+      - name: Build and start Compose stack
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build --wait
+
+      - name: Smoke test health endpoint
+        run: curl -sf http://localhost:3000/health | grep -q ok
+
+      - name: Smoke test sign-in page
+        run: curl -sf http://localhost:3000/signin | grep -q '<'
+
+      - name: Smoke test /api/refresh auth
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/refresh)
+          test "$code" = "401"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer test-secret" http://localhost:3000/api/refresh)
+          test "$code" != "401"
+
+      - name: Verify migrations applied
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T postgres \
+            psql -U watchrr -d watchrr -c '\dt' | grep -q users
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml down -v

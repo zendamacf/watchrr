@@ -1,8 +1,6 @@
 import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import type { ReactNode } from 'react';
@@ -30,8 +28,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const isProd = process.env.NODE_ENV === 'production';
-
 const DEFAULT_COLOR_THEME = 'auto';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -44,12 +40,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <MantineProvider theme={theme} defaultColorScheme={DEFAULT_COLOR_THEME}>
           {children}
         </MantineProvider>
-        {isProd && (
-          <>
-            <Analytics />
-            <SpeedInsights />
-          </>
-        )}
       </body>
     </html>
   );

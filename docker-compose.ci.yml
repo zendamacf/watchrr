@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        DATABASE_URL: postgresql://watchrr:watchrr@postgres:5432/watchrr
+        AUTH_JWT_SECRET: build-placeholder
+        THEMOVIEDB_ACCESS_TOKEN: ${THEMOVIEDB_ACCESS_TOKEN:-ci-dummy-tmdb-token}
+        CRON_SECRET: ${CRON_SECRET:-test-secret}
+    image: watchrr:ci
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://watchrr:watchrr@postgres:5432/watchrr
+      AUTH_JWT_SECRET: ci-dummy-jwt-secret
+      THEMOVIEDB_ACCESS_TOKEN: ${THEMOVIEDB_ACCESS_TOKEN:-ci-dummy-tmdb-token}
+      CRON_SECRET: test-secret

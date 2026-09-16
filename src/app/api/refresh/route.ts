@@ -1,17 +1,25 @@
 import { eq } from 'drizzle-orm';
 import chunk from 'lodash.chunk';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { movies, subscribed_movies, subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { refreshMovie } from '@/lib/refresher/movies';
 import { refreshTvShow } from '@/lib/refresher/tvshows';
 
 /**
- * Refresh all media metadata. No authorization needed for cron.
+ * Refresh all media metadata. Requires CRON_SECRET bearer token.
  *
  * Refreshing is done in chunks to avoid ratelimiting.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) throw new Error('CRON_SECRET is not set');
+
+  const authorization = request.headers.get('Authorization');
+  if (authorization !== `Bearer ${secret}`) {
+    return new NextResponse(null, { status: 401 });
+  }
+
   const subbedMovies = await db
     .selectDistinct({ movie_id: subscribed_movies.movie_id, name: movies.name })
     .from(subscribed_movies)
