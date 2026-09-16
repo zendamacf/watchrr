@@ -1,5 +1,11 @@
 # watchrr
 
+## 3.0.0
+
+### Major Changes
+
+- 8a366bf: Self-host with Docker Compose instead of Vercel.
+
 ## 2.0.0
 
 ### Major Changes
