@@ -29,7 +29,7 @@
     "@mantine/modals": "^9.5.2",
     "@mantine/notifications": "^9.5.2",
     "@sentry/nextjs": "^10.71.0",
-    "@tanstack/react-query": "^5.102.3",
+    "@tanstack/react-query": "^5.102.6",
     "bcrypt": "^6.0.0",
     "classnames": "^2.5.1",
     "countries-and-timezones": "^3.10.0",
