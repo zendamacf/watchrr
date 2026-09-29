@@ -95,6 +95,7 @@ describe('refreshMovie', () => {
       backdrop_slug: '/fresh-backdrop.jpg',
       releasedate: '2024-03-20',
     });
+    expect(after?.metadata_refreshed_at).toBeInstanceOf(Date);
   });
 
   it('is idempotent when run twice without TMDB changes', async () => {

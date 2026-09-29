@@ -8,6 +8,7 @@ export const testShow: Show = {
   poster_slug: '/poster.jpg',
   backdrop_slug: '/backdrop.jpg',
   description: 'A test show',
+  metadata_refreshed_at: null,
 };
 
 export const testTmdbTvShow = {

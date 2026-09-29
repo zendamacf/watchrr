@@ -57,6 +57,7 @@ export const AddMovieModal = (props: Props) => {
             moviedb_id: movie.id,
             poster_slug: movie.poster,
             backdrop_slug: movie.backdrop,
+            metadata_refreshed_at: null,
             releaseDate: DateTime.fromISO(movie.releasedate),
           }}
           releaseDate

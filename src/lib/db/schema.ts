@@ -36,6 +36,7 @@ export const tvshows = pgTable('tvshows', {
   poster_slug: text(),
   backdrop_slug: text(),
   description: text(),
+  metadata_refreshed_at: timestamp('metadata_refreshed_at'),
 });
 
 export const episodes = pgTable(
@@ -104,6 +105,7 @@ export const movies = pgTable('movies', {
   poster_slug: text(),
   backdrop_slug: text(),
   description: text(),
+  metadata_refreshed_at: timestamp('metadata_refreshed_at'),
 });
 
 export const subscribed_movies = pgTable(

@@ -66,7 +66,10 @@ describe('GET /api/refresh', () => {
 
     const response = await GET(makeRequest(`Bearer ${CRON_SECRET}`));
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ message: 'Success' });
+    await expect(response.json()).resolves.toMatchObject({
+      message: 'Success',
+      refreshed: { movies: 1, shows: 1 },
+    });
     expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
     expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
   }, 30_000);

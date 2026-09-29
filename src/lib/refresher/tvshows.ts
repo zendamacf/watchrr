@@ -95,5 +95,7 @@ export const refreshTvShow = async (tvshowId: string) => {
   if (inserted + updated > 0) {
     console.info(`[SHOW][${dbShow.name}] Added ${inserted}, updated ${updated}, ignored ${ignored}`);
   }
+
+  await db.update(tvshows).set({ metadata_refreshed_at: new Date() }).where(eq(tvshows.id, tvshowId));
   console.log(`[SHOW][${dbShow.name}] Finished refreshing`);
 };
