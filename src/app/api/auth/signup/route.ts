@@ -3,10 +3,14 @@ import { NextResponse } from 'next/server';
 import { buildAuthCookie } from '@/lib/auth/cookies';
 import { signAccessToken } from '@/lib/auth/jwt';
 import { hashPassword } from '@/lib/auth/password';
+import { isSignupEnabled } from '@/lib/auth/signup';
 import { db } from '@/lib/db';
 import { lower, users } from '@/lib/db/schema';
 
 export async function POST(request: Request) {
+  if (!isSignupEnabled()) {
+    return NextResponse.json({ message: 'New user registration is disabled' }, { status: 403 });
+  }
   let body: unknown;
   try {
     body = await request.json();
