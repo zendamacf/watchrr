@@ -2,8 +2,10 @@
 
 ## Prerequisites
 
-- Copy [`.env.example`](.env.example) to `.env` with a valid `DATABASE_URL` (tests use the real database; no cleanup after runs).
+- **Node.js 26** (match [`.nvmrc`](../../.nvmrc) and GitHub Actions).
+- Copy [`.env.development.example`](../../.env.development.example) to `.env` at the repo root with a valid `DATABASE_URL` (tests use the real database; no cleanup after runs).
 - `AUTH_JWT_SECRET` and `THEMOVIEDB_ACCESS_TOKEN` are set in [`vitest.setup.ts`](vitest.setup.ts) when missing.
+- Apply migrations before the first test run: `npm run db:migrate`.
 
 ## Commands
 
