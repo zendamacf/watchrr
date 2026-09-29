@@ -1,8 +1,6 @@
-import { eq } from 'drizzle-orm';
 import chunk from 'lodash.chunk';
 import { type NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { movies, subscribed_movies, subscribed_tvshows, tvshows } from '@/lib/db/schema';
+import { listCronMoviesToRefresh, listCronShowsToRefresh } from '@/lib/refresher/cron-refresh';
 import { refreshMovie } from '@/lib/refresher/movies';
 import { refreshTvShow } from '@/lib/refresher/tvshows';
 
@@ -20,26 +18,21 @@ export async function GET(request: NextRequest) {
     return new NextResponse(null, { status: 401 });
   }
 
-  const subbedMovies = await db
-    .selectDistinct({ movie_id: subscribed_movies.movie_id, name: movies.name })
-    .from(subscribed_movies)
-    .innerJoin(movies, eq(movies.id, subscribed_movies.movie_id))
-    .where(eq(subscribed_movies.watched, false))
-    .orderBy(movies.name);
-
+  const subbedMovies = await listCronMoviesToRefresh();
   for (const movieChunk of chunk(subbedMovies, 30)) {
     await Promise.all(movieChunk.map((m) => refreshMovie(m.movie_id)));
   }
 
-  const subbedShows = await db
-    .selectDistinct({ tvshow_id: subscribed_tvshows.tvshow_id, name: tvshows.name })
-    .from(subscribed_tvshows)
-    .innerJoin(tvshows, eq(tvshows.id, subscribed_tvshows.tvshow_id))
-    .orderBy(tvshows.name);
-
+  const subbedShows = await listCronShowsToRefresh();
   for (const showChunk of chunk(subbedShows, 30)) {
     await Promise.all(showChunk.map((s) => refreshTvShow(s.tvshow_id)));
   }
 
-  return NextResponse.json({ message: 'Success' }, { status: 200 });
+  return NextResponse.json(
+    {
+      message: 'Success',
+      refreshed: { movies: subbedMovies.length, shows: subbedShows.length },
+    },
+    { status: 200 },
+  );
 }

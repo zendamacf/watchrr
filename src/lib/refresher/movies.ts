@@ -42,5 +42,7 @@ export const refreshMovie = async (movieId: string) => {
       })
       .where(eq(movies.id, movieId));
   }
+
+  await db.update(movies).set({ metadata_refreshed_at: new Date() }).where(eq(movies.id, movieId));
   console.log(`[MOVIE][${dbMovie.name}] Finished refreshing`);
 };

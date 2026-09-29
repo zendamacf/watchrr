@@ -65,6 +65,7 @@ export const AddShowModal = (props: Props) => {
             moviedb_id: show.id,
             poster_slug: show.poster,
             backdrop_slug: show.backdrop,
+            metadata_refreshed_at: null,
           }}
           actions={
             <>

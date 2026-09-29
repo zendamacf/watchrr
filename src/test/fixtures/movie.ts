@@ -8,6 +8,7 @@ export const testMovie: Movie = {
   poster_slug: '/poster.jpg',
   backdrop_slug: '/backdrop.jpg',
   description: 'A test movie',
+  metadata_refreshed_at: null,
 };
 
 export const testTmdbMovie = {
