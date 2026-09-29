@@ -14,6 +14,8 @@ npm run test:coverage    # coverage report + threshold checks
 
 Open `coverage/index.html` after a coverage run for per-file detail.
 
+Shared components are included in coverage totals; the global functions threshold is set slightly below 98% to account for server-only layout wrappers that are not unit-tested here.
+
 ## Layout
 
 | Area | Location | Notes |

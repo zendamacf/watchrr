@@ -1,5 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { apiRoutes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -14,6 +16,10 @@ const snoozedEpisode: EpisodesResponse[number] = {
 };
 
 describe('SnoozedEpisodesModal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('lists snoozed episodes when open', async () => {
     stubFetch(mockFetchResponse([snoozedEpisode]));
     renderWithProviders(<SnoozedEpisodesModal opened onClose={() => undefined} />);
@@ -21,6 +27,32 @@ describe('SnoozedEpisodesModal', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog', { name: /snoozed episode/i })).toBeInTheDocument();
       expect(screen.getByText(testShow.name)).toBeInTheDocument();
+    });
+  });
+
+  it('marks a snoozed episode as watched', async () => {
+    const user = userEvent.setup();
+    const episodeId = snoozedEpisode.episodes.id;
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(mockFetchResponse([snoozedEpisode]))
+        .mockResolvedValueOnce(mockFetchResponse({ message: 'Success' })),
+    );
+
+    renderWithProviders(<SnoozedEpisodesModal opened onClose={() => undefined} />);
+
+    const markButton = await screen.findByRole('button', {
+      name: `Mark ${testShow.name} S01E01 as watched`,
+    });
+    await user.click(markButton);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        apiRoutes.episodeById(episodeId),
+        expect.objectContaining({ method: 'put' }),
+      );
     });
   });
 });
