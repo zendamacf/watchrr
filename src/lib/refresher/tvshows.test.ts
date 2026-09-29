@@ -211,4 +211,33 @@ describe('refreshTvShow', () => {
     expect(episodeRows).toHaveLength(1);
     expect(episodeRows[0]?.name).toBe('Stable Episode');
   });
+
+  it('imports new episodes from TMDB on refresh', async () => {
+    const show = await seedTvShow({
+      moviedb_id: 999_205,
+      name: 'Import Episodes Show',
+      description: 'Show',
+      country: 'US',
+      poster_slug: '/p.jpg',
+      backdrop_slug: '/b.jpg',
+    });
+    mockGetTvShow.mockResolvedValue(tmdbShow(999_205));
+    mockGetAllEpisodes.mockResolvedValue([
+      {
+        id: 900_301,
+        seasonNumber: 1,
+        episodeNumber: 1,
+        name: 'Brand New',
+        description: 'New ep',
+        airdate: '2023-03-01T00:00:00.000Z',
+        backdrop: '/new.jpg',
+      },
+    ]);
+
+    await refreshTvShow(show.id);
+
+    const rows = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.moviedb_id).toBe(900_301);
+  });
 });

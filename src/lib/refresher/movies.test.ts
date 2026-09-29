@@ -96,4 +96,23 @@ describe('refreshMovie', () => {
       releasedate: '2024-03-20',
     });
   });
+
+  it('is idempotent when run twice without TMDB changes', async () => {
+    const movie = await seedMovie({
+      moviedb_id: 999_103,
+      name: 'Stable Movie',
+      description: 'Stable',
+      poster_slug: '/stable.jpg',
+      backdrop_slug: '/stable-back.jpg',
+      releasedate: '2022-01-01',
+    });
+    mockGetMovie.mockResolvedValue(tmdbMovie(999_103, { name: 'Stable Movie', description: 'Stable' }));
+
+    await refreshMovie(movie.id);
+    await refreshMovie(movie.id);
+
+    expect(mockGetMovie).toHaveBeenCalledTimes(2);
+    const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
+    expect(after?.name).toBe('Stable Movie');
+  });
 });

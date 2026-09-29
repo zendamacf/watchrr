@@ -14,6 +14,8 @@ npm run test:coverage    # coverage report + threshold checks
 
 Open `coverage/index.html` after a coverage run for per-file detail.
 
+Shared components are included in coverage totals; the global functions threshold is set slightly below 98% to account for server-only layout wrappers that are not unit-tested here.
+
 ## Layout
 
 | Area | Location | Notes |
@@ -52,13 +54,11 @@ import '@/test/mocks/refresh-db'; // GET /api/refresh — stubs selectDistinct s
 Configured in [`vitest.config.mts`](vitest.config.mts):
 
 - App Router `page.tsx` / `layout.tsx`
-- Shared `src/components/**` (auth forms are tested but excluded from the coverage denominator until component coverage is tracked here)
 - Instrumentation, Sentry wiring, Drizzle schema, TMDB client bootstrap
 - `src/lib/db/index.ts` — DB client bootstrap (requires `DATABASE_URL` at import)
-- `src/lib/refresher/movies.ts` and `tvshows.ts` — TMDB + DB sync pipelines (exercised via route tests with mocks and dedicated refresher unit tests, not line-tracked here)
 
 Full user flows across pages are a better fit for future E2E (see [TODO.md](TODO.md)).
 
 ## CI
 
-[`.github/workflows/pr-checks.yml`](.github/workflows/pr-checks.yml) runs lint, typecheck, migrations on a Neon preview branch, `npm run test:coverage`, and posts a coverage summary comment on the PR. Vitest thresholds must pass for the job to succeed.
+[`.github/workflows/tests.yml`](.github/workflows/tests.yml) and [`.github/workflows/pr-linting.yml`](.github/workflows/pr-linting.yml) run migrations, `npm run test:coverage`, and lint/typecheck on pull requests. Vitest thresholds must pass for the job to succeed.
