@@ -107,12 +107,8 @@
           "name": "episodes_tvshow_id_tvshows_id_fk",
           "tableFrom": "episodes",
           "tableTo": "tvshows",
-          "columnsFrom": [
-            "tvshow_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tvshow_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -122,9 +118,7 @@
         "episodes_moviedb_id_unique": {
           "name": "episodes_moviedb_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "moviedb_id"
-          ]
+          "columns": ["moviedb_id"]
         }
       },
       "policies": {},
@@ -192,9 +186,7 @@
         "movies_moviedb_id_unique": {
           "name": "movies_moviedb_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "moviedb_id"
-          ]
+          "columns": ["moviedb_id"]
         }
       },
       "policies": {},
@@ -231,12 +223,8 @@
           "name": "subscribed_movies_movie_id_movies_id_fk",
           "tableFrom": "subscribed_movies",
           "tableTo": "movies",
-          "columnsFrom": [
-            "movie_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["movie_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -244,12 +232,8 @@
           "name": "subscribed_movies_watcher_id_users_id_fk",
           "tableFrom": "subscribed_movies",
           "tableTo": "users",
-          "columnsFrom": [
-            "watcher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watcher_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -257,10 +241,7 @@
       "compositePrimaryKeys": {
         "subscribed_movies_movie_id_watcher_id_pk": {
           "name": "subscribed_movies_movie_id_watcher_id_pk",
-          "columns": [
-            "movie_id",
-            "watcher_id"
-          ]
+          "columns": ["movie_id", "watcher_id"]
         }
       },
       "uniqueConstraints": {},
@@ -320,12 +301,8 @@
           "name": "subscribed_tvshows_tvshow_id_tvshows_id_fk",
           "tableFrom": "subscribed_tvshows",
           "tableTo": "tvshows",
-          "columnsFrom": [
-            "tvshow_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tvshow_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -333,12 +310,8 @@
           "name": "subscribed_tvshows_watcher_id_users_id_fk",
           "tableFrom": "subscribed_tvshows",
           "tableTo": "users",
-          "columnsFrom": [
-            "watcher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watcher_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -346,10 +319,7 @@
       "compositePrimaryKeys": {
         "subscribed_tvshows_tvshow_id_watcher_id_pk": {
           "name": "subscribed_tvshows_tvshow_id_watcher_id_pk",
-          "columns": [
-            "tvshow_id",
-            "watcher_id"
-          ]
+          "columns": ["tvshow_id", "watcher_id"]
         }
       },
       "uniqueConstraints": {},
@@ -418,9 +388,7 @@
         "tvshows_moviedb_id_unique": {
           "name": "tvshows_moviedb_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "moviedb_id"
-          ]
+          "columns": ["moviedb_id"]
         }
       },
       "policies": {},
@@ -521,12 +489,8 @@
           "name": "watched_episodes_episode_id_episodes_id_fk",
           "tableFrom": "watched_episodes",
           "tableTo": "episodes",
-          "columnsFrom": [
-            "episode_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["episode_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -534,12 +498,8 @@
           "name": "watched_episodes_watcher_id_users_id_fk",
           "tableFrom": "watched_episodes",
           "tableTo": "users",
-          "columnsFrom": [
-            "watcher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["watcher_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -547,10 +507,7 @@
       "compositePrimaryKeys": {
         "watched_episodes_episode_id_watcher_id_pk": {
           "name": "watched_episodes_episode_id_watcher_id_pk",
-          "columns": [
-            "episode_id",
-            "watcher_id"
-          ]
+          "columns": ["episode_id", "watcher_id"]
         }
       },
       "uniqueConstraints": {},
