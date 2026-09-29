@@ -19,6 +19,8 @@ describe('rate limit config', () => {
 
   it('classifies auth and search routes', () => {
     expect(resolveRateLimitClass('/api/auth/login', null)).toBe('auth');
+    expect(resolveRateLimitClass('/api/auth/signup', null)).toBe('auth');
+    expect(resolveRateLimitClass('/api/movie/search', null)).toBe('search');
     expect(resolveRateLimitClass('/api/tvshow/search', null)).toBe('search');
     expect(resolveRateLimitClass('/api/episode', null)).toBe('api');
   });
@@ -45,5 +47,14 @@ describe('rate limit config', () => {
   it('falls back when env values are invalid', () => {
     process.env.RATE_LIMIT_SEARCH_MAX = 'not-a-number';
     expect(getRateLimitPolicy('search').max).toBe(60);
+  });
+
+  it('reads cron policy limits from env', () => {
+    process.env.RATE_LIMIT_CRON_MAX = '3';
+    process.env.RATE_LIMIT_CRON_WINDOW_SEC = '120';
+    process.env.RATE_LIMIT_CRON_AUTH_MAX = '9';
+    process.env.RATE_LIMIT_CRON_AUTH_WINDOW_SEC = '30';
+    expect(getRateLimitPolicy('cron')).toMatchObject({ max: 3, windowMs: 120_000 });
+    expect(getRateLimitPolicy('cronAuthed')).toMatchObject({ max: 9, windowMs: 30_000 });
   });
 });
