@@ -26,13 +26,10 @@ export default defineConfig({
         'src/app/error.tsx',
         'src/lib/db/schema.ts',
         'src/lib/db/index.ts',
-        'src/lib/refresher/movies.ts',
-        'src/lib/refresher/tvshows.ts',
         'src/lib/themoviedb/client.ts',
         'src/app/**/page.tsx',
         'src/app/**/layout.tsx',
         'src/components/Layout/AuthedPage.tsx',
-        'src/components/**',
         'src/lib/sentry/**',
       ],
       thresholds: {
