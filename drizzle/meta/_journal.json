@@ -50,6 +50,13 @@
       "when": 1789041539124,
       "tag": "0006_broken_sasquatch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790645607166,
+      "tag": "0007_query_performance_indexes",
+      "breakpoints": true
     }
   ]
 }
