@@ -33,7 +33,7 @@ export default defineConfig({
         'src/app/**/layout.tsx',
         'src/components/Layout/AuthedPage.tsx',
         'src/components/**',
-        'src/lib/sentry/**',
+        'src/lib/sentry/options.ts',
       ],
       thresholds: {
         lines: 95,
