@@ -49,10 +49,7 @@ describe('SnoozedEpisodesModal', () => {
     await user.click(markButton);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
-        apiRoutes.episodeById(episodeId),
-        expect.objectContaining({ method: 'put' }),
-      );
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.episodeById(episodeId), expect.objectContaining({ method: 'put' }));
     });
   });
 });
