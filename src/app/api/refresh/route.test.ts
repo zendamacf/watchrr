@@ -1,6 +1,5 @@
 import '@/test/mocks/refresh-db';
 import '@/test/mocks/refresher';
-import type { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockLoggerInfo = vi.hoisted(() => vi.fn());
@@ -12,6 +11,8 @@ vi.mock('@/lib/logger', () => ({
     error: vi.fn(),
   },
 }));
+
+import type { NextRequest } from 'next/server';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { resetRefreshDbMock, setRefreshDbRows } from '@/test/mocks/refresh-db';
 import { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from '@/test/mocks/refresher';
