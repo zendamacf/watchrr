@@ -5,35 +5,25 @@ import { episodes, movies, subscribed_movies, subscribed_tvshows, tvshows } from
 
 export type CronRefreshMode = 'full' | 'incremental';
 
-export function getCronRefreshMode(): CronRefreshMode {
-  const raw = process.env.CRON_REFRESH_MODE?.trim().toLowerCase();
-  if (raw === 'full') return 'full';
-  return 'incremental';
-}
+/** Production cron refresh always runs incrementally. */
+export const DEFAULT_CRON_REFRESH_MODE: CronRefreshMode = 'incremental';
 
-export function readPositiveIntEnv(name: string, fallback: number): number {
-  const raw = process.env[name];
-  if (raw === undefined || raw.trim() === '') return fallback;
-  const value = Number.parseInt(raw, 10);
-  if (!Number.isFinite(value) || value <= 0) return fallback;
-  return value;
-}
+const MOVIE_STALE_HOURS = 168;
+const SHOW_STALE_HOURS = 48;
+const SHOW_RECENT_EPISODE_DAYS = 7;
+const SHOW_IMMINENT_EPISODE_DAYS = 14;
 
 export function getMovieStaleBefore(now: DateTime<boolean> = DateTime.utc()): Date {
-  const hours = readPositiveIntEnv('CRON_MOVIE_STALE_HOURS', 168);
-  return now.minus({ hours }).toJSDate();
+  return now.minus({ hours: MOVIE_STALE_HOURS }).toJSDate();
 }
 
 export function getShowStaleBefore(now: DateTime<boolean> = DateTime.utc()): Date {
-  const hours = readPositiveIntEnv('CRON_SHOW_STALE_HOURS', 48);
-  return now.minus({ hours }).toJSDate();
+  return now.minus({ hours: SHOW_STALE_HOURS }).toJSDate();
 }
 
 export function getShowImminentEpisodeWindow(now: DateTime<boolean> = DateTime.utc()) {
-  const pastDays = readPositiveIntEnv('CRON_SHOW_RECENT_EPISODE_DAYS', 7);
-  const futureDays = readPositiveIntEnv('CRON_SHOW_IMMINENT_EPISODE_DAYS', 14);
-  const start = now.minus({ days: pastDays }).toISODate();
-  const end = now.plus({ days: futureDays }).toISODate();
+  const start = now.minus({ days: SHOW_RECENT_EPISODE_DAYS }).toISODate();
+  const end = now.plus({ days: SHOW_IMMINENT_EPISODE_DAYS }).toISODate();
   if (!start || !end) throw new Error('Failed to compute episode window');
   return { start, end };
 }
@@ -69,7 +59,7 @@ export function buildIncrementalShowFilter(staleBefore: Date, episodeWindow: { s
   return or(isNull(tvshows.metadata_refreshed_at), lt(tvshows.metadata_refreshed_at, staleBefore), imminentEpisode);
 }
 
-export async function listCronMoviesToRefresh(mode = getCronRefreshMode()) {
+export async function listCronMoviesToRefresh(mode: CronRefreshMode = DEFAULT_CRON_REFRESH_MODE) {
   const staleBefore = getMovieStaleBefore();
   const conditions = [eq(subscribed_movies.watched, false)];
   if (mode === 'incremental') {
@@ -85,7 +75,7 @@ export async function listCronMoviesToRefresh(mode = getCronRefreshMode()) {
     .orderBy(movies.name);
 }
 
-export async function listCronShowsToRefresh(mode = getCronRefreshMode()) {
+export async function listCronShowsToRefresh(mode: CronRefreshMode = DEFAULT_CRON_REFRESH_MODE) {
   const staleBefore = getShowStaleBefore();
   const episodeWindow = getShowImminentEpisodeWindow();
   const base = db

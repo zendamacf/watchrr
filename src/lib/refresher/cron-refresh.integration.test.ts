@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
 import { movies, tvshows } from '@/lib/db/schema';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
@@ -8,15 +8,7 @@ import { seedEpisode, seedSubscribedMovie, seedSubscribedTvShow, seedUser } from
 import { listCronMoviesToRefresh, listCronShowsToRefresh } from './cron-refresh';
 
 describe('listCronMoviesToRefresh integration', () => {
-  afterEach(() => {
-    delete process.env.CRON_REFRESH_MODE;
-    delete process.env.CRON_MOVIE_STALE_HOURS;
-  });
-
   it('omits recently refreshed unwatched movies in incremental mode', async () => {
-    process.env.CRON_REFRESH_MODE = 'incremental';
-    process.env.CRON_MOVIE_STALE_HOURS = '48';
-
     const user = await seedUser({ email: `vitest-cron-inc-${Date.now()}@example.com`, password: seedPassword });
     const { movie } = await seedSubscribedMovie({
       watcherId: user.id,
@@ -31,7 +23,6 @@ describe('listCronMoviesToRefresh integration', () => {
   });
 
   it('includes all unwatched movies in full mode', async () => {
-    process.env.CRON_REFRESH_MODE = 'full';
     const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
     const { movie } = await seedSubscribedMovie({
       watcherId: user.id,
@@ -47,13 +38,7 @@ describe('listCronMoviesToRefresh integration', () => {
 });
 
 describe('listCronShowsToRefresh integration', () => {
-  afterEach(() => {
-    delete process.env.CRON_REFRESH_MODE;
-    delete process.env.CRON_SHOW_STALE_HOURS;
-  });
-
   it('omits recently refreshed shows in incremental mode without imminent episodes', async () => {
-    process.env.CRON_REFRESH_MODE = 'incremental';
     const user = await seedUser({ email: `vitest-cron-show-${Date.now()}@example.com`, password: seedPassword });
     const { show } = await seedSubscribedTvShow({
       watcherId: user.id,
@@ -66,7 +51,6 @@ describe('listCronShowsToRefresh integration', () => {
   });
 
   it('includes shows with imminent episode air dates even when metadata is fresh', async () => {
-    process.env.CRON_REFRESH_MODE = 'incremental';
     const user = await seedUser({ email: `vitest-cron-imminent-${Date.now()}@example.com`, password: seedPassword });
     const { show } = await seedSubscribedTvShow({
       watcherId: user.id,
@@ -89,7 +73,6 @@ describe('listCronShowsToRefresh integration', () => {
   });
 
   it('includes all subscribed shows in full mode', async () => {
-    process.env.CRON_REFRESH_MODE = 'full';
     const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
     const { show } = await seedSubscribedTvShow({
       watcherId: user.id,

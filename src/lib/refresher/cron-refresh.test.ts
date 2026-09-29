@@ -1,31 +1,16 @@
 import { DateTime } from 'luxon';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  getCronRefreshMode,
+  DEFAULT_CRON_REFRESH_MODE,
   getMovieStaleBefore,
   getShowImminentEpisodeWindow,
   getShowStaleBefore,
   movieNeedsCronRefresh,
-  readPositiveIntEnv,
 } from './cron-refresh';
 
 describe('cron refresh selection', () => {
-  afterEach(() => {
-    delete process.env.CRON_REFRESH_MODE;
-    delete process.env.CRON_MOVIE_STALE_HOURS;
-    delete process.env.CRON_SHOW_STALE_HOURS;
-    delete process.env.CRON_SHOW_RECENT_EPISODE_DAYS;
-    delete process.env.CRON_SHOW_IMMINENT_EPISODE_DAYS;
-  });
-
-  it('defaults to incremental mode', () => {
-    delete process.env.CRON_REFRESH_MODE;
-    expect(getCronRefreshMode()).toBe('incremental');
-  });
-
-  it('honors full mode from env', () => {
-    process.env.CRON_REFRESH_MODE = 'full';
-    expect(getCronRefreshMode()).toBe('full');
+  it('uses incremental as the default refresh mode', () => {
+    expect(DEFAULT_CRON_REFRESH_MODE).toBe('incremental');
   });
 
   it('refreshes movies when metadata was never synced', () => {
@@ -51,14 +36,9 @@ describe('cron refresh selection', () => {
     expect(window.end).toBe('2026-06-15');
   });
 
-  it('reads stale hour windows from env with safe fallbacks', () => {
-    process.env.CRON_SHOW_STALE_HOURS = '12';
-    process.env.CRON_SHOW_IMMINENT_EPISODE_DAYS = '3';
+  it('uses fixed stale hour windows', () => {
     const now = DateTime.fromISO('2026-03-01T12:00:00.000Z', { zone: 'utc' });
-    expect(getShowStaleBefore(now).getTime()).toBe(now.minus({ hours: 12 }).toJSDate().getTime());
-    expect(getShowImminentEpisodeWindow(now).end).toBe('2026-03-04');
-    expect(readPositiveIntEnv('CRON_MOVIE_STALE_HOURS', 99)).toBe(99);
-    process.env.CRON_MOVIE_STALE_HOURS = 'bad';
-    expect(readPositiveIntEnv('CRON_MOVIE_STALE_HOURS', 99)).toBe(99);
+    expect(getMovieStaleBefore(now).getTime()).toBe(now.minus({ hours: 168 }).toJSDate().getTime());
+    expect(getShowStaleBefore(now).getTime()).toBe(now.minus({ hours: 48 }).toJSDate().getTime());
   });
 });
