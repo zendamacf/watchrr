@@ -7,7 +7,7 @@ import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextPut, routeParams } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { seedEpisode, seedSubscribedTvShow, seedUser } from '@/test/seeds';
+import { seedEpisode, seedSubscribedTvShow, seedTvShow, seedUser } from '@/test/seeds';
 import { PUT } from './route';
 
 const unknownId = '00000000-0000-4000-8000-000000000095';
@@ -54,5 +54,22 @@ describe('PUT /api/episode/[episode_id]', () => {
       .from(watched_episodes)
       .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
     expect(row).toBeDefined();
+  });
+
+  it('returns 404 when the user is not subscribed to the show', async () => {
+    const show = await seedTvShow({ moviedb_id: 998_503, name: 'Unsubscribed Show' });
+    const episode = await seedEpisode({
+      tvshowId: show.id,
+      overrides: { moviedb_id: 998_504, name: 'Locked ep' },
+    });
+
+    const response = await PUT(nextPut(apiRoutes.episodeById(episode.id)), routeParams({ episode_id: episode.id }));
+    expect(response.status).toBe(404);
+
+    const [row] = await db
+      .select()
+      .from(watched_episodes)
+      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
+    expect(row).toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
@@ -15,8 +15,26 @@ function signupRequest(body: unknown) {
 }
 
 describe('POST /api/auth/signup', () => {
+  const previousAllowSignup = process.env.ALLOW_SIGNUP;
+
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
+    delete process.env.ALLOW_SIGNUP;
+  });
+
+  afterEach(() => {
+    if (previousAllowSignup === undefined) {
+      delete process.env.ALLOW_SIGNUP;
+    } else {
+      process.env.ALLOW_SIGNUP = previousAllowSignup;
+    }
+  });
+
+  it('returns 403 when signup is disabled', async () => {
+    process.env.ALLOW_SIGNUP = 'false';
+    const response = await POST(signupRequest({ email: 'new@example.com', password: seedPassword }));
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ message: 'New user registration is disabled' });
   });
 
   it('returns 400 for invalid JSON', async () => {

@@ -3,6 +3,7 @@ import {
   type AnyPgColumn,
   boolean,
   date,
+  index,
   integer,
   pgTable,
   primaryKey,
@@ -37,19 +38,27 @@ export const tvshows = pgTable('tvshows', {
   description: text(),
 });
 
-export const episodes = pgTable('episodes', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  tvshow_id: uuid('tvshow_id')
-    .notNull()
-    .references(() => tvshows.id, { onDelete: 'cascade' }),
-  season: integer().notNull(),
-  episode: integer().notNull(),
-  name: text().notNull(),
-  airdate: date().notNull(),
-  moviedb_id: integer().notNull().unique(),
-  backdrop_slug: text(),
-  description: text(),
-});
+export const episodes = pgTable(
+  'episodes',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    tvshow_id: uuid('tvshow_id')
+      .notNull()
+      .references(() => tvshows.id, { onDelete: 'cascade' }),
+    season: integer().notNull(),
+    episode: integer().notNull(),
+    name: text().notNull(),
+    airdate: date().notNull(),
+    moviedb_id: integer().notNull().unique(),
+    backdrop_slug: text(),
+    description: text(),
+  },
+  (table) => [
+    // Episode list + refresher load episodes per show ordered by airdate.
+    index('episodes_tvshow_id_idx').on(table.tvshow_id),
+    index('episodes_tvshow_id_airdate_idx').on(table.tvshow_id, table.airdate),
+  ],
+);
 
 export const subscribed_tvshows = pgTable(
   'subscribed_tvshows',
@@ -63,7 +72,11 @@ export const subscribed_tvshows = pgTable(
     delay_days: integer('delay_days').notNull().default(0),
     snoozed_until: date('snoozed_until'),
   },
-  (t) => [primaryKey({ columns: [t.tvshow_id, t.watcher_id] })],
+  (t) => [
+    primaryKey({ columns: [t.tvshow_id, t.watcher_id] }),
+    // Filter subscriptions by watcher (episode list joins on watcher_id).
+    index('subscribed_tvshows_watcher_id_idx').on(t.watcher_id),
+  ],
 );
 
 export const watched_episodes = pgTable(
@@ -76,7 +89,11 @@ export const watched_episodes = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
   },
-  (t) => [primaryKey({ columns: [t.episode_id, t.watcher_id] })],
+  (t) => [
+    primaryKey({ columns: [t.episode_id, t.watcher_id] }),
+    // Watched lookup anti-join in GET /api/episode filters by watcher_id.
+    index('watched_episodes_watcher_id_idx').on(t.watcher_id),
+  ],
 );
 
 export const movies = pgTable('movies', {

@@ -20,9 +20,11 @@ npm run start:dev
 ## Docker
 
 ```bash
-cp .env.example .env   # production Compose secrets (DB_PASSWORD, CRON_SECRET, …)
+cp .env.example .env   # production Compose secrets (DB_PASSWORD, CRON_SECRET, ALLOW_SIGNUP, …)
 # Local/CI: build from source
 docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build
 # Production: pull published image + cron sidecar
 # APP_IMAGE=ghcr.io/zendamacf/watchrr:v2.0.0 docker compose --profile production up -d
 ```
+
+Set `ALLOW_SIGNUP=false` in `.env` to run a private instance: existing users can sign in, but new registrations are rejected.

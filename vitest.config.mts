@@ -32,7 +32,7 @@ export default defineConfig({
         'src/components/Layout/AuthedPage.tsx',
         'src/components/**/index.ts',
         'src/lib/auth/types.ts',
-        'src/lib/sentry/**',
+        'src/lib/sentry/options.ts',
       ],
       thresholds: {
         lines: 95,
