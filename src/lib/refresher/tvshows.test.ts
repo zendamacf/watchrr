@@ -240,4 +240,18 @@ describe('refreshTvShow', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0]?.moviedb_id).toBe(900_301);
   });
+
+  it('rethrows when TMDB lookup fails', async () => {
+    const show = await seedTvShow({
+      moviedb_id: 999_206,
+      name: 'Failing Show',
+      description: 'Show',
+      country: 'US',
+      poster_slug: '/p.jpg',
+      backdrop_slug: '/b.jpg',
+    });
+    mockGetTvShow.mockRejectedValue(new Error('tmdb unavailable'));
+
+    await expect(refreshTvShow(show.id)).rejects.toThrow('tmdb unavailable');
+  });
 });
