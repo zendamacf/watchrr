@@ -28,3 +28,5 @@ docker compose -f docker-compose.yml -f docker-compose.ci.yml up --build
 ```
 
 Set `ALLOW_SIGNUP=false` in `.env` to run a private instance: existing users can sign in, but new registrations are rejected.
+
+API routes are rate limited per client IP (see `RATE_LIMIT_*` in `.env.example`). Authenticated cron calls to `/api/refresh` use a separate, higher limit.
