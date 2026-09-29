@@ -34,4 +34,16 @@ describe('rate limit config', () => {
     process.env.RATE_LIMIT_AUTH_WINDOW_SEC = '60';
     expect(getRateLimitPolicy('auth')).toMatchObject({ max: 5, windowMs: 60_000 });
   });
+
+  it('exposes policies for search, cron, cronAuthed, and default API routes', () => {
+    expect(getRateLimitPolicy('search').class).toBe('search');
+    expect(getRateLimitPolicy('cron').class).toBe('cron');
+    expect(getRateLimitPolicy('cronAuthed').class).toBe('cronAuthed');
+    expect(getRateLimitPolicy('api').class).toBe('api');
+  });
+
+  it('falls back when env values are invalid', () => {
+    process.env.RATE_LIMIT_SEARCH_MAX = 'not-a-number';
+    expect(getRateLimitPolicy('search').max).toBe(60);
+  });
 });
