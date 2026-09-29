@@ -32,4 +32,32 @@ describe('logger', () => {
     expect(payload.error).toBe('boom');
     expect(payload.stack).toContain('boom');
   });
+
+  it('writes warn logs to console.warn', () => {
+    logger.warn('slow refresh', { operation: 'cronRefresh' });
+    expect(console.warn).toHaveBeenCalledOnce();
+    const payload = JSON.parse(String((console.warn as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]));
+    expect(payload.level).toBe('warn');
+  });
+
+  it('serializes non-Error failures', () => {
+    logger.error('refresh failed', 'timeout', { operation: 'refreshMovie' });
+    const payload = JSON.parse(String((console.error as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]));
+    expect(payload.error).toBe('timeout');
+  });
+
+  it('includes error cause when present', () => {
+    const err = new Error('wrapped');
+    err.cause = new Error('root');
+    logger.error('refresh failed', err);
+    const payload = JSON.parse(String((console.error as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]));
+    expect(payload.cause).toBe('root');
+  });
+
+  it('logs errors without an exception object', () => {
+    logger.error('refresh failed', undefined, { operation: 'cronRefresh' });
+    const payload = JSON.parse(String((console.error as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]));
+    expect(payload.message).toBe('refresh failed');
+    expect(payload.error).toBeUndefined();
+  });
 });
