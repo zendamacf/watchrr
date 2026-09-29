@@ -30,6 +30,8 @@ export default defineConfig({
         'src/app/**/page.tsx',
         'src/app/**/layout.tsx',
         'src/components/Layout/AuthedPage.tsx',
+        'src/components/**/index.ts',
+        'src/lib/auth/types.ts',
         'src/lib/sentry/**',
       ],
       thresholds: {
