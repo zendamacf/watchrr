@@ -1,5 +1,6 @@
 import chunk from 'lodash.chunk';
 import { type NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 import { listCronMoviesToRefresh, listCronShowsToRefresh } from '@/lib/refresher/cron-refresh';
 import { refreshMovie } from '@/lib/refresher/movies';
 import { refreshTvShow } from '@/lib/refresher/tvshows';
@@ -18,6 +19,9 @@ export async function GET(request: NextRequest) {
     return new NextResponse(null, { status: 401 });
   }
 
+  const started = Date.now();
+  logger.info('cron refresh started', { operation: 'cronRefresh' });
+
   const subbedMovies = await listCronMoviesToRefresh();
   for (const movieChunk of chunk(subbedMovies, 30)) {
     await Promise.all(movieChunk.map((m) => refreshMovie(m.movie_id)));
@@ -27,6 +31,13 @@ export async function GET(request: NextRequest) {
   for (const showChunk of chunk(subbedShows, 30)) {
     await Promise.all(showChunk.map((s) => refreshTvShow(s.tvshow_id)));
   }
+
+  logger.info('cron refresh completed', {
+    operation: 'cronRefresh',
+    durationMs: Date.now() - started,
+    movieCount: subbedMovies.length,
+    showCount: subbedShows.length,
+  });
 
   return NextResponse.json(
     {
