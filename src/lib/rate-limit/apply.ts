@@ -1,12 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getRateLimitClientKey } from './client';
-import { getRateLimitPolicy, isRateLimitEnabled, resolveRateLimitClass } from './config';
+import { getRateLimitPolicy, resolveRateLimitClass } from './config';
 import { consumeRateLimit } from './store';
 
 /** Returns a 429 response when limited, or null to continue the request chain. */
 export function applyRateLimit(request: NextRequest): NextResponse | null {
-  if (!isRateLimitEnabled()) return null;
-
   const { pathname } = request.nextUrl;
   if (!pathname.startsWith('/api/')) return null;
 

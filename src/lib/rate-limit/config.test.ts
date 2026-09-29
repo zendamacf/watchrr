@@ -1,20 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { getRateLimitPolicy, isRateLimitEnabled, resolveRateLimitClass } from './config';
+import { getRateLimitPolicy, resolveRateLimitClass } from './config';
 
 describe('rate limit config', () => {
-  const keys = ['RATE_LIMIT_ENABLED', 'CRON_SECRET', 'RATE_LIMIT_AUTH_MAX', 'RATE_LIMIT_AUTH_WINDOW_SEC'] as const;
-  const previous: Partial<Record<(typeof keys)[number], string>> = {};
-
   afterEach(() => {
-    for (const key of keys) {
-      if (previous[key] === undefined) delete process.env[key];
-      else process.env[key] = previous[key];
-    }
-  });
-
-  it('can be disabled with RATE_LIMIT_ENABLED=false', () => {
-    process.env.RATE_LIMIT_ENABLED = 'false';
-    expect(isRateLimitEnabled()).toBe(false);
+    delete process.env.CRON_SECRET;
   });
 
   it('classifies auth and search routes', () => {
@@ -31,30 +20,11 @@ describe('rate limit config', () => {
     expect(resolveRateLimitClass('/api/refresh', 'Bearer wrong')).toBe('cron');
   });
 
-  it('reads custom auth limits from env', () => {
-    process.env.RATE_LIMIT_AUTH_MAX = '5';
-    process.env.RATE_LIMIT_AUTH_WINDOW_SEC = '60';
-    expect(getRateLimitPolicy('auth')).toMatchObject({ max: 5, windowMs: 60_000 });
-  });
-
-  it('exposes policies for search, cron, cronAuthed, and default API routes', () => {
-    expect(getRateLimitPolicy('search').class).toBe('search');
-    expect(getRateLimitPolicy('cron').class).toBe('cron');
-    expect(getRateLimitPolicy('cronAuthed').class).toBe('cronAuthed');
-    expect(getRateLimitPolicy('api').class).toBe('api');
-  });
-
-  it('falls back when env values are invalid', () => {
-    process.env.RATE_LIMIT_SEARCH_MAX = 'not-a-number';
-    expect(getRateLimitPolicy('search').max).toBe(60);
-  });
-
-  it('reads cron policy limits from env', () => {
-    process.env.RATE_LIMIT_CRON_MAX = '3';
-    process.env.RATE_LIMIT_CRON_WINDOW_SEC = '120';
-    process.env.RATE_LIMIT_CRON_AUTH_MAX = '9';
-    process.env.RATE_LIMIT_CRON_AUTH_WINDOW_SEC = '30';
-    expect(getRateLimitPolicy('cron')).toMatchObject({ max: 3, windowMs: 120_000 });
-    expect(getRateLimitPolicy('cronAuthed')).toMatchObject({ max: 9, windowMs: 30_000 });
+  it('exposes fixed policies for each route class', () => {
+    expect(getRateLimitPolicy('auth')).toMatchObject({ max: 20, windowMs: 900_000 });
+    expect(getRateLimitPolicy('search')).toMatchObject({ max: 60, windowMs: 60_000 });
+    expect(getRateLimitPolicy('cron')).toMatchObject({ max: 10, windowMs: 3_600_000 });
+    expect(getRateLimitPolicy('cronAuthed')).toMatchObject({ max: 120, windowMs: 3_600_000 });
+    expect(getRateLimitPolicy('api')).toMatchObject({ max: 300, windowMs: 60_000 });
   });
 });

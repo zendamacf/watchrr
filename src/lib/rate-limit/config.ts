@@ -6,52 +6,18 @@ export type RateLimitPolicy = {
   windowMs: number;
 };
 
-function readPositiveInt(raw: string | undefined, fallback: number): number {
-  if (raw === undefined || raw.trim() === '') return fallback;
-  const value = Number.parseInt(raw, 10);
-  if (!Number.isFinite(value) || value <= 0) return fallback;
-  return value;
-}
-
-export function isRateLimitEnabled(): boolean {
-  const raw = process.env.RATE_LIMIT_ENABLED;
-  if (raw === undefined || raw.trim() === '') return true;
-  return !['false', '0', 'no', 'off'].includes(raw.trim().toLowerCase());
-}
+/** Fixed per-route limits (in-memory per app instance). */
+const POLICIES: Record<RateLimitClass, { max: number; windowMs: number }> = {
+  auth: { max: 20, windowMs: 15 * 60 * 1000 },
+  search: { max: 60, windowMs: 60 * 1000 },
+  cron: { max: 10, windowMs: 60 * 60 * 1000 },
+  cronAuthed: { max: 120, windowMs: 60 * 60 * 1000 },
+  api: { max: 300, windowMs: 60 * 1000 },
+};
 
 export function getRateLimitPolicy(className: RateLimitClass): RateLimitPolicy {
-  switch (className) {
-    case 'auth':
-      return {
-        class: 'auth',
-        max: readPositiveInt(process.env.RATE_LIMIT_AUTH_MAX, 20),
-        windowMs: readPositiveInt(process.env.RATE_LIMIT_AUTH_WINDOW_SEC, 900) * 1000,
-      };
-    case 'search':
-      return {
-        class: 'search',
-        max: readPositiveInt(process.env.RATE_LIMIT_SEARCH_MAX, 60),
-        windowMs: readPositiveInt(process.env.RATE_LIMIT_SEARCH_WINDOW_SEC, 60) * 1000,
-      };
-    case 'cron':
-      return {
-        class: 'cron',
-        max: readPositiveInt(process.env.RATE_LIMIT_CRON_MAX, 10),
-        windowMs: readPositiveInt(process.env.RATE_LIMIT_CRON_WINDOW_SEC, 3600) * 1000,
-      };
-    case 'cronAuthed':
-      return {
-        class: 'cronAuthed',
-        max: readPositiveInt(process.env.RATE_LIMIT_CRON_AUTH_MAX, 120),
-        windowMs: readPositiveInt(process.env.RATE_LIMIT_CRON_AUTH_WINDOW_SEC, 3600) * 1000,
-      };
-    default:
-      return {
-        class: 'api',
-        max: readPositiveInt(process.env.RATE_LIMIT_API_MAX, 300),
-        windowMs: readPositiveInt(process.env.RATE_LIMIT_API_WINDOW_SEC, 60) * 1000,
-      };
-  }
+  const limits = POLICIES[className];
+  return { class: className, ...limits };
 }
 
 export function resolveRateLimitClass(pathname: string, authorization: string | null): RateLimitClass {

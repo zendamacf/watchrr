@@ -1,26 +1,26 @@
 import { NextRequest } from 'next/server';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as config from '@/lib/rate-limit/config';
 import { resetRateLimitStoreForTests } from '@/lib/rate-limit/store';
 import { middleware } from '@/middleware';
 
 describe('middleware', () => {
   afterEach(() => {
-    delete process.env.RATE_LIMIT_ENABLED;
-    delete process.env.RATE_LIMIT_AUTH_MAX;
-    delete process.env.RATE_LIMIT_AUTH_WINDOW_SEC;
+    vi.restoreAllMocks();
     resetRateLimitStoreForTests();
   });
 
-  it('delegates to NextResponse.next when rate limiting is disabled', () => {
-    process.env.RATE_LIMIT_ENABLED = 'false';
+  it('continues the request when under the rate limit', () => {
     const response = middleware(new NextRequest('http://localhost/api/movie'));
     expect(response.status).toBe(200);
   });
 
   it('returns 429 when applyRateLimit blocks the request', async () => {
-    process.env.RATE_LIMIT_ENABLED = 'true';
-    process.env.RATE_LIMIT_AUTH_MAX = '1';
-    process.env.RATE_LIMIT_AUTH_WINDOW_SEC = '60';
+    vi.spyOn(config, 'getRateLimitPolicy').mockReturnValue({
+      class: 'auth',
+      max: 1,
+      windowMs: 60_000,
+    });
     const request = new NextRequest('http://localhost/api/auth/signup', {
       headers: { 'x-real-ip': '203.0.113.10' },
     });
