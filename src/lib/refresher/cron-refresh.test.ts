@@ -4,13 +4,18 @@ import {
   getCronRefreshMode,
   getMovieStaleBefore,
   getShowImminentEpisodeWindow,
+  getShowStaleBefore,
   movieNeedsCronRefresh,
+  readPositiveIntEnv,
 } from './cron-refresh';
 
 describe('cron refresh selection', () => {
   afterEach(() => {
     delete process.env.CRON_REFRESH_MODE;
     delete process.env.CRON_MOVIE_STALE_HOURS;
+    delete process.env.CRON_SHOW_STALE_HOURS;
+    delete process.env.CRON_SHOW_RECENT_EPISODE_DAYS;
+    delete process.env.CRON_SHOW_IMMINENT_EPISODE_DAYS;
   });
 
   it('defaults to incremental mode', () => {
@@ -44,5 +49,16 @@ describe('cron refresh selection', () => {
     const window = getShowImminentEpisodeWindow(DateTime.fromISO('2026-06-01T00:00:00.000Z', { zone: 'utc' }));
     expect(window.start).toBe('2026-05-25');
     expect(window.end).toBe('2026-06-15');
+  });
+
+  it('reads stale hour windows from env with safe fallbacks', () => {
+    process.env.CRON_SHOW_STALE_HOURS = '12';
+    process.env.CRON_SHOW_IMMINENT_EPISODE_DAYS = '3';
+    const now = DateTime.fromISO('2026-03-01T12:00:00.000Z', { zone: 'utc' });
+    expect(getShowStaleBefore(now).getTime()).toBe(now.minus({ hours: 12 }).toJSDate().getTime());
+    expect(getShowImminentEpisodeWindow(now).end).toBe('2026-03-04');
+    expect(readPositiveIntEnv('CRON_MOVIE_STALE_HOURS', 99)).toBe(99);
+    process.env.CRON_MOVIE_STALE_HOURS = 'bad';
+    expect(readPositiveIntEnv('CRON_MOVIE_STALE_HOURS', 99)).toBe(99);
   });
 });
