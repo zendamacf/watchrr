@@ -48,7 +48,7 @@ const showDetail: ShowEpisodesResponse = {
 };
 
 function stubShowDetailFetch(handler?: (url: string, method: string) => Response | undefined) {
-  stubFetch((input, init) => {
+  stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = fetchRequestUrl(input);
     const method = init?.method?.toLowerCase() ?? 'get';
     const custom = handler?.(url, method);
@@ -75,7 +75,7 @@ describe('ShowDetailPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: testShow.name, level: 2 })).toBeInTheDocument();
-      expect(screen.getByText(testShow.description!)).toBeInTheDocument();
+      expect(screen.getByText(testShow.description ?? '')).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: 'Season 1', level: 4 })).toBeInTheDocument();
       expect(screen.getByText(/S01E01 — Pilot/)).toBeInTheDocument();
       expect(screen.getByText(/S01E02 — Second/)).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe('ShowDetailPage', () => {
 
   it('marks a season as watched via the API', async () => {
     let seasonMarked = false;
-    stubFetch((input, init) => {
+    stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = fetchRequestUrl(input);
       const method = init?.method?.toLowerCase() ?? 'get';
       if (url === apiRoutes.tvshowEpisodes(testShow.id) && method === 'get') {
@@ -148,7 +148,7 @@ describe('ShowDetailPage', () => {
   });
 
   it('shows a not-following message when the show cannot be loaded', async () => {
-    stubFetch((input, init) => {
+    stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = fetchRequestUrl(input);
       if (url === apiRoutes.tvshowEpisodes(testShow.id) && (init?.method?.toLowerCase() ?? 'get') === 'get') {
         return mockFetchResponse({ message: 'Not found' }, { ok: false, status: 404 });

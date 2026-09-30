@@ -1,4 +1,4 @@
-import { and, eq, exists } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
