@@ -10,10 +10,37 @@
 
 .seasonEpisodes {
   padding: var(--mantine-spacing-sm) var(--mantine-spacing-md) var(--mantine-spacing-md);
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-8));
+}
+
+.episodeRow {
+  border-radius: var(--mantine-radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.episodeRow:nth-child(odd) {
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-8));
 }
 
 .episodeRow:nth-child(even) {
-  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-  border-radius: var(--mantine-radius-sm);
-  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+  background-color: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-6));
+}
+
+.episodeRow:hover {
+  background-color: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
+}
+
+.episodeRowWatched {
+  border-left: 2px solid light-dark(var(--mantine-color-gray-4), var(--mantine-color-dark-3));
+  padding-left: calc(var(--mantine-spacing-xs) - 2px);
+}
+
+.unwatchAction {
+  opacity: 0.45;
+  transition: opacity 0.15s ease;
+}
+
+.episodeRowWatched:hover .unwatchAction,
+.episodeRowWatched:focus-within .unwatchAction {
+  opacity: 1;
 }

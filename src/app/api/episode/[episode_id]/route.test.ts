@@ -5,10 +5,10 @@ import { db } from '@/lib/db';
 import { watched_episodes } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
-import { nextPut, routeParams } from '@/test/helpers/api-request';
+import { nextDelete, nextPut, routeParams } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedEpisode, seedSubscribedTvShow, seedTvShow, seedUser } from '@/test/seeds';
-import { PUT } from './route';
+import { DELETE, PUT } from './route';
 
 const unknownId = '00000000-0000-4000-8000-000000000095';
 
@@ -71,5 +71,70 @@ describe('PUT /api/episode/[episode_id]', () => {
       .from(watched_episodes)
       .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
     expect(row).toBeUndefined();
+  });
+});
+
+describe('DELETE /api/episode/[episode_id]', () => {
+  let userId: string;
+
+  beforeAll(async () => {
+    const user = await seedUser({ email: seedEmails.apiUser, password: seedPassword });
+    userId = user.id;
+  });
+
+  beforeEach(() => {
+    resetAuthGuardMocks();
+    mockGuardUser.mockResolvedValue({ id: userId });
+  });
+
+  it('returns 401 when not authenticated', async () => {
+    mockGuardUser.mockResolvedValue(null);
+    const response = await DELETE(nextDelete(apiRoutes.episodeById(unknownId)), routeParams({ episode_id: unknownId }));
+    expect(response.status).toBe(401);
+  });
+
+  it('removes a watched episode row for the user', async () => {
+    const { tvshowId } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 998_505, name: 'Unwatch Show' },
+    });
+    const episode = await seedEpisode({
+      tvshowId,
+      overrides: { moviedb_id: 998_506, name: 'Watched ep' },
+    });
+    await db.insert(watched_episodes).values({ episode_id: episode.id, watcher_id: userId }).onConflictDoNothing();
+
+    const response = await DELETE(
+      nextDelete(apiRoutes.episodeById(episode.id)),
+      routeParams({ episode_id: episode.id }),
+    );
+    expect(response.status).toBe(200);
+
+    const [row] = await db
+      .select()
+      .from(watched_episodes)
+      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
+    expect(row).toBeUndefined();
+  });
+
+  it('returns 404 when the user is not subscribed to the show', async () => {
+    const show = await seedTvShow({ moviedb_id: 998_507, name: 'Locked unwatch show' });
+    const episode = await seedEpisode({
+      tvshowId: show.id,
+      overrides: { moviedb_id: 998_508, name: 'Locked watched ep' },
+    });
+    await db.insert(watched_episodes).values({ episode_id: episode.id, watcher_id: userId }).onConflictDoNothing();
+
+    const response = await DELETE(
+      nextDelete(apiRoutes.episodeById(episode.id)),
+      routeParams({ episode_id: episode.id }),
+    );
+    expect(response.status).toBe(404);
+
+    const [row] = await db
+      .select()
+      .from(watched_episodes)
+      .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
+    expect(row).toBeDefined();
   });
 });

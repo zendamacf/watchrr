@@ -27,9 +27,17 @@ vi.mock('@/hooks/useAlert', () => ({
   }),
 }));
 
+vi.mock('@mantine/modals', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@mantine/modals')>();
+  return {
+    ...actual,
+    openConfirmModal: vi.fn(),
+  };
+});
+
 const seasonOneEpisode: ShowEpisodesResponse['episodes'][number] = {
   ...testEpisode,
-  watched: false,
+  watched: true,
 };
 
 const seasonOneEpisodeTwo: ShowEpisodesResponse['episodes'][number] = {
@@ -65,9 +73,14 @@ function stubShowDetailFetch(handler?: (url: string, method: string) => Response
 }
 
 describe('ShowDetailPage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     stubShowDetailFetch();
+    const { openConfirmModal } = await import('@mantine/modals');
+    vi.mocked(openConfirmModal).mockImplementation(({ onConfirm }) => {
+      onConfirm?.();
+      return 'test-modal-id';
+    });
   });
 
   it('loads and renders show metadata and grouped episodes', async () => {
@@ -145,6 +158,56 @@ describe('ShowDetailPage', () => {
     await waitFor(() => {
       expect(queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes])).toEqual([]);
     });
+  });
+
+  it('unmarks a watched episode via the API', async () => {
+    let pilotUnwatched = false;
+    stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = fetchRequestUrl(input);
+      const method = init?.method?.toLowerCase() ?? 'get';
+      if (url === apiRoutes.tvshowEpisodes(testShow.id) && method === 'get') {
+        return mockFetchResponse({
+          ...showDetail,
+          episodes: showDetail.episodes.map((ep) =>
+            ep.id === seasonOneEpisode.id ? { ...ep, watched: !pilotUnwatched } : ep,
+          ),
+        });
+      }
+      if (url === apiRoutes.episodeById(seasonOneEpisode.id) && method === 'delete') {
+        pilotUnwatched = true;
+        return mockFetchResponse({ message: 'Success' });
+      }
+      return mockFetchResponse({ message: 'Unexpected request' }, { ok: false, status: 500 });
+    });
+
+    const user = userEvent.setup();
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData([QueryKey.getShowEpisodes, testShow.id], showDetail);
+
+    renderWithProviders(<ShowDetailPage tvshowId={testShow.id} />, { queryClient });
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Unmark S01E01 as watched')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByLabelText('Unmark S01E01 as watched'));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.episodeById(seasonOneEpisode.id), { method: 'delete' });
+      expect(mockShowSuccess).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('S01E01') }),
+      );
+      const cached = queryClient.getQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, testShow.id]);
+      expect(cached?.episodes.find((ep) => ep.id === seasonOneEpisode.id)?.watched).toBe(false);
+    });
+
+    const { openConfirmModal } = await import('@mantine/modals');
+    expect(openConfirmModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Unmark as watched?',
+        children: expect.anything(),
+      }),
+    );
   });
 
   it('shows a not-following message when the show cannot be loaded', async () => {
