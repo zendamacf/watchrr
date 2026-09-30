@@ -48,6 +48,8 @@ Set `ALLOW_SIGNUP=false` in `.env` to run a private instance: existing users can
 
 API routes are rate limited per client IP with fixed in-app limits. Authenticated cron calls to `/api/refresh` use a separate, higher limit.
 
+`src/middleware.ts` enforces session cookies (same JWT validation as `guardUser()` / API handlers): unauthenticated visitors are redirected from app pages to `/signin`, and protected API routes return `401` without a valid session. Public paths are allowlisted in `src/lib/auth/middleware-config.ts` (auth endpoints, `/health`, `/api/refresh`, Sentry `/monitoring`, etc.).
+
 For backups, HTTPS in front of the app, and production cron setup, see [docs/self-hosting.md](./docs/self-hosting.md).
 
 ## Environment variables
