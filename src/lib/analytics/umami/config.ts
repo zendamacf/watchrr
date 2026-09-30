@@ -4,7 +4,12 @@ export type UmamiConfig = {
   hostUrl?: string;
 };
 
-export const DEFAULT_UMAMI_SCRIPT_URL = 'https://cloud.umami.is/script.js';
+export const UMAMI_CLOUD_ORIGIN = 'https://cloud.umami.is';
+
+function scriptUrlForHost(hostUrl: string): string {
+  const base = hostUrl.replace(/\/$/, '');
+  return `${base}/script.js`;
+}
 
 export function getUmamiConfig(): UmamiConfig | null {
   if (process.env.NODE_ENV === 'development') {
@@ -16,8 +21,10 @@ export function getUmamiConfig(): UmamiConfig | null {
     return null;
   }
 
-  const scriptUrl = process.env.UMAMI_SCRIPT_URL?.trim() || DEFAULT_UMAMI_SCRIPT_URL;
   const hostUrl = process.env.UMAMI_HOST_URL?.trim();
+  const scriptUrl = scriptUrlForHost(hostUrl ?? UMAMI_CLOUD_ORIGIN);
 
-  return hostUrl ? { websiteId, scriptUrl, hostUrl } : { websiteId, scriptUrl };
+  return hostUrl
+    ? { websiteId, scriptUrl, hostUrl: hostUrl.replace(/\/$/, '') }
+    : { websiteId, scriptUrl };
 }

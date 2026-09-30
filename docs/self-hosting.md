@@ -65,4 +65,4 @@ Set `ALLOW_SIGNUP=false` in `.env` to block new registrations while existing use
 
 ## Umami analytics (optional)
 
-Set `UMAMI_WEBSITE_ID` in `.env` for privacy-friendly page analytics in production. For self-hosted Umami, set `UMAMI_SCRIPT_URL` (and `UMAMI_HOST_URL` if the API base differs). Use `trackUmamiEvent` from `@/lib/analytics/umami/track` for custom events.
+Set `UMAMI_WEBSITE_ID` in `.env` for privacy-friendly page analytics in production. For self-hosted Umami, set `UMAMI_HOST_URL` to your instance origin. Use `trackUmamiEvent` from `@/lib/analytics/umami/track` for custom events.

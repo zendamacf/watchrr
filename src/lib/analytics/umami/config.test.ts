@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_UMAMI_SCRIPT_URL } from './config';
+import { UMAMI_CLOUD_ORIGIN } from './config';
 
 describe('getUmamiConfig', () => {
   afterEach(() => {
@@ -21,21 +21,20 @@ describe('getUmamiConfig', () => {
     expect(getUmamiConfig()).toBeNull();
   });
 
-  it('returns config with defaults in production', async () => {
+  it('uses the Umami cloud script by default in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('UMAMI_WEBSITE_ID', 'abc-123');
     const { getUmamiConfig } = await import('./config');
     expect(getUmamiConfig()).toEqual({
       websiteId: 'abc-123',
-      scriptUrl: DEFAULT_UMAMI_SCRIPT_URL,
+      scriptUrl: `${UMAMI_CLOUD_ORIGIN}/script.js`,
     });
   });
 
-  it('honors custom script and host URLs', async () => {
+  it('derives script URL from UMAMI_HOST_URL for self-hosted', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('UMAMI_WEBSITE_ID', 'abc-123');
-    vi.stubEnv('UMAMI_SCRIPT_URL', 'https://analytics.example.com/script.js');
-    vi.stubEnv('UMAMI_HOST_URL', 'https://analytics.example.com');
+    vi.stubEnv('UMAMI_HOST_URL', 'https://analytics.example.com/');
     const { getUmamiConfig } = await import('./config');
     expect(getUmamiConfig()).toEqual({
       websiteId: 'abc-123',
