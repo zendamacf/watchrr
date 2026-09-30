@@ -26,4 +26,5 @@ export const apiRoutes = {
   tvshowById: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
   tvshowPreferences: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
   tvshowRefresh: (tvshowId: string) => `/api/tvshow/${tvshowId}/refresh`,
+  tvshowSeasonWatch: (tvshowId: string, season: number) => `/api/tvshow/${tvshowId}/season/${season}/`,
 } as const;
