@@ -11,6 +11,14 @@ export const dateCompare = (a: unknown, b: unknown) =>
     .startOf('day')
     .diff(DateTime.fromISO(`${b}`).startOf('day'), 'days').days === 0;
 
+export const isoToSqlDate = (iso: string): string => {
+  const sqlDate = DateTime.fromISO(iso).toSQLDate();
+  if (!sqlDate) {
+    throw new Error(`Invalid ISO date: ${iso}`);
+  }
+  return sqlDate;
+};
+
 const defaultCompare = (a: unknown, b: unknown) => a === b;
 
 export const getDiff = <TDb, TApi>(

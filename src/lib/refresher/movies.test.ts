@@ -116,4 +116,14 @@ describe('refreshMovie', () => {
     const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
     expect(after?.name).toBe('Stable Movie');
   });
+
+  it('rethrows when TMDB lookup fails', async () => {
+    const movie = await seedMovie({
+      moviedb_id: 999_104,
+      name: 'Failing Movie',
+    });
+    mockGetMovie.mockRejectedValue(new Error('tmdb unavailable'));
+
+    await expect(refreshMovie(movie.id)).rejects.toThrow('tmdb unavailable');
+  });
 });

@@ -1,7 +1,18 @@
 import '@/test/mocks/refresh-db';
 import '@/test/mocks/refresher';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const mockLoggerInfo = vi.hoisted(() => vi.fn());
+
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    info: mockLoggerInfo,
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 import type { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it } from 'vitest';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { resetRefreshDbMock, setRefreshDbRows } from '@/test/mocks/refresh-db';
 import { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from '@/test/mocks/refresher';
@@ -22,6 +33,7 @@ describe('GET /api/refresh', () => {
     resetRefresherMocks();
     mockRefreshMovie.mockResolvedValue(undefined);
     mockRefreshTvShow.mockResolvedValue(undefined);
+    mockLoggerInfo.mockClear();
   });
 
   it('returns 401 without a valid bearer token', async () => {
@@ -72,6 +84,15 @@ describe('GET /api/refresh', () => {
     });
     expect(mockRefreshMovie).toHaveBeenCalledWith(movie.id);
     expect(mockRefreshTvShow).toHaveBeenCalledWith(show.id);
+    expect(mockLoggerInfo).toHaveBeenCalledWith('cron refresh started', { operation: 'cronRefresh' });
+    expect(mockLoggerInfo).toHaveBeenCalledWith(
+      'cron refresh completed',
+      expect.objectContaining({
+        operation: 'cronRefresh',
+        movieCount: 1,
+        showCount: 1,
+      }),
+    );
   }, 30_000);
 
   it('refreshes unwatched movies in chunks of 30', async () => {
