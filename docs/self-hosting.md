@@ -62,3 +62,7 @@ Test restores on a non-production copy of the database periodically.
 ## Private instances
 
 Set `ALLOW_SIGNUP=false` in `.env` to block new registrations while existing users keep signing in.
+
+## Umami analytics (optional)
+
+Set `UMAMI_WEBSITE_ID` in `.env` for privacy-friendly page analytics in production. For self-hosted Umami, set `UMAMI_HOST_URL` to your instance origin. Use `trackUmamiEvent` from `@/lib/analytics/umami/track` for custom events.
