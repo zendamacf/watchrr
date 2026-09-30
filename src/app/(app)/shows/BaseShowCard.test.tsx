@@ -5,11 +5,11 @@ import { renderWithProviders } from '@/test/render';
 import { BaseShowCard } from './BaseShowCard';
 
 describe('BaseShowCard', () => {
-  it('renders show name, description, and country badge', () => {
+  it('renders show name, description, and status badge', () => {
     renderWithProviders(<BaseShowCard show={testShow} />);
     expect(screen.getByRole('heading', { name: testShow.name })).toBeInTheDocument();
     expect(screen.getByText(testShow.description!)).toBeInTheDocument();
-    expect(screen.getByText(testShow.country!)).toBeInTheDocument();
+    expect(screen.getByText('Returning series')).toBeInTheDocument();
   });
 
   it('renders action buttons when provided', () => {

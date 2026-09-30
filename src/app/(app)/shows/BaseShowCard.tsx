@@ -21,6 +21,7 @@ import { getImageUrl } from '@/lib/themoviedb/images';
 import type { Show, ShowCard, ShowSubscription } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
+import { formatTvShowStatusLabel, tvShowStatusBadgeColor } from '@/utils/tvshowStatus';
 
 type Props = {
   show: Show | ShowCard;
@@ -74,9 +75,11 @@ export const BaseShowCard = ({ show, subscription, titleHref, actions, ...props 
           </Stack>
           <Group justify={'space-between'}>
             <Group gap="xs">
-              <Badge color={'blue'} variant={'outline'}>
-                {show.country}
-              </Badge>
+              {show.status ? (
+                <Badge color={tvShowStatusBadgeColor(show.status)} variant="light" size="sm">
+                  {formatTvShowStatusLabel(show.status)}
+                </Badge>
+              ) : null}
               {delayDays > 0 && (
                 <Popover width="unset">
                   <PopoverTarget>
