@@ -12,5 +12,3 @@ declare global {
     umami?: UmamiTracker;
   }
 }
-
-export {};

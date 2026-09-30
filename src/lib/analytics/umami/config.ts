@@ -24,7 +24,5 @@ export function getUmamiConfig(): UmamiConfig | null {
   const hostUrl = process.env.UMAMI_HOST_URL?.trim();
   const scriptUrl = scriptUrlForHost(hostUrl ?? UMAMI_CLOUD_ORIGIN);
 
-  return hostUrl
-    ? { websiteId, scriptUrl, hostUrl: hostUrl.replace(/\/$/, '') }
-    : { websiteId, scriptUrl };
+  return hostUrl ? { websiteId, scriptUrl, hostUrl: hostUrl.replace(/\/$/, '') } : { websiteId, scriptUrl };
 }
