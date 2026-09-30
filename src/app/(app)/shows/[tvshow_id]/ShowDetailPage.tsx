@@ -14,8 +14,9 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check } from 'lucide-react';
+import { Check, Undo2 } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
@@ -23,7 +24,7 @@ import { useShowEpisodesQuery } from '@/hooks/useShowEpisodes';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes, routes } from '@/lib/routes';
 import { getImageUrl } from '@/lib/themoviedb/images';
-import type { EpisodesResponse, ShowEpisodesResponse, SubscribedShow } from '@/types';
+import type { EpisodesResponse, ShowEpisode, ShowEpisodesResponse, SubscribedShow } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
 import { formatEpisodeNumber } from '@/utils/formatEpisodeNumber';
@@ -88,6 +89,69 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
       queryClient.setQueryData([QueryKey.getEpisodes], context?.previousEpisodes);
     },
   });
+
+  type EpisodeMutationContext = {
+    previousShowEpisodes: ShowEpisodesResponse | undefined;
+    previousEpisodes: EpisodesResponse | undefined;
+  };
+
+  const {
+    mutate: unwatchEpisode,
+    isPending: unwatchPending,
+    variables: unwatchEpisodeId,
+  } = useMutation<unknown, Error, ShowEpisode, EpisodeMutationContext>({
+    mutationFn: async (episode) => {
+      const response = await apiFetch(apiRoutes.episodeById(episode.id), { method: 'delete' });
+      if (!response.ok) throw new Error((await response.json()).message);
+    },
+    onMutate: async (episode) => {
+      await queryClient.cancelQueries({ queryKey: [QueryKey.getShowEpisodes, tvshowId] });
+      await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
+      const previousShowEpisodes = queryClient.getQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, tvshowId]);
+      const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
+      const showName = previousShowEpisodes?.tvshow.name ?? 'Show';
+      const episodeNumber = formatEpisodeNumber(episode.season, episode.episode);
+
+      queryClient.setQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, tvshowId], (old) =>
+        old
+          ? {
+              ...old,
+              episodes: old.episodes.map((row) => (row.id === episode.id ? { ...row, watched: false } : row)),
+            }
+          : old,
+      );
+
+      showSuccess({
+        title: 'Undone',
+        message: `Unmarked ${showName} ${episodeNumber} as watched`,
+      });
+      return { previousShowEpisodes, previousEpisodes };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getShowEpisodes, tvshowId] });
+    },
+    onError: (err, _episode, context) => {
+      showError({ title: 'An error occurred', message: err.message });
+      queryClient.setQueryData([QueryKey.getShowEpisodes, tvshowId], context?.previousShowEpisodes);
+      queryClient.setQueryData([QueryKey.getEpisodes], context?.previousEpisodes);
+    },
+  });
+
+  const confirmUnwatchEpisode = (episode: ShowEpisode) => {
+    const episodeNumber = formatEpisodeNumber(episode.season, episode.episode);
+    openConfirmModal({
+      title: 'Unmark as watched?',
+      children: (
+        <Text size="sm">
+          Remove watched status for {episodeNumber} — {episode.name}?
+        </Text>
+      ),
+      labels: { confirm: 'Unmark', cancel: 'Cancel' },
+      centered: true,
+      onConfirm: () => unwatchEpisode(episode),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -200,15 +264,27 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
                 </Group>
                 <Stack gap={4} className={classes.seasonEpisodes}>
                   {episodes.map((episode) => (
-                    <Group key={episode.id} justify="space-between" wrap="nowrap" className={classes.episodeRow}>
+                    <Group
+                      key={episode.id}
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={`${classes.episodeRow}${episode.watched ? ` ${classes.episodeRowWatched}` : ''}`}
+                    >
                       <Text size="sm" c={episode.watched ? 'dimmed' : undefined}>
                         {formatEpisodeNumber(episode.season, episode.episode)} — {episode.name}
                       </Text>
-                      {episode.watched && (
-                        <Text size="xs" c="dimmed">
-                          Watched
-                        </Text>
-                      )}
+                      {episode.watched ? (
+                        <ActionIcon
+                          className={classes.unwatchAction}
+                          aria-label={`Unmark ${formatEpisodeNumber(episode.season, episode.episode)} as watched`}
+                          variant="subtle"
+                          size="sm"
+                          loading={unwatchPending && unwatchEpisodeId?.id === episode.id}
+                          onClick={() => confirmUnwatchEpisode(episode)}
+                        >
+                          <Undo2 size={16} />
+                        </ActionIcon>
+                      ) : null}
                     </Group>
                   ))}
                 </Stack>
