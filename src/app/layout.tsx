@@ -4,6 +4,7 @@ import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/c
 import type { Metadata, Viewport } from 'next';
 import { Raleway } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { UmamiAnalytics } from '@/components/analytics/UmamiAnalytics';
 import './globals.css';
 import theme from './theme';
 
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ColorSchemeScript defaultColorScheme={DEFAULT_COLOR_THEME} />
       </head>
       <body>
+        <UmamiAnalytics />
         <MantineProvider theme={theme} defaultColorScheme={DEFAULT_COLOR_THEME}>
           {children}
         </MantineProvider>

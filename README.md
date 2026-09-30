@@ -64,6 +64,9 @@ For backups, HTTPS in front of the app, and production cron setup, see [docs/sel
 | `ALLOW_SIGNUP` | Both | `false` disables new registrations |
 | `APP_PORT` / `PORT` | Docker / local | HTTP port (default 3000) |
 | `SENTRY_TRACES_SAMPLE_RATE` | Optional | Production trace sampling (0–1) |
+| `UMAMI_WEBSITE_ID` | Optional | Umami site id; enables analytics in production |
+| `UMAMI_SCRIPT_URL` | Optional | Umami script URL (self-hosted or cloud) |
+| `UMAMI_HOST_URL` | Optional | Umami API base when it differs from the script host |
 | `APP_IMAGE` | Docker | Published image tag for production |
 
 Production Compose reads [`.env.example`](./.env.example); local dev uses [`.env.development.example`](./.env.development.example).
