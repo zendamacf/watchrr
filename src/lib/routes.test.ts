@@ -7,6 +7,7 @@ describe('routes', () => {
     expect(routes.episodes).toBe('/episodes');
     expect(routes.movies).toBe('/movies');
     expect(routes.signin).toBe('/signin');
+    expect(routes.showById('00000000-0000-4000-8000-000000000001')).toBe('/shows/00000000-0000-4000-8000-000000000001');
   });
 });
 
@@ -30,6 +31,8 @@ describe('apiRoutes', () => {
     expect(apiRoutes.movieById(id)).toBe(`/api/movie/${id}/`);
     expect(apiRoutes.movieRefresh(id)).toBe(`/api/movie/${id}/refresh`);
     expect(apiRoutes.tvshowById(id)).toBe(`/api/tvshow/${id}/`);
+    expect(apiRoutes.tvshowEpisodes(id)).toBe(`/api/tvshow/${id}/episodes/`);
+    expect(apiRoutes.tvshowSeasonWatch(id, 2)).toBe(`/api/tvshow/${id}/season/2/`);
     expect(apiRoutes.tvshowRefresh(id)).toBe(`/api/tvshow/${id}/refresh`);
     expect(apiRoutes.episodeById(id)).toBe(`/api/episode/${id}/`);
   });

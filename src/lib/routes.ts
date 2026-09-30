@@ -2,6 +2,7 @@ export const routes = {
   home: '/',
   episodes: '/episodes',
   shows: '/shows',
+  showById: (tvshowId: string) => `/shows/${tvshowId}`,
   movies: '/movies',
   signin: '/signin',
   signup: '/signup',
@@ -24,6 +25,8 @@ export const apiRoutes = {
   tvshowSearch: (searchParams: URLSearchParams | string) =>
     `/api/tvshow/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   tvshowById: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
+  tvshowEpisodes: (tvshowId: string) => `/api/tvshow/${tvshowId}/episodes/`,
   tvshowPreferences: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
   tvshowRefresh: (tvshowId: string) => `/api/tvshow/${tvshowId}/refresh`,
+  tvshowSeasonWatch: (tvshowId: string, season: number) => `/api/tvshow/${tvshowId}/season/${season}/`,
 } as const;

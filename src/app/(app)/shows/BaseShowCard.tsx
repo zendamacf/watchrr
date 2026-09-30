@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Anchor,
   Badge,
   type CardProps,
   Group,
@@ -12,6 +13,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
+import { ChevronRight } from 'lucide-react';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { BackdropCard } from '@/components/BackdropCard';
@@ -23,10 +25,11 @@ import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
 type Props = {
   show: Show | ShowCard;
   subscription?: ShowSubscription;
+  titleHref?: string;
   actions?: ReactNode;
 } & CardProps;
 
-export const BaseShowCard = ({ show, subscription, actions, ...props }: Props) => {
+export const BaseShowCard = ({ show, subscription, titleHref, actions, ...props }: Props) => {
   const delayDays = subscription?.delay_days ?? 0;
   const snoozed = isShowSnoozed(subscription?.snoozed_until);
 
@@ -43,7 +46,21 @@ export const BaseShowCard = ({ show, subscription, actions, ...props }: Props) =
         />
         <Stack h={'100%'} justify={'space-between'} flex={2}>
           <Stack gap={'xs'}>
-            <Title order={3}>{show.name}</Title>
+            {titleHref ? (
+              <Anchor href={titleHref} underline="never" c="inherit">
+                <Stack gap={2}>
+                  <Title order={3}>{show.name}</Title>
+                  <Group gap={4} wrap="nowrap" c="var(--mantine-color-anchor)">
+                    <Text size="sm" fw={500} component="span">
+                      View show
+                    </Text>
+                    <ChevronRight size={16} aria-hidden />
+                  </Group>
+                </Stack>
+              </Anchor>
+            ) : (
+              <Title order={3}>{show.name}</Title>
+            )}
             <Popover width={'unset'}>
               <PopoverTarget>
                 <Text c={'dimmed'} lineClamp={3}>

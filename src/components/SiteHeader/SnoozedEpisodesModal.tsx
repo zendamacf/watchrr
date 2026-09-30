@@ -12,16 +12,13 @@ import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
+import { formatEpisodeNumber } from '@/utils/formatEpisodeNumber';
 
 type Props = Pick<ModalProps, 'opened' | 'onClose'>;
 
 type EpisodeRow = EpisodesResponse[number];
 
 type MutationContext = { previousEpisodes: EpisodesResponse | undefined };
-
-function formatEpisodeNumber(season: number, episode: number) {
-  return `S${String(season).padStart(2, '0')}E${String(episode).padStart(2, '0')}`;
-}
 
 function SnoozedEpisodeRow({ episode }: { episode: EpisodeRow }) {
   const { showError, showSuccess } = useAlert();

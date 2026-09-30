@@ -12,4 +12,10 @@ export type MovieCard = Omit<Movie, 'id'>;
 export type SubscribedShow = Show & ShowSubscription;
 export type ShowsResponse = SubscribedShow[];
 export type EpisodesResponse = { episodes: Episode; tvshows: Show; subscription: ShowSubscription }[];
+export type ShowEpisode = Episode & { watched: boolean };
+export type ShowEpisodesResponse = {
+  tvshow: Show;
+  subscription: ShowSubscription;
+  episodes: ShowEpisode[];
+};
 export type MoviesResponse = Movie[];
