@@ -54,7 +54,7 @@ describe('GET /api/tvshow/[tvshow_id]/episodes', () => {
       tvshowId,
       overrides: { moviedb_id: 998_523, name: 'S1E1', season: 1, episode: 1 },
     });
-    await db.insert(watched_episodes).values({ episode_id: watched.id, watcher_id: userId });
+    await db.insert(watched_episodes).values({ episode_id: watched.id, watcher_id: userId }).onConflictDoNothing();
 
     const response = await GET(nextGet(apiRoutes.tvshowEpisodes(tvshowId)), routeParams({ tvshow_id: tvshowId }));
     expect(response.status).toBe(200);
