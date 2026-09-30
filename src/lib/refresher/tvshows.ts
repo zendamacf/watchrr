@@ -1,12 +1,11 @@
 import { eq } from 'drizzle-orm';
-import { DateTime } from 'luxon';
 import { db } from '@/lib/db';
 import { episodes, tvshows } from '@/lib/db/schema';
 import { logger } from '@/lib/logger';
 import { getAllEpisodes, getTvShow, type TMDBEpisode, type TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import type { Episode, Show } from '@/types';
 import { ResourceNotFound } from './errors';
-import { type DiffLookup, dateCompare, getDiff } from './utils';
+import { type DiffLookup, dateCompare, getDiff, isoToSqlDate } from './utils';
 
 /**
  * Refresh all metadata for a TV Show & its episodes, and imports in any new episodes.
@@ -86,7 +85,7 @@ export const refreshTvShow = async (tvshowId: string) => {
               season: apiEpisode.seasonNumber,
               episode: apiEpisode.episodeNumber,
               name: apiEpisode.name,
-              airdate: DateTime.fromISO(apiEpisode.airdate).toSQLDate()!,
+              airdate: isoToSqlDate(apiEpisode.airdate),
               moviedb_id: apiEpisode.id,
               backdrop_slug: apiEpisode.backdrop,
               description: apiEpisode.description,
@@ -102,7 +101,7 @@ export const refreshTvShow = async (tvshowId: string) => {
           season: apiEpisode.seasonNumber,
           episode: apiEpisode.episodeNumber,
           name: apiEpisode.name,
-          airdate: DateTime.fromISO(apiEpisode.airdate).toSQLDate()!,
+          airdate: isoToSqlDate(apiEpisode.airdate),
           moviedb_id: apiEpisode.id,
           backdrop_slug: apiEpisode.backdrop,
           description: apiEpisode.description,
@@ -121,10 +120,7 @@ export const refreshTvShow = async (tvshowId: string) => {
       });
     }
 
-    await db
-      .update(tvshows)
-      .set({ metadata_refreshed_at: new Date() })
-      .where(eq(tvshows.id, tvshowId));
+    await db.update(tvshows).set({ metadata_refreshed_at: new Date() }).where(eq(tvshows.id, tvshowId));
 
     logger.info('show refresh completed', {
       operation: 'refreshTvShow',

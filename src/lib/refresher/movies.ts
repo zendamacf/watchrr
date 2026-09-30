@@ -5,14 +5,13 @@
  */
 
 import { eq } from 'drizzle-orm';
-import { DateTime } from 'luxon';
 import { logger } from '@/lib/logger';
 import type { Movie } from '@/types';
 import { db } from '../db';
 import { movies } from '../db/schema';
 import { getMovie, type TMDBMovie } from '../themoviedb/movies';
 import { ResourceNotFound } from './errors';
-import { type DiffLookup, dateCompare, getDiff } from './utils';
+import { type DiffLookup, dateCompare, getDiff, isoToSqlDate } from './utils';
 
 export const refreshMovie = async (movieId: string) => {
   const started = Date.now();
@@ -49,17 +48,14 @@ export const refreshMovie = async (movieId: string) => {
         .set({
           name: apiMovie.name,
           description: apiMovie.description,
-          releasedate: DateTime.fromISO(apiMovie.releasedate).toSQLDate()!,
+          releasedate: isoToSqlDate(apiMovie.releasedate),
           poster_slug: apiMovie.poster,
           backdrop_slug: apiMovie.backdrop,
         })
         .where(eq(movies.id, movieId));
     }
 
-    await db
-      .update(movies)
-      .set({ metadata_refreshed_at: new Date() })
-      .where(eq(movies.id, movieId));
+    await db.update(movies).set({ metadata_refreshed_at: new Date() }).where(eq(movies.id, movieId));
 
     logger.info('movie refresh completed', {
       operation: 'refreshMovie',

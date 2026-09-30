@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateCompare, getDiff } from './utils';
+import { dateCompare, getDiff, isoToSqlDate } from './utils';
 
 describe('getDiff', () => {
   it('returns empty when db and api values match with default compare', () => {
@@ -35,6 +35,16 @@ describe('getDiff', () => {
     const api = { releasedate: '2024-01-16T00:00:00.000Z' };
     const lookup = [{ dbKey: 'releasedate' as const, apiKey: 'releasedate' as const, compare: dateCompare }];
     expect(getDiff(db, api, lookup)).toHaveLength(1);
+  });
+});
+
+describe('isoToSqlDate', () => {
+  it('converts a valid ISO string to SQL date', () => {
+    expect(isoToSqlDate('2024-01-15T00:00:00.000Z')).toBe('2024-01-15');
+  });
+
+  it('throws for an invalid ISO string', () => {
+    expect(() => isoToSqlDate('not-a-date')).toThrow('Invalid ISO date');
   });
 });
 
