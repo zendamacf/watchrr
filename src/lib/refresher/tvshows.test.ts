@@ -20,6 +20,7 @@ function tmdbShow(
     country: string | null;
     poster: string | null;
     backdrop: string | null;
+    status: string | null;
   }> = {},
 ) {
   return {
@@ -30,6 +31,7 @@ function tmdbShow(
     firstAirDate: '2011-04-17T00:00:00.000Z',
     poster: '/synced-poster.jpg',
     backdrop: '/synced-backdrop.jpg',
+    status: 'Returning Series' as string | null,
     ...overrides,
   };
 }
@@ -52,6 +54,7 @@ describe('refreshTvShow', () => {
       country: 'US',
       poster_slug: '/synced-poster.jpg',
       backdrop_slug: '/synced-backdrop.jpg',
+      status: 'Returning Series',
     });
     mockGetTvShow.mockResolvedValue(tmdbShow(SHOW_UNCHANGED));
     mockGetAllEpisodes.mockResolvedValue([]);
@@ -110,6 +113,7 @@ describe('refreshTvShow', () => {
       country: 'US',
       poster_slug: '/new.jpg',
       backdrop_slug: '/new-back.jpg',
+      status: 'Returning Series',
     });
 
     const afterEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
@@ -239,6 +243,21 @@ describe('refreshTvShow', () => {
     const rows = await db.select().from(episodes).where(eq(episodes.tvshow_id, show.id));
     expect(rows).toHaveLength(1);
     expect(rows[0]?.moviedb_id).toBe(900_301);
+  });
+
+  it('updates show status from TMDB', async () => {
+    const show = await seedTvShow({
+      moviedb_id: 999_207,
+      name: 'Status Show',
+      status: null,
+    });
+    mockGetTvShow.mockResolvedValue(tmdbShow(999_207, { status: 'Ended' }));
+    mockGetAllEpisodes.mockResolvedValue([]);
+
+    await refreshTvShow(show.id);
+
+    const [after] = await db.select().from(tvshows).where(eq(tvshows.id, show.id));
+    expect(after?.status).toBe('Ended');
   });
 
   it('rethrows when TMDB lookup fails', async () => {

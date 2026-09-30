@@ -9,6 +9,7 @@ export type TMDBTvShow = {
   firstAirDate: string;
   poster: string | null;
   backdrop: string | null;
+  status: string | null;
 };
 
 export type TMDBEpisode = {
@@ -36,6 +37,7 @@ export const search = async (query: string): Promise<TMDBTvShow[]> => {
     firstAirDate: DateTime.fromJSDate(new Date(d.first_air_date)).toISO()!,
     poster: d.poster_path,
     backdrop: d.backdrop_path,
+    status: null,
   }));
 };
 
@@ -54,6 +56,7 @@ export const getTvShow = async (moviedb_id: number): Promise<TMDBTvShow> => {
     firstAirDate: DateTime.fromJSDate(new Date(data.first_air_date)).toISO()!,
     poster: data.poster_path,
     backdrop: data.backdrop_path,
+    status: data.status ?? null,
   };
 };
 
@@ -81,7 +84,6 @@ export const getAllEpisodes = async (moviedb_id: number): Promise<TMDBEpisode[]>
           name: d.name,
           description: d.overview,
           airdate: DateTime.fromJSDate(new Date(d.air_date)).toISO()!,
-          moviedb_id: d.id,
           backdrop: d.still_path,
         })),
     );

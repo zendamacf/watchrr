@@ -19,6 +19,7 @@ export async function seedTvShow(overrides: Partial<typeof testShow> = {}): Prom
       poster_slug: values.poster_slug,
       backdrop_slug: values.backdrop_slug,
       description: values.description,
+      status: values.status,
     })
     .returning();
 

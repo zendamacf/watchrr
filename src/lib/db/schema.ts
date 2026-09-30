@@ -36,6 +36,7 @@ export const tvshows = pgTable('tvshows', {
   poster_slug: text(),
   backdrop_slug: text(),
   description: text(),
+  status: text(),
   metadata_refreshed_at: timestamp('metadata_refreshed_at'),
 });
 

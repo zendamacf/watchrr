@@ -31,6 +31,7 @@ export const refreshTvShow = async (tvshowId: string) => {
       { dbKey: 'country', apiKey: 'country' },
       { dbKey: 'poster_slug', apiKey: 'poster' },
       { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
+      { dbKey: 'status', apiKey: 'status' },
     ];
     const diffs = getDiff(dbShow, apiShow, showLookup);
     if (diffs.length) {
@@ -48,6 +49,7 @@ export const refreshTvShow = async (tvshowId: string) => {
           country: apiShow.country,
           poster_slug: apiShow.poster,
           backdrop_slug: apiShow.backdrop,
+          status: apiShow.status,
         })
         .where(eq(tvshows.id, tvshowId));
     }

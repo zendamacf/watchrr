@@ -88,6 +88,7 @@ describe('ShowDetailPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: testShow.name, level: 2 })).toBeInTheDocument();
+      expect(screen.getByText('Returning series')).toBeInTheDocument();
       expect(screen.getByText(testShow.description ?? '')).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: 'Season 1', level: 4 })).toBeInTheDocument();
       expect(screen.getByText(/S01E01 — Pilot/)).toBeInTheDocument();

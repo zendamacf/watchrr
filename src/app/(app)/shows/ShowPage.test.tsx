@@ -62,4 +62,26 @@ describe('ShowPage', () => {
       expect(screen.getByTestId('show-list')).not.toHaveTextContent('Alpha Show');
     });
   });
+
+  it('filters shows by TMDB status', async () => {
+    const shows = [
+      { ...testShow, id: '00000000-0000-4000-8000-000000000097', name: 'Airing Show', status: 'Returning Series' },
+      { ...testShow, id: '00000000-0000-4000-8000-000000000098', name: 'Finished Show', status: 'Ended' },
+    ];
+    stubFetch(mockFetchResponse(shows));
+    const user = userEvent.setup();
+    renderWithProviders(<ShowPage />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('show-list')).toHaveTextContent('Airing Show,Finished Show');
+    });
+
+    await user.click(screen.getByLabelText('Filter by show status'));
+    await user.click(await screen.findByRole('option', { name: 'Ended', hidden: true }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('show-list')).toHaveTextContent('Finished Show');
+      expect(screen.getByTestId('show-list')).not.toHaveTextContent('Airing Show');
+    });
+  });
 });
