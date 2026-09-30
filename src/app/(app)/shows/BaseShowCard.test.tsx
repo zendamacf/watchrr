@@ -24,4 +24,11 @@ describe('BaseShowCard', () => {
     expect(screen.getByText('14d')).toBeInTheDocument();
     expect(screen.getByText('Snoozed')).toBeInTheDocument();
   });
+
+  it('links to show details when titleHref is set', () => {
+    const href = '/shows/00000000-0000-4000-8000-000000000001';
+    renderWithProviders(<BaseShowCard show={testShow} titleHref={href} />);
+    const link = screen.getByRole('link', { name: new RegExp(`${testShow.name}.*View show`, 'i') });
+    expect(link).toHaveAttribute('href', href);
+  });
 });

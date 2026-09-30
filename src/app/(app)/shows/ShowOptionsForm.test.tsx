@@ -8,8 +8,8 @@ import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
-import type { EpisodesResponse, SubscribedShow } from '@/types';
-import { ShowOptionsModal } from './ShowOptionsModal';
+import type { EpisodesResponse, ShowEpisodesResponse, SubscribedShow } from '@/types';
+import { ShowOptionsForm } from './ShowOptionsForm';
 
 const { mockShowError, mockShowSuccess } = vi.hoisted(() => ({
   mockShowError: vi.fn(),
@@ -34,7 +34,7 @@ const baseShow: SubscribedShow = {
   snoozed_until: null,
 };
 
-describe('ShowOptionsModal', () => {
+describe('ShowOptionsForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     stubFetch(mockFetchResponse({ delay_days: 14, snoozed_until: null }));
@@ -42,8 +42,7 @@ describe('ShowOptionsModal', () => {
 
   it('saves delay preferences when enabled', async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={onClose} />);
+    renderWithProviders(<ShowOptionsForm show={baseShow} />);
 
     await user.click(screen.getByLabelText('Enable delay'));
     await user.click(screen.getByRole('button', { name: '14 days' }));
@@ -60,13 +59,12 @@ describe('ShowOptionsModal', () => {
       expect(mockShowSuccess).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringContaining(baseShow.name) }),
       );
-      expect(onClose).toHaveBeenCalled();
     });
   });
 
   it('saves snooze preferences with a preset duration', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={() => {}} />);
+    renderWithProviders(<ShowOptionsForm show={baseShow} />);
 
     await user.click(screen.getByLabelText('Snooze this show'));
     await user.click(screen.getByRole('radio', { name: '2 weeks' }));
@@ -87,7 +85,7 @@ describe('ShowOptionsModal', () => {
 
   it('saves snooze preferences with a custom date', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={() => {}} />);
+    renderWithProviders(<ShowOptionsForm show={baseShow} />);
 
     await user.click(screen.getByLabelText('Snooze this show'));
     await user.click(screen.getByRole('radio', { name: 'Custom' }));
@@ -105,15 +103,14 @@ describe('ShowOptionsModal', () => {
     });
   });
 
-  it('initialises from existing show preferences when reopened', async () => {
+  it('initialises from existing show preferences', async () => {
     const show: SubscribedShow = {
       ...baseShow,
       delay_days: 21,
       snoozed_until: DateTime.now().startOf('day').plus({ weeks: 1 }).toFormat('yyyy-MM-dd'),
     };
 
-    const { rerender } = renderWithProviders(<ShowOptionsModal show={show} opened={false} onClose={() => {}} />);
-    rerender(<ShowOptionsModal show={show} opened onClose={() => {}} />);
+    renderWithProviders(<ShowOptionsForm show={show} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Enable delay')).toBeChecked();
@@ -122,7 +119,7 @@ describe('ShowOptionsModal', () => {
     });
   });
 
-  it('updates cached episodes after a successful save', async () => {
+  it('updates cached episodes and show detail after a successful save', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
     const episodes: EpisodesResponse = [
@@ -132,9 +129,15 @@ describe('ShowOptionsModal', () => {
         subscription: { delay_days: 0, snoozed_until: null },
       },
     ];
+    const showDetail: ShowEpisodesResponse = {
+      tvshow: baseShow,
+      subscription: { delay_days: 0, snoozed_until: null },
+      episodes: [],
+    };
     queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getShowEpisodes, baseShow.id], showDetail);
 
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={() => {}} />, { queryClient });
+    renderWithProviders(<ShowOptionsForm show={baseShow} />, { queryClient });
 
     await user.click(screen.getByLabelText('Enable delay'));
     await user.click(screen.getByRole('button', { name: '7 days' }));
@@ -143,27 +146,20 @@ describe('ShowOptionsModal', () => {
     await waitFor(() => {
       const cached = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
       expect(cached?.[0]?.subscription.delay_days).toBe(14);
+      const detail = queryClient.getQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, baseShow.id]);
+      expect(detail?.subscription.delay_days).toBe(14);
     });
   });
 
   it('shows an error when saving fails', async () => {
     stubFetch(mockFetchResponse({ message: 'Forbidden' }, { ok: false, status: 403 }));
     const user = userEvent.setup();
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={() => {}} />);
+    renderWithProviders(<ShowOptionsForm show={baseShow} />);
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Forbidden' }));
     });
-  });
-
-  it('closes when cancel is clicked', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    renderWithProviders(<ShowOptionsModal show={baseShow} opened onClose={onClose} />);
-
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(onClose).toHaveBeenCalled();
   });
 });

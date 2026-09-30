@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes, routes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
@@ -176,7 +176,7 @@ describe('EpisodeCard', () => {
     });
   });
 
-  it('opens show settings from a snoozed episode card', async () => {
+  it('links to show settings from a snoozed episode card', () => {
     const snoozedEpisode: ParsedEpisode = {
       ...parsedEpisode,
       episodes: {
@@ -187,11 +187,7 @@ describe('EpisodeCard', () => {
       subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
     };
 
-    const user = userEvent.setup();
     renderWithProviders(<EpisodeCard episode={snoozedEpisode} variant="snoozed" />);
-    await user.click(screen.getByLabelText('Show settings'));
-
-    expect(screen.getByText('Release delay')).toBeInTheDocument();
-    expect(screen.getByText('Snooze')).toBeInTheDocument();
+    expect(screen.getByLabelText('Show settings')).toHaveAttribute('href', routes.showById(parsedEpisode.tvshows.id));
   });
 });

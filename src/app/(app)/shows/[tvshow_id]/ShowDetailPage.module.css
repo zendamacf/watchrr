@@ -1,0 +1,19 @@
+.season {
+  overflow: hidden;
+}
+
+.seasonHeader {
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+}
+
+.seasonEpisodes {
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md) var(--mantine-spacing-md);
+}
+
+.episodeRow:nth-child(even) {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+  border-radius: var(--mantine-radius-sm);
+  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+}

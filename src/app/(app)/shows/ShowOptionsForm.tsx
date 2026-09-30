@@ -2,16 +2,16 @@
 
 import {
   Button,
-  Divider,
   Group,
-  Modal,
-  type ModalProps,
   NumberInput,
+  Paper,
   SegmentedControl,
+  SimpleGrid,
   Stack,
   Switch,
   Text,
   TextInput,
+  Title,
 } from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
@@ -20,12 +20,13 @@ import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
-import type { EpisodesResponse, ShowSubscription, SubscribedShow } from '@/types';
+import type { EpisodesResponse, ShowEpisodesResponse, ShowSubscription, SubscribedShow } from '@/types';
 import { DELAY_UI_COLOR, MAX_DELAY_DAYS, SNOOZE_UI_COLOR } from '@/utils/episode-schedule';
+import classes from './ShowOptionsForm.module.css';
 
 type Props = {
   show: SubscribedShow;
-} & ModalProps;
+};
 
 const DELAY_PRESETS = [7, 14, 21] as const;
 type SnoozePreset = '1w' | '2w' | '1m' | 'custom';
@@ -55,7 +56,7 @@ function detectSnoozePreset(snoozedUntil: string | null): SnoozePreset {
   return 'custom';
 }
 
-export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => {
+export const ShowOptionsForm = ({ show }: Props) => {
   const { showError, showSuccess } = useAlert();
   const queryClient = useQueryClient();
 
@@ -66,13 +67,12 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
   const [customSnoozeDate, setCustomSnoozeDate] = useState(show.snoozed_until ?? snoozeDateForPreset('1w'));
 
   useEffect(() => {
-    if (!opened) return;
     setDelayEnabled(show.delay_days > 0);
     setDelayDays(show.delay_days);
     setSnoozeEnabled(!!show.snoozed_until);
     setSnoozePreset(detectSnoozePreset(show.snoozed_until));
     setCustomSnoozeDate(show.snoozed_until ?? snoozeDateForPreset('1w'));
-  }, [opened, show]);
+  }, [show.delay_days, show.snoozed_until]);
 
   const { mutate, isPending } = useMutation<ShowSubscription, Error, ShowSubscription>({
     mutationFn: async (preferences) => {
@@ -93,9 +93,11 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
       queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
         old?.map((row) => (row.tvshows.id === show.id ? { ...row, subscription: preferences } : row)),
       );
+      queryClient.setQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, show.id], (old) =>
+        old ? { ...old, subscription: preferences } : old,
+      );
       queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
       queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
-      onClose();
     },
     onError: (error) => showError({ title: 'An error occurred', message: error.message }),
   });
@@ -113,92 +115,90 @@ export const ShowOptionsModal = ({ show, opened, onClose, ...props }: Props) => 
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title={show.name} centered {...props}>
+    <Paper withBorder p="md" radius="md">
       <Stack gap="lg">
-        <Stack gap="sm">
-          <Text fw={600}>Release delay</Text>
-          <Text size="sm" c="dimmed">
-            Wait a number of days after the listed air date before episodes appear on your schedule.
-          </Text>
-          <Switch
-            label="Enable delay"
-            color={DELAY_UI_COLOR}
-            checked={delayEnabled}
-            onChange={(event) => setDelayEnabled(event.currentTarget.checked)}
-          />
-          {delayEnabled && (
-            <Stack gap="xs">
-              <NumberInput
-                label="Days"
-                value={delayDays}
-                onChange={(value) => setDelayDays(typeof value === 'number' ? value : 0)}
-                min={0}
-                max={MAX_DELAY_DAYS}
-              />
-              <Group gap="xs">
-                {DELAY_PRESETS.map((preset) => (
-                  <Button
-                    key={preset}
-                    variant="light"
-                    color={DELAY_UI_COLOR}
-                    size="xs"
-                    onClick={() => setDelayDays(preset)}
-                  >
-                    {preset} days
-                  </Button>
-                ))}
-              </Group>
-            </Stack>
-          )}
-        </Stack>
-
-        <Divider />
-
-        <Stack gap="sm">
-          <Text fw={600}>Snooze</Text>
-          <Text size="sm" c="dimmed">
-            Hide all unwatched episodes until a date.
-          </Text>
-          <Switch
-            label="Snooze this show"
-            color={SNOOZE_UI_COLOR}
-            checked={snoozeEnabled}
-            onChange={(event) => setSnoozeEnabled(event.currentTarget.checked)}
-          />
-          {snoozeEnabled && (
-            <Stack gap="xs">
-              <SegmentedControl
-                color={SNOOZE_UI_COLOR}
-                value={snoozePreset}
-                onChange={(value) => setSnoozePreset(value as SnoozePreset)}
-                data={[
-                  { label: '1 week', value: '1w' },
-                  { label: '2 weeks', value: '2w' },
-                  { label: '1 month', value: '1m' },
-                  { label: 'Custom', value: 'custom' },
-                ]}
-              />
-              {snoozePreset === 'custom' && (
-                <TextInput
-                  label="Snooze until"
-                  type="date"
-                  value={customSnoozeDate}
-                  onChange={(event) => setCustomSnoozeDate(event.currentTarget.value)}
-                />
-              )}
-            </Stack>
-          )}
-        </Stack>
-
-        <Group justify="flex-end">
-          <Button variant="default" onClick={onClose}>
-            Cancel
-          </Button>
+        <Group justify="space-between" align="center" wrap="nowrap">
+          <Title order={3}>Settings</Title>
           <Button loading={isPending} onClick={handleSave}>
             Save
           </Button>
         </Group>
+
+        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+          <Stack gap="sm" className={classes.settingsSectionDelay}>
+            <Text fw={600}>Release delay</Text>
+            <Text size="sm" c="dimmed">
+              Wait a number of days after the listed air date before episodes appear on your schedule.
+            </Text>
+            <Switch
+              label="Enable delay"
+              color={DELAY_UI_COLOR}
+              checked={delayEnabled}
+              onChange={(event) => setDelayEnabled(event.currentTarget.checked)}
+            />
+            {delayEnabled && (
+              <Stack gap="xs">
+                <NumberInput
+                  label="Days"
+                  value={delayDays}
+                  onChange={(value) => setDelayDays(typeof value === 'number' ? value : 0)}
+                  min={0}
+                  max={MAX_DELAY_DAYS}
+                />
+                <Group gap="xs">
+                  {DELAY_PRESETS.map((preset) => (
+                    <Button
+                      key={preset}
+                      variant="light"
+                      color={DELAY_UI_COLOR}
+                      size="xs"
+                      onClick={() => setDelayDays(preset)}
+                    >
+                      {preset} days
+                    </Button>
+                  ))}
+                </Group>
+              </Stack>
+            )}
+          </Stack>
+
+          <Stack gap="sm" className={classes.settingsSectionSnooze}>
+            <Text fw={600}>Snooze</Text>
+            <Text size="sm" c="dimmed">
+              Hide all unwatched episodes until a date.
+            </Text>
+            <Switch
+              label="Snooze this show"
+              color={SNOOZE_UI_COLOR}
+              checked={snoozeEnabled}
+              onChange={(event) => setSnoozeEnabled(event.currentTarget.checked)}
+            />
+            {snoozeEnabled && (
+              <Stack gap="xs">
+                <SegmentedControl
+                  color={SNOOZE_UI_COLOR}
+                  value={snoozePreset}
+                  onChange={(value) => setSnoozePreset(value as SnoozePreset)}
+                  data={[
+                    { label: '1 week', value: '1w' },
+                    { label: '2 weeks', value: '2w' },
+                    { label: '1 month', value: '1m' },
+                    { label: 'Custom', value: 'custom' },
+                  ]}
+                />
+                {snoozePreset === 'custom' && (
+                  <TextInput
+                    label="Snooze until"
+                    type="date"
+                    value={customSnoozeDate}
+                    onChange={(event) => setCustomSnoozeDate(event.currentTarget.value)}
+                  />
+                )}
+              </Stack>
+            )}
+          </Stack>
+        </SimpleGrid>
       </Stack>
-    </Modal>
+    </Paper>
   );
 };

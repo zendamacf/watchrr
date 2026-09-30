@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes, routes } from '@/lib/routes';
 import { mockFetchResponse, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
@@ -56,13 +56,9 @@ describe('ShowCard', () => {
     stubFetch(mockFetchResponse({ message: 'Success' }));
   });
 
-  it('opens show options when the settings action is clicked', async () => {
-    const user = userEvent.setup();
+  it('links to the show detail page', () => {
     renderWithProviders(<ShowCard show={show} />);
-
-    await user.click(screen.getByLabelText('Show settings'));
-    expect(screen.getByText('Release delay')).toBeInTheDocument();
-    expect(screen.getByText('Snooze')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View show/ })).toHaveAttribute('href', routes.showById(show.id));
   });
 
   it('calls refresh when the refresh action is clicked', async () => {

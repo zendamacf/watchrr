@@ -1,0 +1,17 @@
+.settingsSectionDelay {
+  padding-bottom: var(--mantine-spacing-lg);
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+@media (min-width: 62em) {
+  .settingsSectionDelay {
+    padding-bottom: 0;
+    border-bottom: none;
+    padding-right: var(--mantine-spacing-lg);
+    border-right: 1px solid var(--mantine-color-default-border);
+  }
+
+  .settingsSectionSnooze {
+    padding-left: var(--mantine-spacing-lg);
+  }
+}
