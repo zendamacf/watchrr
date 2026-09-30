@@ -8,6 +8,7 @@ export const testShow: Show = {
   poster_slug: '/poster.jpg',
   backdrop_slug: '/backdrop.jpg',
   description: 'A test show',
+  status: 'Returning Series',
   metadata_refreshed_at: null,
 };
 
@@ -19,4 +20,5 @@ export const testTmdbTvShow = {
   firstAirDate: '2011-04-17T00:00:00.000Z',
   poster: '/poster.jpg',
   backdrop: '/backdrop.jpg',
+  status: 'Returning Series',
 };

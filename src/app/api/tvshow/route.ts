@@ -21,6 +21,7 @@ export async function GET() {
       poster_slug: tvshows.poster_slug,
       backdrop_slug: tvshows.backdrop_slug,
       description: tvshows.description,
+      status: tvshows.status,
       delay_days: subscribed_tvshows.delay_days,
       snoozed_until: subscribed_tvshows.snoozed_until,
     })
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
         description: found.description,
+        status: found.status,
       })
       .onConflictDoNothing({ target: tvshows.moviedb_id })
       .returning();

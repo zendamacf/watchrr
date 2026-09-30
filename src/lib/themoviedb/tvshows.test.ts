@@ -79,6 +79,7 @@ describe('themoviedb tvshows', () => {
       first_air_date: '2011-04-17',
       poster_path: '/poster.jpg',
       backdrop_path: '/backdrop.jpg',
+      status: 'Ended',
     });
 
     const show = await getTvShow(1399);
@@ -89,6 +90,7 @@ describe('themoviedb tvshows', () => {
       country: 'US',
       poster: '/poster.jpg',
       backdrop: '/backdrop.jpg',
+      status: 'Ended',
     });
     expect(DateTime.fromISO(show.firstAirDate).toISODate()).toBe('2011-04-17');
   });
@@ -131,7 +133,6 @@ describe('themoviedb tvshows', () => {
       name: 'Winter Is Coming',
       description: 'Pilot',
       backdrop: '/still.jpg',
-      moviedb_id: 63056,
     });
     expect(DateTime.fromISO(episodes[0]?.airdate ?? '').toISODate()).toBe('2011-04-17');
     expect(mockTvSeasonDetails).toHaveBeenCalledWith({

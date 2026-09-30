@@ -28,6 +28,7 @@ import type { EpisodesResponse, ShowEpisode, ShowEpisodesResponse, SubscribedSho
 import { DateFormat } from '@/utils/dates';
 import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
 import { formatEpisodeNumber } from '@/utils/formatEpisodeNumber';
+import { formatTvShowStatusLabel, tvShowStatusBadgeColor } from '@/utils/tvshowStatus';
 import { groupEpisodesBySeason } from '../groupEpisodesBySeason';
 import { ShowOptionsForm } from '../ShowOptionsForm';
 import classes from './ShowDetailPage.module.css';
@@ -214,6 +215,11 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
             </Text>
           )}
           <Group gap="xs">
+            {data.tvshow.status ? (
+              <Badge color={tvShowStatusBadgeColor(data.tvshow.status)} variant="light">
+                {formatTvShowStatusLabel(data.tvshow.status)}
+              </Badge>
+            ) : null}
             <Badge color="blue" variant="outline">
               {data.tvshow.country}
             </Badge>
