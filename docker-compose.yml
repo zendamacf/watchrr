@@ -53,8 +53,9 @@ services:
       CRON_SECRET: ${CRON_SECRET}
     volumes:
       - ./docker/cron-refresh.sh:/usr/local/bin/cron-refresh.sh:ro
-      - ./docker/crontab:/etc/crontabs/root:ro
-    entrypoint: ['/bin/sh', '-c', 'crond -f -l 2']
+      - ./docker/crontab:/etc/cron.schedule:ro
+      - ./docker/cron-entrypoint.sh:/usr/local/bin/cron-entrypoint.sh:ro
+    entrypoint: ['/bin/sh', '/usr/local/bin/cron-entrypoint.sh']
     restart: unless-stopped
 
 volumes:
