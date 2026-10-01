@@ -1,5 +1,44 @@
 # watchrr
 
+## 3.1.0
+
+### Minor Changes
+
+- 1566384: Self-hosted installs can turn off new account registration with `ALLOW_SIGNUP=false`. People who already have accounts can still sign in; the signup page explains when registration is closed.
+- 3ed5497: API routes now apply per-IP rate limits (login, signup, search, cron, and general API traffic) with `429` responses and `Retry-After` headers.
+- 40dc6ed: Centralize session checks in Next.js middleware for app pages and protected API routes, reusing existing JWT cookie validation.
+- 91ed58a: Scheduled metadata refresh runs incrementally: only stale titles and shows with recent or upcoming episodes are refreshed (fixed thresholds in code).
+- e584ba4: Add show detail pages where you can review episodes by season, mark an entire season as watched in one action, and manage release delay and snooze settings.
+- 7a4d226: Add TV show lifecycle status to detail page, and filter the shows list by status.
+
+### Patch Changes
+
+- 03d7c0b: Shared UI components are now included in test coverage reports, so the numbers better reflect real app quality.
+- 8441194: Database indexes were added for common episode and subscription lookups so lists and sync jobs stay snappy as your library grows.
+- 1176ca4: Updated brace-expansion from 5.0.9 to 5.0.12 (version-update:semver-patch).
+- 546bbb4: Updated @sentry/nextjs, lucide-react (version-update:semver-minor).
+- 335acc1: Updated @tanstack/react-query (version-update:semver-patch).
+- 303c475: Updated lucide-react, @changesets/cli (version-update:semver-minor).
+- e4b2074: Updated lucide-react, @biomejs/biome, @testing-library/user-event (version-update:semver-minor).
+- 8f4a4c1: Updated @tanstack/react-query, jose, @biomejs/biome, @testing-library/user-event, @types/luxon, happy-dom (version-update:semver-minor).
+- 335acc1: Updated @tanstack/react-query (version-update:semver-patch).
+- d2c030d: Updated @sentry/nextjs, @tanstack/react-query, lucide-react, @biomejs/biome, @testing-library/react, @types/node, happy-dom, lint-staged (version-update:semver-minor).
+- daa0db0: Updated @sentry/nextjs, @tanstack/react-query, lucide-react, @types/node, @types/react-dom (version-update:semver-minor).
+- 9884810: Updated fast-uri from 3.1.7 to 3.1.8 (version-update:semver-patch).
+- ff571d0: Updated @mantine/core, @mantine/hooks, @mantine/modals, @mantine/notifications (version-update:semver-patch).
+- ff571d0: Updated @mantine/core, @mantine/hooks, @mantine/modals, @mantine/notifications (version-update:semver-minor).
+- 2048c0b: Updated next from 16.3.4 to 16.3.8 (version-update:semver-patch).
+- 38514ed: Documentation now covers Node 26 prerequisites, accurate CI workflow names, self-host backups and HTTPS, and a clearer env variable reference.
+- 1566384: You can only mark an episode as watched if you follow that TV show. This matches how movies already work and stops watch state from drifting away from your subscriptions.
+- 2efff54: Bumps expected PostgreSQL version from 16 to 18.
+- 11aca71: Fixed GitHub Actions publish workflow not running for GH Actions-created version tags.
+- 03d7c0b: Automated tests now exercise movie and TV show refresh flows end to end (with the movie database mocked), so metadata and episode sync regressions are easier to catch.
+- 8441194: Production error monitoring now samples performance traces by default instead of recording every request, which reduces overhead while keeping error reporting the same. Operators can adjust sampling with `SENTRY_TRACES_SAMPLE_RATE` if needed.
+- dbc2f45: Add unwatch button to episodes on show detail page.
+- b1ddb01: Scheduled refresh and metadata sync now write structured JSON logs (with timing and IDs) so Docker and log tools are easier to search.
+- 8a691b0: Optional Umami analytics for production deployments.
+- 3ed7606: Fixed cron refresh job failing.
+
 ## 3.0.0
 
 ### Major Changes
