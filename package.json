@@ -37,7 +37,7 @@
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.12",
     "lodash.chunk": "^4.2.0",
-    "lucide-react": "^1.45.0",
+    "lucide-react": "^1.46.0",
     "luxon": "^3.7.2",
     "next": "16.3.8",
     "postgres": "^3.4.9",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.13",
-    "@changesets/cli": "^3.0.2",
+    "@changesets/cli": "^3.0.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
