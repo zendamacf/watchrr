@@ -28,8 +28,8 @@
     "@mantine/hooks": "^9.6.1",
     "@mantine/modals": "^9.6.1",
     "@mantine/notifications": "^9.6.1",
-    "@sentry/nextjs": "^10.74.0",
-    "@tanstack/react-query": "^5.102.8",
+    "@sentry/nextjs": "^10.75.0",
+    "@tanstack/react-query": "^5.103.1",
     "bcrypt": "^6.0.0",
     "classnames": "^2.5.1",
     "countries-and-timezones": "^3.10.0",
@@ -46,7 +46,7 @@
     "tmdb-ts": "^2.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.13",
+    "@biomejs/biome": "^2.5.14",
     "@changesets/cli": "^3.0.3",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
