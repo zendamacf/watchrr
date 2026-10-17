@@ -64,8 +64,22 @@ describe('themoviedb movies', () => {
       poster: '/poster.jpg',
       backdrop: '/backdrop.jpg',
     });
-    expect(DateTime.fromISO(movie.releasedate).toISODate()).toBe('1999-10-15');
+    expect(DateTime.fromISO(movie.releasedate!).toISODate()).toBe('1999-10-15');
     expect(mockMovieDetails).toHaveBeenCalledWith(550);
+  });
+
+  it('getMovie uses null releasedate when release_date is missing', async () => {
+    mockMovieDetails.mockResolvedValue({
+      id: 1486200,
+      title: 'Jack of Spades',
+      overview: 'Description',
+      poster_path: '/poster.jpg',
+      backdrop_path: '/backdrop.jpg',
+      release_date: null,
+    });
+
+    const movie = await getMovie(1486200);
+    expect(movie.releasedate).toBeNull();
   });
 
   it('getMovie uses null poster when poster_path is missing', async () => {

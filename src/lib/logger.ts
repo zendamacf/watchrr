@@ -10,6 +10,13 @@ function serializeError(error: unknown): LogFields {
       ...(error.cause instanceof Error ? { cause: error.cause.message } : {}),
     };
   }
+  if (typeof error === 'object' && error !== null) {
+    try {
+      return { error: JSON.stringify(error) };
+    } catch {
+      return { error: String(error) };
+    }
+  }
   return { error: String(error) };
 }
 

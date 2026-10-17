@@ -95,6 +95,37 @@ describe('GET /api/refresh', () => {
     );
   }, 30_000);
 
+  it('continues when individual refreshes fail', async () => {
+    const user = await seedUser({ email: 'vitest-cron-fail@example.com', password: seedPassword });
+    const { movies: seededMovies } = await seedSubscribedMovies({
+      watcherId: user.id,
+      movies: [
+        { moviedb_id: 996_001, name: 'Good Movie' },
+        { moviedb_id: 996_002, name: 'Bad Movie' },
+      ],
+      watched: false,
+    });
+
+    setRefreshDbRows({
+      movies: seededMovies.map((m) => ({ movie_id: m.id, name: m.name })),
+      shows: [],
+    });
+
+    mockRefreshMovie.mockImplementation(async (movieId: string) => {
+      if (movieId === seededMovies[1]?.id) {
+        throw new Error('tmdb unavailable');
+      }
+    });
+
+    const response = await GET(makeRequest(`Bearer ${CRON_SECRET}`));
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      message: 'Success',
+      refreshed: { movies: 2, shows: 0, movieFailures: 1, showFailures: 0 },
+    });
+    expect(mockRefreshMovie).toHaveBeenCalledTimes(2);
+  }, 30_000);
+
   it('refreshes unwatched movies in chunks of 30', async () => {
     const user = await seedUser({ email: 'vitest-cron-chunk@example.com', password: seedPassword });
     const { movies: seededMovies, movieIds: seededMovieIds } = await seedSubscribedMovies({

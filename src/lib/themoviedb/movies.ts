@@ -1,5 +1,5 @@
-import { DateTime } from 'luxon';
 import { tmdb } from './client';
+import { tmdbDateToIso } from './dates';
 
 export type TMDBMovie = {
   id: number;
@@ -7,7 +7,7 @@ export type TMDBMovie = {
   description: string;
   poster: string | null;
   backdrop: string | null;
-  releasedate: string;
+  releasedate: string | null;
 };
 
 /**
@@ -23,7 +23,7 @@ export const search = async (query: string): Promise<TMDBMovie[]> => {
     description: d.overview,
     poster: d.poster_path,
     backdrop: d.backdrop_path,
-    releasedate: DateTime.fromJSDate(new Date(d.release_date)).toISO()!,
+    releasedate: tmdbDateToIso(d.release_date),
   }));
 };
 
@@ -40,6 +40,6 @@ export const getMovie = async (moviedb_id: number): Promise<TMDBMovie> => {
     description: data.overview,
     poster: data.poster_path ?? null,
     backdrop: data.backdrop_path,
-    releasedate: DateTime.fromJSDate(new Date(data.release_date)).toISO()!,
+    releasedate: tmdbDateToIso(data.release_date),
   };
 };

@@ -46,6 +46,12 @@ describe('logger', () => {
     expect(payload.error).toBe('timeout');
   });
 
+  it('JSON-serializes plain object failures', () => {
+    logger.error('show refresh failed', { success: false, status_code: 34 });
+    const payload = JSON.parse(String((console.error as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]));
+    expect(payload.error).toBe(JSON.stringify({ success: false, status_code: 34 }));
+  });
+
   it('includes error cause when present', () => {
     const err = new Error('wrapped');
     err.cause = new Error('root');

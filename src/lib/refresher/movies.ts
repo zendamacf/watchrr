@@ -11,7 +11,7 @@ import { db } from '../db';
 import { movies } from '../db/schema';
 import { getMovie, type TMDBMovie } from '../themoviedb/movies';
 import { ResourceNotFound } from './errors';
-import { type DiffLookup, dateCompare, getDiff, isoToSqlDate } from './utils';
+import { type DiffLookup, getDiff, isoToSqlDate, optionalDateCompare } from './utils';
 
 export const refreshMovie = async (movieId: string) => {
   const started = Date.now();
@@ -32,7 +32,7 @@ export const refreshMovie = async (movieId: string) => {
       { dbKey: 'description', apiKey: 'description' },
       { dbKey: 'poster_slug', apiKey: 'poster' },
       { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
-      { dbKey: 'releasedate', apiKey: 'releasedate', compare: dateCompare },
+      { dbKey: 'releasedate', apiKey: 'releasedate', compare: optionalDateCompare },
     ];
 
     const diffs = getDiff(dbMovie, apiMovie, movieLookup);
@@ -48,7 +48,7 @@ export const refreshMovie = async (movieId: string) => {
         .set({
           name: apiMovie.name,
           description: apiMovie.description,
-          releasedate: isoToSqlDate(apiMovie.releasedate),
+          ...(apiMovie.releasedate != null ? { releasedate: isoToSqlDate(apiMovie.releasedate) } : {}),
           poster_slug: apiMovie.poster,
           backdrop_slug: apiMovie.backdrop,
         })

@@ -18,7 +18,7 @@ function tmdbMovie(
     description: string;
     poster: string | null;
     backdrop: string | null;
-    releasedate: string;
+    releasedate: string | null;
   }> = {},
 ) {
   return {
@@ -115,6 +115,32 @@ describe('refreshMovie', () => {
     expect(mockGetMovie).toHaveBeenCalledTimes(2);
     const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
     expect(after?.name).toBe('Stable Movie');
+  });
+
+  it('refreshes other metadata when TMDB has no release date', async () => {
+    const movie = await seedMovie({
+      moviedb_id: 1486200,
+      name: 'Stale Title',
+      description: 'Stale description',
+      releasedate: '2020-06-01',
+    });
+    mockGetMovie.mockResolvedValue(
+      tmdbMovie(1486200, {
+        name: 'Jack of Spades',
+        description: 'Fresh description',
+        releasedate: null,
+      }),
+    );
+
+    await refreshMovie(movie.id);
+
+    const [after] = await db.select().from(movies).where(eq(movies.id, movie.id));
+    expect(after).toMatchObject({
+      name: 'Jack of Spades',
+      description: 'Fresh description',
+      releasedate: '2020-06-01',
+    });
+    expect(after?.metadata_refreshed_at).toBeInstanceOf(Date);
   });
 
   it('rethrows when TMDB lookup fails', async () => {
