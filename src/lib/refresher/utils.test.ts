@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateCompare, getDiff, isoToSqlDate } from './utils';
+import { dateCompare, getDiff, isoToSqlDate, optionalDateCompare } from './utils';
 
 describe('getDiff', () => {
   it('returns empty when db and api values match with default compare', () => {
@@ -45,6 +45,12 @@ describe('isoToSqlDate', () => {
 
   it('throws for an invalid ISO string', () => {
     expect(() => isoToSqlDate('not-a-date')).toThrow('Invalid ISO date');
+  });
+});
+
+describe('optionalDateCompare', () => {
+  it('treats a missing API date as unchanged', () => {
+    expect(optionalDateCompare('2024-01-15', null)).toBe(true);
   });
 });
 

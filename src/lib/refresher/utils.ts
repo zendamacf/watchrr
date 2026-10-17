@@ -11,6 +11,12 @@ export const dateCompare = (a: unknown, b: unknown) =>
     .startOf('day')
     .diff(DateTime.fromISO(`${b}`).startOf('day'), 'days').days === 0;
 
+/** Treat a missing API date as unchanged so refresh can skip updating the DB column. */
+export const optionalDateCompare = (a: unknown, b: unknown) => {
+  if (b == null) return true;
+  return dateCompare(a, b);
+};
+
 export const isoToSqlDate = (iso: string): string => {
   const sqlDate = DateTime.fromISO(iso).toSQLDate();
   if (!sqlDate) {
