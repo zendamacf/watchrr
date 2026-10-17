@@ -1,5 +1,25 @@
 # watchrr
 
+## 3.1.1
+
+### Patch Changes
+
+- 06259b0: Scheduled library updates no longer stop when one movie or show cannot be refreshed—for example when release info is missing or a title is no longer on The Movie Database. The rest of your list still updates as usual.
+- cb8c587: Updated @sentry/nextjs, lucide-react, react, @types/react, react-dom, @types/react-dom, @biomejs/biome, @types/node, @types/react, @types/react-dom, happy-dom, lint-staged (version-update:semver-minor).
+- 56524b8: Updated lucide-react (version-update:semver-minor).
+- ab8404f: Updated lucide-react, @types/node (version-update:semver-minor).
+- cc3bddf: Updated @sentry/nextjs, @tanstack/react-query, @biomejs/biome, @types/node (version-update:semver-minor).
+- 7a985be: Updated lucide-react, @changesets/cli (version-update:semver-minor).
+- 88a4c61: Updated jose, lucide-react, @biomejs/biome, @changesets/cli, @types/react-dom, @vitest/coverage-v8, happy-dom, lint-staged, postcss, vitest (version-update:semver-major).
+- 7d90df5: Updated @types/node, @vitest/coverage-v8, vitest (version-update:semver-minor).
+- 9a508ef: Updated @testing-library/user-event, @types/node, happy-dom (version-update:semver-minor).
+- 56524b8: Updated lucide-react (version-update:semver-minor).
+- c7c0318: Updated @mantine/core, @mantine/hooks, @mantine/modals, @mantine/notifications (version-update:semver-patch).
+- 6aa0651: Updated postcss-selector-parser from 7.1.4 to 7.1.6 (version-update:semver-patch).
+- 04bf2dd: Updated sharp from 0.35.4 to 0.35.5 (version-update:semver-patch).
+- e752a9f: Updated shell-quote from 1.10.0 to 1.12.0 (version-update:semver-minor).
+- e719f4d: Updated source-map-js from 1.2.1 to 1.2.2 (version-update:semver-patch).
+
 ## 3.1.0
 
 ### Minor Changes
