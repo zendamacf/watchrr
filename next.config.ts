@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -17,7 +17,9 @@ export default isDockerBuild
       widenClientFileUpload: true,
       // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
       tunnelRoute: '/monitoring',
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      disableLogger: true,
-      automaticVercelMonitors: false,
+      webpack: {
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        treeshake: { removeDebugLogging: true },
+        automaticVercelMonitors: false,
+      },
     });
