@@ -20,6 +20,5 @@ export default isDockerBuild
       webpack: {
         // Automatically tree-shake Sentry logger statements to reduce bundle size
         treeshake: { removeDebugLogging: true },
-        automaticVercelMonitors: false,
       },
     });
