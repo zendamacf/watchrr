@@ -1,5 +1,22 @@
 # watchrr
 
+## 3.1.2
+
+### Patch Changes
+
+- b7a379a: Updated @tanstack/react-query, lucide-react, @types/node, @vitest/coverage-v8, lint-staged, vitest (version-update:semver-minor).
+- f8b74b0: Updated @types/luxon (version-update:semver-patch).
+- d4574b9, 25b967e, e41428f: Updated @sentry/nextjs (version-update:semver-major).
+- ca9b79b: Updated @sentry/nextjs, @types/node (version-update:semver-minor).
+- 0c15dea: Updated @sentry/nextjs, @tanstack/react-query, lucide-react (version-update:semver-minor).
+- ec9cbad: Updated @sentry/nextjs, @tanstack/react-query, drizzle-kit, drizzle-orm (version-update:semver-patch).
+- f04bc57: Updated lucide-react, @biomejs/biome, @vitest/coverage-v8, vitest (version-update:semver-minor).
+- acea0e7: Updated lucide-react, @types/node (version-update:semver-minor).
+- b4b4440: Updated happy-dom from 20.14.5 to 21.0.4 (version-update:semver-major).
+- 7266aae: Updated launch-editor from 2.14.1 to 2.14.2 (version-update:semver-patch).
+- 5ef9597, 55ea5bf: Updated @mantine/core, @mantine/hooks, @mantine/modals, @mantine/notifications (version-update:semver-patch).
+- 91dd22d, 9e9cff8: Updated vite from 8.3.0 to 8.3.5 (version-update:semver-patch).
+
 ## 3.1.1
 
 ### Patch Changes
