@@ -1,22 +1,34 @@
+/*
+ * The artwork shows at near full strength; a scrim keeps text readable on the
+ * brightest posters. Text colours are scoped to the card so it reads the same
+ * in light and dark mode.
+ */
 .root {
-  @mixin light {
-    /* Background image */
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), var(--image-url);
+  --mantine-color-text: #fff;
+  --mantine-color-dimmed: rgba(255, 255, 255, 0.74);
+  --mantine-color-anchor: var(--mantine-color-signal-3);
 
-    /* Fallback background color */
-    background-color: rgba(0, 0, 0, 0.65);
-  }
+  color: #fff;
+  border-color: transparent;
+  background:
+    linear-gradient(to bottom, rgba(14, 11, 22, 0.66), rgba(14, 11, 22, 0.9)),
+    var(--image-url);
 
-  @mixin dark {
-    /* Background image */
-    background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), var(--image-url);
-
-    /* Fallback background color */
-    background-color: rgba(0, 0, 0, 0.65);
-  }
-
+  /* Fallback when a show has no backdrop */
+  background-color: var(--mantine-color-dark-6);
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: center 20%;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: 0 10px 30px -8px alpha(var(--mantine-color-signal-5), 0.55);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 }

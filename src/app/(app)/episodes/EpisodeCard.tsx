@@ -138,13 +138,14 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
                 component={Link}
                 href={routes.showById(episode.tvshows.id)}
                 aria-label="Show settings"
-                variant="outline"
+                variant="white"
+                color="gray"
               >
                 <Settings size={'20'} />
               </ActionIcon>
               <ActionIcon
                 aria-label="Wake show"
-                variant="outline"
+                variant="white"
                 color="orange"
                 loading={wakePending}
                 onClick={() => wakeShow()}
@@ -156,8 +157,8 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
           <CopyButton value={`${episode.tvshows.name} ${episodeNumber}`} timeout={2000}>
             {({ copied, copy }) => (
               <ActionIcon
-                variant={'outline'}
-                color={copied ? 'blue' : 'gray'}
+                variant={'white'}
+                color={copied ? 'afterglow' : 'gray'}
                 onClick={() => {
                   copy();
                   showInfo({ message: 'Copied', icon: <ClipboardCheck /> });
