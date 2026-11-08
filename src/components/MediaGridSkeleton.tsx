@@ -53,7 +53,7 @@ const EpisodeCardSkeleton = () => (
 
 /** Show and movie lists. */
 export const MediaGridSkeleton = ({ count = 6 }: { count?: number }) => (
-  <MediaGrid data-testid="media-skeleton" aria-busy aria-label="Loading">
+  <MediaGrid data-testid="media-skeleton" role="status" aria-busy aria-label="Loading">
     {range(count).map((i) => (
       <PosterCardSkeleton key={i} />
     ))}
@@ -62,7 +62,7 @@ export const MediaGridSkeleton = ({ count = 6 }: { count?: number }) => (
 
 /** Episode list: a day header followed by a grid of episode cards. */
 export const EpisodeGridSkeleton = ({ count = 6 }: { count?: number }) => (
-  <Stack gap="sm" data-testid="media-skeleton" aria-busy aria-label="Loading">
+  <Stack gap="sm" data-testid="media-skeleton" role="status" aria-busy aria-label="Loading">
     <Skeleton height={31} width={240} />
     <MediaGrid>
       {range(count).map((i) => (

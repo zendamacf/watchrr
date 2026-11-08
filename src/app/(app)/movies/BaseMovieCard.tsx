@@ -1,6 +1,6 @@
 'use client';
 
-import { type CardProps, Group, Popover, PopoverDropdown, PopoverTarget, Stack, Text, Title } from '@mantine/core';
+import { type CardProps, Group, Popover, PopoverDropdown, PopoverTarget, Text, Title } from '@mantine/core';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { MediaCard } from '@/components/MediaCard';

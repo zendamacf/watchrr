@@ -103,7 +103,7 @@ export const BaseShowCard = ({ show, subscription, titleHref, actions, ...props 
           </Text>
         </PopoverTarget>
         <PopoverDropdown>
-          <Text c="var(--mantine-color-text)">{show.description}</Text>
+          <Text>{show.description}</Text>
         </PopoverDropdown>
       </Popover>
     </MediaCard>

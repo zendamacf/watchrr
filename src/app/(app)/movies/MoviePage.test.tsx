@@ -35,6 +35,13 @@ describe('MoviePage', () => {
     expect(screen.queryByTestId('media-skeleton')).toBeTruthy();
   });
 
+  it('shows an empty state with an add action when there are no movies', async () => {
+    stubFetch(mockPagedResponse([]));
+    renderWithProviders(<MoviePage />);
+    expect(await screen.findByText('No movies yet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add a movie' })).toBeInTheDocument();
+  });
+
   it('shows an error when the movies request fails', async () => {
     stubFetch(mockFetchResponse({ message: 'fail' }, { ok: false, status: 500 }));
     renderWithProviders(<MoviePage />);

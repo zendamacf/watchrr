@@ -45,6 +45,12 @@ describe('EpisodeList', () => {
     expect(screen.queryByTestId('media-skeleton')).toBeTruthy();
   });
 
+  it('shows an all-caught-up state when there are no episodes', async () => {
+    stubFetch(mockPagedResponse([]));
+    renderWithProviders(<EpisodeList />);
+    expect(await screen.findByText("You're all caught up")).toBeInTheDocument();
+  });
+
   it('shows an error when the episodes request fails', async () => {
     stubFetch(mockFetchResponse({ message: 'fail' }, { ok: false, status: 500 }));
     renderWithProviders(<EpisodeList />);

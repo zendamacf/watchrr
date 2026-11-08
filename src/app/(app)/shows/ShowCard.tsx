@@ -66,7 +66,8 @@ export const ShowCard = ({ show }: Props) => {
         <>
           <ActionIcon
             aria-label="Refresh metadata"
-            color={'blue'}
+            variant="white"
+            color={'gray'}
             loading={refreshPending}
             onClick={() => refresh({ tvshowId: show.id, name: show.name })}
           >
@@ -74,6 +75,7 @@ export const ShowCard = ({ show }: Props) => {
           </ActionIcon>
           <ActionIcon
             aria-label="Unsubscribe"
+            variant="white"
             color={'red'}
             loading={removePending}
             onClick={() => confirmUnsubscribe(show.id)}

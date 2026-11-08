@@ -19,9 +19,7 @@
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center 20%;
-  transition:
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+  transition: box-shadow 0.2s ease;
 
   &:hover,
   &:focus-within {
