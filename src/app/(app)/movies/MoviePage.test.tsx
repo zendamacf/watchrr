@@ -29,10 +29,10 @@ describe('MoviePage', () => {
     vi.clearAllMocks();
   });
 
-  it('shows a loader while movies are loading', () => {
+  it('shows skeleton cards while movies are loading', () => {
     stubFetch(() => new Promise<Response>(() => {}));
-    const { container } = renderWithProviders(<MoviePage />);
-    expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
+    renderWithProviders(<MoviePage />);
+    expect(screen.queryByTestId('media-skeleton')).toBeTruthy();
   });
 
   it('shows an error when the movies request fails', async () => {

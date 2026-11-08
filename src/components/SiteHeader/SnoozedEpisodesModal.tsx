@@ -86,6 +86,11 @@ export const SnoozedEpisodesModal = ({ opened, onClose }: Props) => {
   return (
     <Modal opened={opened} onClose={onClose} title={title} size="md">
       <ScrollArea.Autosize mah="60vh" type="auto">
+        {!episodes.length && (
+          <Text c="dimmed" ta="center" py="lg">
+            Nothing is snoozed. Snooze a show from its page to pause its episodes.
+          </Text>
+        )}
         <Stack gap="sm">
           {episodes.map((episode, index) => (
             <Fragment key={episode.episodes.id}>

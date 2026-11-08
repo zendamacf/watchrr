@@ -39,10 +39,10 @@ describe('EpisodeList', () => {
     vi.clearAllMocks();
   });
 
-  it('shows a loader while episodes are loading', () => {
+  it('shows skeleton cards while episodes are loading', () => {
     stubFetch(() => new Promise<Response>(() => {}));
-    const { container } = renderWithProviders(<EpisodeList />);
-    expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
+    renderWithProviders(<EpisodeList />);
+    expect(screen.queryByTestId('media-skeleton')).toBeTruthy();
   });
 
   it('shows an error when the episodes request fails', async () => {

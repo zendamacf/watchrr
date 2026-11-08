@@ -158,6 +158,7 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
             {({ copied, copy }) => (
               <ActionIcon
                 variant={'white'}
+                aria-label={`Copy ${episode.tvshows.name} ${episodeNumber}`}
                 color={copied ? 'afterglow' : 'gray'}
                 onClick={() => {
                   copy();
@@ -168,7 +169,11 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
               </ActionIcon>
             )}
           </CopyButton>
-          <ActionIcon loading={isPending} onClick={() => mutate(episode.episodes.id)}>
+          <ActionIcon
+            aria-label={`Mark ${episode.tvshows.name} ${episodeNumber} as watched`}
+            loading={isPending}
+            onClick={() => mutate(episode.episodes.id)}
+          >
             <Check size={'20'} />
           </ActionIcon>
         </Group>

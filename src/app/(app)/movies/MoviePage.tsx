@@ -1,12 +1,14 @@
 'use client';
 
-import { Alert, Center, Loader, Space, TextInput } from '@mantine/core';
+import { Alert, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Film, Search } from 'lucide-react';
 import { useMemo } from 'react';
+import { EmptyState } from '@/components/EmptyState';
 import { FloatingButton } from '@/components/FloatingButton';
 import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
+import { MediaGridSkeleton } from '@/components/MediaGridSkeleton';
 import { QueryKey } from '@/components/QueryProvider';
 import { flattenPages, pagedQueryOptions } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
@@ -27,14 +29,6 @@ export const MoviePage = () => {
 
   const movies = useMemo(() => flattenPages(data, (movie) => movie.id), [data]);
 
-  if (isLoading)
-    return (
-      <Center>
-        <Loader />
-      </Center>
-    );
-  if (isError) return <Alert color={'red'}>An error occurred</Alert>;
-
   return (
     <>
       <AddMovieModal opened={opened} onClose={close} size={'xl'} />
@@ -45,13 +39,36 @@ export const MoviePage = () => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
-      <MovieList movies={movies} />
-      <InfiniteScrollSentinel
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        loadedCount={movies.length}
-      />
+      {isLoading ? (
+        <MediaGridSkeleton />
+      ) : isError ? (
+        <Alert color={'red'}>An error occurred</Alert>
+      ) : (
+        <>
+          {movies.length ? (
+            <MovieList movies={movies} />
+          ) : search.trim() ? (
+            <EmptyState
+              icon={<Film size={40} aria-hidden />}
+              title="No movies match"
+              description="Try a different search."
+            />
+          ) : (
+            <EmptyState
+              icon={<Film size={40} aria-hidden />}
+              title="No movies yet"
+              description="Add a movie to keep track of when it's released."
+              action={{ label: 'Add a movie', onClick: open }}
+            />
+          )}
+          <InfiniteScrollSentinel
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            loadedCount={movies.length}
+          />
+        </>
+      )}
       <FloatingButton onClick={open} />
     </>
   );
