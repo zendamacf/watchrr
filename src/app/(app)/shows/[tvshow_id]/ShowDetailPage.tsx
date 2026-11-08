@@ -16,8 +16,9 @@ import {
 } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, Undo2 } from 'lucide-react';
+import { Check, ChevronLeft, Undo2 } from 'lucide-react';
 import { DateTime } from 'luxon';
+import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useShowEpisodesQuery } from '@/hooks/useShowEpisodes';
@@ -195,47 +196,52 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
   return (
     <Stack gap="xl">
       <Anchor href={routes.shows} size="sm">
-        Back to shows
+        <Group gap={4} wrap="nowrap" component="span">
+          <ChevronLeft size={16} aria-hidden />
+          Back to shows
+        </Group>
       </Anchor>
 
-      <Group align="flex-start" wrap="nowrap" gap="lg">
-        <Image
-          src={data.tvshow.poster_slug ? getImageUrl(data.tvshow.poster_slug) : undefined}
-          fallbackSrc="/placeholder.jpg"
-          alt={`Poster for ${data.tvshow.name}`}
-          w={120}
-          mah={180}
-          style={{ objectFit: 'contain' }}
-        />
-        <Stack gap="xs" flex={1}>
-          <Title order={2}>{data.tvshow.name}</Title>
-          {data.tvshow.description && (
-            <Text c="dimmed" size="sm">
-              {data.tvshow.description}
-            </Text>
-          )}
-          <Group gap="xs">
-            {data.tvshow.status ? (
-              <Badge color={tvShowStatusBadgeColor(data.tvshow.status)} variant="light">
-                {formatTvShowStatusLabel(data.tvshow.status)}
-              </Badge>
-            ) : null}
-            <Badge color="blue" variant="outline">
-              {data.tvshow.country}
-            </Badge>
-            {data.subscription.delay_days > 0 && (
-              <Badge color={DELAY_UI_COLOR} variant="outline">
-                {data.subscription.delay_days}d delay
-              </Badge>
+      <BackdropCard backdrop={data.tvshow.backdrop_slug} padding="lg">
+        <Group align="flex-start" wrap="nowrap" gap="lg">
+          <Image
+            src={data.tvshow.poster_slug ? getImageUrl(data.tvshow.poster_slug) : undefined}
+            fallbackSrc="/placeholder.jpg"
+            alt={`Poster for ${data.tvshow.name}`}
+            w={{ base: 100, sm: 140 }}
+            radius="md"
+            style={{ aspectRatio: '2 / 3', objectFit: 'cover', flex: '0 0 auto' }}
+          />
+          <Stack gap="xs" flex={1}>
+            <Title order={2}>{data.tvshow.name}</Title>
+            {data.tvshow.description && (
+              <Text c="dimmed" size="sm">
+                {data.tvshow.description}
+              </Text>
             )}
-            {snoozed && data.subscription.snoozed_until && (
-              <Badge color="orange" variant="outline">
-                Snoozed until {DateTime.fromSQL(data.subscription.snoozed_until).toFormat(DateFormat.DMY)}
+            <Group gap="xs">
+              {data.tvshow.status ? (
+                <Badge color={tvShowStatusBadgeColor(data.tvshow.status)} variant="filled">
+                  {formatTvShowStatusLabel(data.tvshow.status)}
+                </Badge>
+              ) : null}
+              <Badge color="gray" variant="filled">
+                {data.tvshow.country}
               </Badge>
-            )}
-          </Group>
-        </Stack>
-      </Group>
+              {data.subscription.delay_days > 0 && (
+                <Badge color={DELAY_UI_COLOR} variant="outline">
+                  {data.subscription.delay_days}d delay
+                </Badge>
+              )}
+              {snoozed && data.subscription.snoozed_until && (
+                <Badge color="orange" variant="outline">
+                  Snoozed until {DateTime.fromSQL(data.subscription.snoozed_until).toFormat(DateFormat.DMY)}
+                </Badge>
+              )}
+            </Group>
+          </Stack>
+        </Group>
+      </BackdropCard>
 
       <ShowOptionsForm show={subscribedShow} />
 
@@ -251,11 +257,11 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
             const unwatchedCount = episodes.filter((ep) => !ep.watched).length;
 
             return (
-              <Paper key={season} withBorder shadow="xs" radius="md" className={classes.season}>
+              <Paper key={season} withBorder className={classes.season}>
                 <Group justify="space-between" align="center" wrap="nowrap" className={classes.seasonHeader}>
                   <Group gap="sm" wrap="nowrap">
                     <Title order={4}>Season {season}</Title>
-                    <Badge variant="light" color={allWatched ? 'gray' : 'blue'} size="sm">
+                    <Badge variant="light" color={allWatched ? 'afterglow' : 'signal'} size="sm">
                       {allWatched ? 'All watched' : `${unwatchedCount} unwatched`}
                     </Badge>
                   </Group>
@@ -276,9 +282,12 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
                       wrap="nowrap"
                       className={`${classes.episodeRow}${episode.watched ? ` ${classes.episodeRowWatched}` : ''}`}
                     >
-                      <Text size="sm" c={episode.watched ? 'dimmed' : undefined}>
-                        {formatEpisodeNumber(episode.season, episode.episode)} — {episode.name}
-                      </Text>
+                      <Group gap="xs" wrap="nowrap">
+                        {episode.watched && <Check size={14} aria-hidden className={classes.watchedTick} />}
+                        <Text size="sm" c={episode.watched ? 'dimmed' : undefined}>
+                          {formatEpisodeNumber(episode.season, episode.episode)} — {episode.name}
+                        </Text>
+                      </Group>
                       {episode.watched ? (
                         <ActionIcon
                           className={classes.unwatchAction}

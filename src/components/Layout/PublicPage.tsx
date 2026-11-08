@@ -14,7 +14,7 @@ export function PublicPage({
 }) {
   return (
     <Container size={420} my={40}>
-      <Stack gap={80}>
+      <Stack gap="calc(var(--mantine-spacing-xl) * 2)">
         <Logo />
         <Title ta="center" className={classes.title}>
           {title}
@@ -23,7 +23,7 @@ export function PublicPage({
 
       <Text className={classes.subtitle}>{subtitle}</Text>
 
-      <Paper withBorder shadow="sm" p={22} mt={30} radius="md">
+      <Paper withBorder shadow="sm" p="lg" mt="xl">
         {children}
       </Paper>
     </Container>

@@ -116,7 +116,7 @@ export const ShowOptionsForm = ({ show }: Props) => {
   };
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md">
       <Stack gap="lg">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={3}>Settings</Title>
