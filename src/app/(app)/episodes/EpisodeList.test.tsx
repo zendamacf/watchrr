@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -134,7 +134,11 @@ describe('EpisodeList', () => {
   });
 
   it('groups past and future episodes and filters by search', async () => {
-    stubFetch(mockFetchResponse([pastEpisode, futureEpisode]));
+    stubFetch(async (input: RequestInfo | URL) => {
+      const search = new URL(String(input), 'http://localhost').searchParams.get('search');
+      const rows = [pastEpisode, futureEpisode];
+      return mockPagedResponse(search ? rows.filter((r) => r.tvshows.name.toLowerCase().includes(search)) : rows);
+    });
     const user = userEvent.setup();
     renderWithProviders(<EpisodeList />);
 

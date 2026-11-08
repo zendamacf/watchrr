@@ -5,9 +5,12 @@ import { ClockFading } from 'lucide-react';
 import { GroupedEpisodes, type GroupedEpisodesProps } from './GroupedEpisodes';
 import classes from './PastEpisodes.module.css';
 
-type Props = Omit<GroupedEpisodesProps, 'showDates'>;
+type Props = Omit<GroupedEpisodesProps, 'showDates'> & {
+  /** More past episodes may still be loading, so the count is a lower bound. */
+  hasMore?: boolean;
+};
 
-export const PastEpisodes = (props: Props) => {
+export const PastEpisodes = ({ hasMore, ...props }: Props) => {
   return (
     <Accordion
       classNames={{
@@ -18,7 +21,10 @@ export const PastEpisodes = (props: Props) => {
       transitionDuration={500}
     >
       <AccordionItem value={'past-episodes'}>
-        <AccordionControl icon={<ClockFading />}>{props.episodes.length} Past Episodes</AccordionControl>
+        <AccordionControl icon={<ClockFading />}>
+          {props.episodes.length}
+          {hasMore ? '+' : ''} Past Episodes
+        </AccordionControl>
         <AccordionPanel>
           <GroupedEpisodes {...props} showDates />
         </AccordionPanel>

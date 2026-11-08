@@ -5,10 +5,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Fragment } from 'react';
+import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useSnoozedEpisodes } from '@/hooks/useEpisodes';
 import { apiFetch } from '@/lib/api/fetch';
+import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
@@ -18,7 +20,7 @@ type Props = Pick<ModalProps, 'opened' | 'onClose'>;
 
 type EpisodeRow = EpisodesResponse[number];
 
-type MutationContext = { previousEpisodes: EpisodesResponse | undefined };
+type MutationContext = { previousEpisodes: ReturnType<typeof snapshotPaged> };
 
 function SnoozedEpisodeRow({ episode }: { episode: EpisodeRow }) {
   const { showError, showSuccess } = useAlert();
@@ -32,9 +34,9 @@ function SnoozedEpisodeRow({ episode }: { episode: EpisodeRow }) {
     },
     onMutate: async (episodeId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
-      const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
-      queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.filter((row) => row.episodes.id !== episodeId),
+      const previousEpisodes = snapshotPaged(queryClient, QueryKey.getEpisodes);
+      updatePaged<EpisodeRow>(queryClient, QueryKey.getEpisodes, (rows) =>
+        rows.filter((row) => row.episodes.id !== episodeId),
       );
       showSuccess({
         title: 'Nice!',
@@ -45,7 +47,7 @@ function SnoozedEpisodeRow({ episode }: { episode: EpisodeRow }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] }),
     onError(error, _vars, context) {
       showError({ title: 'An error occurred', message: error.message });
-      queryClient.setQueryData([QueryKey.getEpisodes], context?.previousEpisodes);
+      restorePaged(queryClient, context?.previousEpisodes);
     },
   });
 
@@ -76,8 +78,8 @@ function SnoozedEpisodeRow({ episode }: { episode: EpisodeRow }) {
 }
 
 export const SnoozedEpisodesModal = ({ opened, onClose }: Props) => {
-  const { episodes } = useSnoozedEpisodes();
-  const title = episodes.length === 1 ? '1 snoozed episode' : `${episodes.length} snoozed episodes`;
+  const { episodes, total, hasNextPage, isFetchingNextPage, fetchNextPage } = useSnoozedEpisodes();
+  const title = total === 1 ? '1 snoozed episode' : `${total} snoozed episodes`;
 
   return (
     <Modal opened={opened} onClose={onClose} title={title} size="md">
@@ -90,6 +92,12 @@ export const SnoozedEpisodesModal = ({ opened, onClose }: Props) => {
             </Fragment>
           ))}
         </Stack>
+        <InfiniteScrollSentinel
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          fetchNextPage={fetchNextPage}
+          loadedCount={episodes.length}
+        />
       </ScrollArea.Autosize>
     </Modal>
   );

@@ -8,6 +8,7 @@ import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useRefreshShow } from '@/hooks/useRefresh';
 import { apiFetch } from '@/lib/api/fetch';
+import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes, routes } from '@/lib/routes';
 import type { ShowsResponse, SubscribedShow } from '@/types';
 import { BaseShowCard } from './BaseShowCard';
@@ -16,7 +17,7 @@ type Props = {
   show: SubscribedShow;
 };
 
-type MutationContext = { previousShows: ShowsResponse | undefined };
+type MutationContext = { previousShows: ReturnType<typeof snapshotPaged> };
 
 export const ShowCard = ({ show }: Props) => {
   const { showError, showSuccess } = useAlert();
@@ -31,15 +32,17 @@ export const ShowCard = ({ show }: Props) => {
     },
     onMutate: async (tvshowId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getShows] });
-      const previousShows = queryClient.getQueryData<ShowsResponse>([QueryKey.getShows]);
-      queryClient.setQueryData<ShowsResponse>([QueryKey.getShows], (old) => old?.filter((o) => o.id !== tvshowId));
+      const previousShows = snapshotPaged(queryClient, QueryKey.getShows);
+      updatePaged<ShowsResponse[number]>(queryClient, QueryKey.getShows, (rows) =>
+        rows.filter((o) => o.id !== tvshowId),
+      );
       showSuccess({ title: 'All done!', message: `You are no longer following ${show.name}` });
       return { previousShows };
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] }),
     onError: (error, _vars, context) => {
       showError({ title: 'An error occurred', message: error.message });
-      queryClient.setQueryData([QueryKey.getShows], context?.previousShows);
+      restorePaged(queryClient, context?.previousShows);
     },
   });
 

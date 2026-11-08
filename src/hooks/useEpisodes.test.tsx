@@ -1,6 +1,6 @@
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -26,7 +26,7 @@ describe('useSnoozedEpisodeCount', () => {
   });
 
   it('returns the number of snoozed unwatched episodes', async () => {
-    stubFetch(mockFetchResponse([snoozedEpisode, snoozedEpisode, scheduledEpisode]));
+    stubFetch(mockPagedResponse([snoozedEpisode, snoozedEpisode], 2));
     const { result } = renderHookWithProviders(() => useSnoozedEpisodeCount());
 
     await waitFor(() => {
@@ -35,7 +35,7 @@ describe('useSnoozedEpisodeCount', () => {
   });
 
   it('returns zero when there are no snoozed episodes', async () => {
-    stubFetch(mockFetchResponse([scheduledEpisode]));
+    stubFetch(mockPagedResponse([], 0));
     const { result } = renderHookWithProviders(() => useSnoozedEpisodeCount());
 
     await waitFor(() => {
@@ -45,12 +45,42 @@ describe('useSnoozedEpisodeCount', () => {
 });
 
 describe('useSnoozedEpisodes', () => {
+  it('requests only snoozed episodes from the API', async () => {
+    stubFetch(mockPagedResponse([snoozedEpisode], 1));
+    const { result } = renderHookWithProviders(() => useSnoozedEpisodes());
+
+    await waitFor(() => expect(result.current.episodes).toHaveLength(1));
+    expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toContain('snoozed=true');
+  });
+
+  it('loads the next page and reports whether more remain', async () => {
+    const second = { ...snoozedEpisode, episodes: { ...snoozedEpisode.episodes, id: 'second' } };
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(mockPagedResponse([snoozedEpisode], 2))
+        .mockResolvedValueOnce(mockPagedResponse([second], 2)),
+    );
+    const { result } = renderHookWithProviders(() => useSnoozedEpisodes());
+
+    await waitFor(() => expect(result.current.hasNextPage).toBe(true));
+    expect(result.current.total).toBe(2);
+
+    await act(async () => {
+      await result.current.fetchNextPage();
+    });
+    await waitFor(() => expect(result.current.episodes).toHaveLength(2));
+    expect(result.current.hasNextPage).toBe(false);
+    expect(String(vi.mocked(fetch).mock.calls[1]?.[0])).toContain('offset=1');
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('returns only snoozed episodes', async () => {
-    stubFetch(mockFetchResponse([snoozedEpisode, snoozedEpisode, scheduledEpisode]));
+    stubFetch(mockPagedResponse([snoozedEpisode, snoozedEpisode], 2));
     const { result } = renderHookWithProviders(() => useSnoozedEpisodes());
 
     await waitFor(() => {

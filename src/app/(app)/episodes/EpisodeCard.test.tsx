@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes, routes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -61,7 +61,7 @@ describe('EpisodeCard', () => {
         subscription: parsedEpisode.subscription,
       },
     ];
-    queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     renderWithProviders(<EpisodeCard episode={parsedEpisode} showDate />, { queryClient });
 
     const buttons = screen.getAllByRole('button');
@@ -86,7 +86,7 @@ describe('EpisodeCard', () => {
         subscription: parsedEpisode.subscription,
       },
     ];
-    queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     renderWithProviders(<EpisodeCard episode={parsedEpisode} />, { queryClient });
 
     const buttons = screen.getAllByRole('button');
@@ -94,7 +94,7 @@ describe('EpisodeCard', () => {
 
     await waitFor(() => {
       expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Server error' }));
-      expect(queryClient.getQueryData([QueryKey.getEpisodes])).toEqual(episodes);
+      expect(pagedRows(queryClient.getQueryData([QueryKey.getEpisodes, {}]))).toEqual(episodes);
     });
   });
 

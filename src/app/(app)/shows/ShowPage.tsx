@@ -2,16 +2,16 @@
 
 import { Alert, Center, Group, Loader, Select, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { FloatingButton } from '@/components/FloatingButton';
+import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiFetch } from '@/lib/api/fetch';
+import { flattenPages, pagedQueryOptions } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { ShowsResponse } from '@/types';
 import {
-  showMatchesStatusFilter,
   TV_SHOW_STATUS_FILTER_ALL,
   TV_SHOW_STATUS_FILTER_OPTIONS,
   type TvShowStatusFilter,
@@ -24,23 +24,15 @@ export const ShowPage = () => {
   const [search, setSearch] = useDebouncedState('', 200);
   const [statusFilter, setStatusFilter] = useState<TvShowStatusFilter>(TV_SHOW_STATUS_FILTER_ALL);
 
-  const { isLoading, isError, data } = useQuery<ShowsResponse>({
-    queryKey: [QueryKey.getShows],
-    queryFn: async () => {
-      const response = await apiFetch(apiRoutes.tvshow, { method: 'get' });
-      if (response.ok) return await response.json();
-      throw new Error((await response.json()).message);
-    },
+  const { isLoading, isError, data, hasNextPage, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+    ...pagedQueryOptions<ShowsResponse[number]>(QueryKey.getShows, apiRoutes.tvshow, {
+      search: search.trim() || undefined,
+      status: statusFilter === TV_SHOW_STATUS_FILTER_ALL ? undefined : statusFilter,
+    }),
+    placeholderData: keepPreviousData,
   });
 
-  const shows = useMemo(() => {
-    const trimmedSearch = search.trim().toLowerCase();
-    return data?.filter((show) => {
-      if (!showMatchesStatusFilter(show, statusFilter)) return false;
-      if (!trimmedSearch) return true;
-      return show.name.toLowerCase().includes(trimmedSearch) || show.description?.toLowerCase().includes(trimmedSearch);
-    });
-  }, [search, data, statusFilter]);
+  const shows = useMemo(() => flattenPages(data), [data]);
 
   if (isLoading)
     return (
@@ -72,7 +64,13 @@ export const ShowPage = () => {
         />
       </Group>
       <Space h={'md'} />
-      <ShowList shows={shows ?? []} />
+      <ShowList shows={shows} />
+      <InfiniteScrollSentinel
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        loadedCount={shows.length}
+      />
       <FloatingButton onClick={open} />
     </>
   );

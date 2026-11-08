@@ -2,12 +2,13 @@
 
 import { Alert, Center, Loader, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { FloatingButton } from '@/components/FloatingButton';
+import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiFetch } from '@/lib/api/fetch';
+import { flattenPages, pagedQueryOptions } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { MoviesResponse } from '@/types';
 import { AddMovieModal } from './AddMovieModal';
@@ -17,23 +18,14 @@ export const MoviePage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data } = useQuery<MoviesResponse>({
-    queryKey: [QueryKey.getMovies],
-    queryFn: async () => {
-      const response = await apiFetch(apiRoutes.movie, { method: 'get' });
-      if (response.ok) return await response.json();
-      throw new Error((await response.json()).message);
-    },
+  const { isLoading, isError, data, hasNextPage, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
+    ...pagedQueryOptions<MoviesResponse[number]>(QueryKey.getMovies, apiRoutes.movie, {
+      search: search.trim() || undefined,
+    }),
+    placeholderData: keepPreviousData,
   });
 
-  const movies = useMemo(() => {
-    const trimmedSearch = search.trim().toLowerCase();
-    return trimmedSearch
-      ? data?.filter(
-          (d) => d.name.toLowerCase().includes(trimmedSearch) || d.description?.toLowerCase().includes(trimmedSearch),
-        )
-      : data;
-  }, [search, data]);
+  const movies = useMemo(() => flattenPages(data), [data]);
 
   if (isLoading)
     return (
@@ -53,7 +45,13 @@ export const MoviePage = () => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
-      <MovieList movies={movies ?? []} />
+      <MovieList movies={movies} />
+      <InfiniteScrollSentinel
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        loadedCount={movies.length}
+      />
       <FloatingButton onClick={open} />
     </>
   );
