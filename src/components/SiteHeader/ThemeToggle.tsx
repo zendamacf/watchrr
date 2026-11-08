@@ -24,7 +24,7 @@ export function ThemeToggle() {
       checked={!isDark}
       onChange={() => toggleTheme()}
       onLabel={<Sun size={16} color="var(--mantine-color-yellow-4)" />}
-      offLabel={<Moon size={16} color="var(--mantine-color-blue-6)" />}
+      offLabel={<Moon size={16} color="var(--mantine-color-signal-4)" />}
       style={{ width: 50 }}
     />
   );

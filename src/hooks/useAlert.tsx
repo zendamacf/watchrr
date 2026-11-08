@@ -12,7 +12,7 @@ const successProps = {
 };
 
 const infoProps = {
-  color: 'blue',
+  color: 'gray',
   icon: <Info />,
   loading: false,
   autoClose: 2000,
@@ -26,7 +26,7 @@ const errorProps = {
 };
 
 const loadingProps = {
-  color: 'blue',
+  color: 'gray',
   loading: true,
   loaderProps: { type: 'dots' },
   autoClose: false,

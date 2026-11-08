@@ -65,7 +65,7 @@ export const AddMovieModal = (props: Props) => {
             <>
               <Popover width={'unset'}>
                 <PopoverTarget>
-                  <ActionIcon color={'blue'} aria-label={`About ${movie.name}`}>
+                  <ActionIcon variant="white" color={'gray'} aria-label={`About ${movie.name}`}>
                     <List size={'20'} />
                   </ActionIcon>
                 </PopoverTarget>

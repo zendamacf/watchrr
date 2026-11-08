@@ -71,7 +71,7 @@ export const AddShowModal = (props: Props) => {
             <>
               <Popover width={'unset'}>
                 <PopoverTarget>
-                  <ActionIcon color={'blue'} aria-label={`About ${show.name}`}>
+                  <ActionIcon variant="white" color={'gray'} aria-label={`About ${show.name}`}>
                     <List size={'20'} />
                   </ActionIcon>
                 </PopoverTarget>

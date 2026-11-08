@@ -52,12 +52,12 @@ describe('useAlert', () => {
     );
   });
 
-  it('showInfo shows a blue notification', () => {
+  it('showInfo shows a gray notification', () => {
     const { result } = renderHook(() => useAlert(), { wrapper });
     result.current.showInfo({ message: 'Note' });
     expect(mockShow).toHaveBeenCalledWith(
       expect.objectContaining({
-        color: 'blue',
+        color: 'gray',
         loading: false,
       }),
     );
@@ -106,7 +106,7 @@ describe('useAlert', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'nid',
-        color: 'blue',
+        color: 'gray',
         loading: false,
       }),
     );

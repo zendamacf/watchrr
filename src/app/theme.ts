@@ -94,16 +94,16 @@ export default createTheme({
       '#cc4e12',
     ],
     red: [
-      '#ffb3c8',
-      '#ff99b6',
-      '#ff80a4',
-      '#ff6691',
-      '#ff4d7f',
-      '#ff336d',
-      '#ff1a5a',
-      '#ff0048', // Theme color
-      '#e60041',
-      '#cc003a',
+      '#ffe5e1',
+      '#ffc9c1',
+      '#ffa597',
+      '#fb8070',
+      '#f2604d',
+      '#e84a36',
+      '#de3a28',
+      '#d92d20', // Theme color
+      '#bf2418',
+      '#9f1d13',
     ],
   },
   components: {
