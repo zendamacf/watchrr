@@ -39,10 +39,10 @@ export default createTheme({
       '#74e3d3',
       '#52dac7',
       '#35d0ba', // Brand color
-      '#2bb8a4',
       '#22a08e',
       '#1b8777',
-      '#146b5f',
+      '#176f62',
+      '#10574d',
     ],
     // Dark scheme surfaces: dark[7] is the page ("night"), dark[6] is cards ("dusk").
     dark: [

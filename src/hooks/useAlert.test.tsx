@@ -29,12 +29,12 @@ describe('useAlert', () => {
     mockShow.mockReturnValue('notification-id');
   });
 
-  it('showSuccess shows a green notification', () => {
+  it('showSuccess shows an afterglow notification', () => {
     const { result } = renderHook(() => useAlert(), { wrapper });
     result.current.showSuccess({ title: 'Done', message: 'Saved' });
     expect(mockShow).toHaveBeenCalledWith(
       expect.objectContaining({
-        color: 'green',
+        color: 'afterglow',
         loading: false,
         autoClose: 2000,
       }),
@@ -82,7 +82,7 @@ describe('useAlert', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'notification-id',
-        color: 'green',
+        color: 'afterglow',
         loading: false,
       }),
     );

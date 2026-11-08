@@ -45,7 +45,7 @@ describe('useRefresh', () => {
         expect(mockUpdate).toHaveBeenCalledWith(
           expect.objectContaining({
             id: 'notification-id',
-            color: 'green',
+            color: 'afterglow',
             loading: false,
           }),
         );
@@ -81,7 +81,7 @@ describe('useRefresh', () => {
         expect(mockUpdate).toHaveBeenCalledWith(
           expect.objectContaining({
             id: 'notification-id',
-            color: 'green',
+            color: 'afterglow',
           }),
         );
       });

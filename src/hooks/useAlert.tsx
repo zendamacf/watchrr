@@ -5,7 +5,7 @@ import type { ReactElement } from 'react';
 import classes from './useAlert.module.css';
 
 const successProps = {
-  color: 'green',
+  color: 'afterglow',
   icon: <Check />,
   loading: false,
   autoClose: 2000,
