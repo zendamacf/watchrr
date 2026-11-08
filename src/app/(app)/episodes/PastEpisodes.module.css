@@ -4,7 +4,7 @@
 
 .past-episodes-accordion-control {
   color: white;
-  background-color: var(--info);
+  background-color: var(--mantine-primary-color-filled);
   border-radius: var(--mantine-radius-default);
 
   &[data-active] {
@@ -14,7 +14,7 @@
 
   transition: all 0.2s ease-in-out;
   @mixin hover {
-    background-color: light-dark(darken(var(--info), 0.15), lighten(var(--info), 0.15));
+    background-color: light-dark(darken(var(--mantine-primary-color-filled), 0.15), lighten(var(--mantine-primary-color-filled), 0.15));
   }
 }
 

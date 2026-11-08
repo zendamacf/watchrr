@@ -157,7 +157,7 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
             {({ copied, copy }) => (
               <ActionIcon
                 variant={'outline'}
-                color={copied ? 'blue' : 'grey'}
+                color={copied ? 'blue' : 'gray'}
                 onClick={() => {
                   copy();
                   showInfo({ message: 'Copied', icon: <ClipboardCheck /> });

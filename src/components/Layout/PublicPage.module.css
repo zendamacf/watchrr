@@ -1,5 +1,5 @@
 .title {
-  font-family: Outfit, var(--mantine-font-family);
+  font-family: var(--mantine-font-family-headings);
   font-weight: 500;
 }
 

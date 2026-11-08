@@ -29,9 +29,9 @@
 
 .active_link {
   font-weight: 700;
-  background-color: alpha(var(--primary), 0.1);
+  background-color: alpha(var(--mantine-primary-color-filled), 0.1);
   /* Override dark theme */
-  color: var(--primary);
+  color: var(--mantine-primary-color-filled);
 }
 
 .snoozed-indicator-button {

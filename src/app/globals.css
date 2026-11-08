@@ -1,10 +1,12 @@
 :root {
-  --primary: #00c853;
-  --info: #0090ff;
-  --warning: #ff6117;
-  --error: #ff0048;
+  --mantine-color-error: var(--mantine-color-red-7);
+  --mantine-color-anchor: var(--mantine-primary-color-filled);
+}
 
-  --mantine-color-error: var(--error);
+:root[data-mantine-color-scheme='light'] {
+  --mantine-color-body: #f4f2f9;
+}
 
-  --mantine-color-anchor: var(--info);
+body {
+  font-variant-numeric: tabular-nums;
 }

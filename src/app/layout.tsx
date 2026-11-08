@@ -2,15 +2,22 @@ import '@mantine/core/styles.css';
 
 import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 import type { Metadata, Viewport } from 'next';
-import { Raleway } from 'next/font/google';
+import { Bricolage_Grotesque, Figtree } from 'next/font/google';
 import type { ReactNode } from 'react';
 import { UmamiAnalytics } from '@/components/analytics/UmamiAnalytics';
 import './globals.css';
 import theme from './theme';
 
-const font = Raleway({
+const bodyFont = Figtree({
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-body',
+});
+
+const displayFont = Bricolage_Grotesque({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -33,7 +40,7 @@ const DEFAULT_COLOR_THEME = 'auto';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" {...mantineHtmlProps} className={font.className}>
+    <html lang="en" {...mantineHtmlProps} className={`${bodyFont.variable} ${displayFont.variable}`}>
       <head>
         <ColorSchemeScript defaultColorScheme={DEFAULT_COLOR_THEME} />
       </head>
