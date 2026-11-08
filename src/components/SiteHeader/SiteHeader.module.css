@@ -65,6 +65,11 @@
   backdrop-filter: blur(12px);
   border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-5));
 
+  /* Promote to its own layer so mobile browsers keep it pinned to the bottom
+     while the URL bar shows/hides (e.g. when scrolled to the top). */
+  transform: translateZ(0);
+  will-change: transform;
+
   @media (min-width: $mantine-breakpoint-sm) {
     display: none;
   }
