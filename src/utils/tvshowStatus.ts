@@ -46,7 +46,7 @@ export function tvShowStatusBadgeColor(status: string): string {
     case 'Returning Series':
     case 'In Production':
     case 'Pilot':
-      return 'green';
+      return 'afterglow';
     case 'Planned':
       return 'blue';
     case 'Ended':

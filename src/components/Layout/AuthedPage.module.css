@@ -1,0 +1,8 @@
+/* Room for the floating button and, on mobile, the tab bar */
+.bottomSpace {
+  height: calc(var(--tabbar-height) + 80px);
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    height: 100px;
+  }
+}

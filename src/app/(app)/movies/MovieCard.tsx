@@ -88,6 +88,7 @@ export const MovieCard = ({ movie }: Props) => {
           </ActionIcon>
           <ActionIcon
             aria-label="Unsubscribe"
+            variant="white"
             color={'red'}
             loading={pendingRemove}
             onClick={() => confirmUnsubscribe(movie.id)}

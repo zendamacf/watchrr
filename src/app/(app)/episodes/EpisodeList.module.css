@@ -1,0 +1,16 @@
+/* One reveal when the lineup first loads */
+.day {
+  animation: reveal 0.4s ease-out both;
+  animation-delay: var(--reveal-delay, 0ms);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

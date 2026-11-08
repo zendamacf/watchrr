@@ -1,12 +1,14 @@
 'use client';
 
-import { Alert, Center, Group, Loader, Select, Space, TextInput } from '@mantine/core';
+import { Alert, Group, Select, Space, TextInput } from '@mantine/core';
 import { useDebouncedState, useDisclosure } from '@mantine/hooks';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
+import { Search, Tv } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { EmptyState } from '@/components/EmptyState';
 import { FloatingButton } from '@/components/FloatingButton';
 import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
+import { MediaGridSkeleton } from '@/components/MediaGridSkeleton';
 import { QueryKey } from '@/components/QueryProvider';
 import { flattenPages, pagedQueryOptions } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
@@ -32,15 +34,8 @@ export const ShowPage = () => {
     placeholderData: keepPreviousData,
   });
 
+  const filtered = !!search.trim() || statusFilter !== TV_SHOW_STATUS_FILTER_ALL;
   const shows = useMemo(() => flattenPages(data, (show) => show.id), [data]);
-
-  if (isLoading)
-    return (
-      <Center>
-        <Loader />
-      </Center>
-    );
-  if (isError) return <Alert color={'red'}>An error occurred</Alert>;
 
   return (
     <>
@@ -64,13 +59,36 @@ export const ShowPage = () => {
         />
       </Group>
       <Space h={'md'} />
-      <ShowList shows={shows} />
-      <InfiniteScrollSentinel
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        loadedCount={shows.length}
-      />
+      {isLoading ? (
+        <MediaGridSkeleton />
+      ) : isError ? (
+        <Alert color={'red'}>An error occurred</Alert>
+      ) : (
+        <>
+          {shows.length ? (
+            <ShowList shows={shows} />
+          ) : filtered ? (
+            <EmptyState
+              icon={<Tv size={40} aria-hidden />}
+              title="No shows match"
+              description="Try a different search or status filter."
+            />
+          ) : (
+            <EmptyState
+              icon={<Tv size={40} aria-hidden />}
+              title="No shows yet"
+              description="Add a show to see its upcoming episodes on your schedule."
+              action={{ label: 'Add a show', onClick: open }}
+            />
+          )}
+          <InfiniteScrollSentinel
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            loadedCount={shows.length}
+          />
+        </>
+      )}
       <FloatingButton onClick={open} />
     </>
   );

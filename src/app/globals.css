@@ -1,10 +1,23 @@
 :root {
-  --primary: #00c853;
-  --info: #0090ff;
-  --warning: #ff6117;
-  --error: #ff0048;
+  --header-height: 60px;
+  --tabbar-height: 60px;
+  /* Floating action button clears the mobile tab bar */
+  --fab-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 16px);
 
-  --mantine-color-error: var(--error);
+  --mantine-color-error: var(--mantine-color-red-7);
+  --mantine-color-anchor: var(--mantine-primary-color-filled);
+}
 
-  --mantine-color-anchor: var(--info);
+:root[data-mantine-color-scheme='light'] {
+  --mantine-color-body: #f4f2f9;
+}
+
+body {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 48em) {
+  :root {
+    --fab-bottom: 30px;
+  }
 }

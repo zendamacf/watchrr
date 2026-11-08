@@ -29,10 +29,18 @@ describe('ShowPage', () => {
     vi.clearAllMocks();
   });
 
-  it('shows a loader while shows are loading', () => {
+  it('shows skeleton cards while shows are loading', () => {
     stubFetch(() => new Promise<Response>(() => {}));
-    const { container } = renderWithProviders(<ShowPage />);
-    expect(container.querySelector('.mantine-Loader-root')).toBeTruthy();
+    renderWithProviders(<ShowPage />);
+    expect(screen.queryByTestId('media-skeleton')).toBeTruthy();
+  });
+
+  it('shows an empty state with an add action when there are no shows', async () => {
+    stubFetch(mockPagedResponse([]));
+    renderWithProviders(<ShowPage />);
+
+    expect(await screen.findByText('No shows yet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add a show' })).toBeInTheDocument();
   });
 
   it('shows an error when the shows request fails', async () => {

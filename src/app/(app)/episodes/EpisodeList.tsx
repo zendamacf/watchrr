@@ -1,18 +1,28 @@
 'use client';
 
-import { Alert, Center, Loader, Space, Stack, TextInput, Title } from '@mantine/core';
+import { Alert, Space, Stack, Text, TextInput, Title } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
-import { Search } from 'lucide-react';
+import { CalendarCheck, Search } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
+import { EmptyState } from '@/components/EmptyState';
 import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
+import { EpisodeGridSkeleton } from '@/components/MediaGridSkeleton';
 import { useEpisodesQuery } from '@/hooks/useEpisodes';
 import { DateFormat } from '@/utils/dates';
 import { compareParsedEpisodes } from './compareParsedEpisodes';
+import classes from './EpisodeList.module.css';
 import { GroupedEpisodes } from './GroupedEpisodes';
 import { PastEpisodes } from './PastEpisodes';
 import { parseEpisodeDate } from './parseEpisodeDate';
 import type { ParsedEpisode } from './types';
+
+const relativeDayLabel = (day: DateTime) => {
+  const today = DateTime.now().startOf('day');
+  if (day.hasSame(today, 'day')) return 'Today';
+  if (day.hasSame(today.plus({ days: 1 }), 'day')) return 'Tomorrow';
+  return null;
+};
 
 export const EpisodeList = () => {
   const [search, setSearch] = useDebouncedState('', 200);
@@ -57,14 +67,6 @@ export const EpisodeList = () => {
     return { pastEpisodes, futureDates };
   }, [episodes]);
 
-  if (isLoading)
-    return (
-      <Center>
-        <Loader />
-      </Center>
-    );
-  if (isError) return <Alert color={'red'}>An error occurred</Alert>;
-
   return (
     <>
       <TextInput
@@ -74,26 +76,64 @@ export const EpisodeList = () => {
         leftSection={<Search />}
       />
       <Space h={'md'} />
-      <Stack gap={'xl'}>
-        {!!pastEpisodes.length && (
-          <PastEpisodes episodes={pastEpisodes} hasMore={hasNextPage && !Object.keys(futureDates).length} />
-        )}
+      {isLoading ? (
+        <EpisodeGridSkeleton />
+      ) : isError ? (
+        <Alert color={'red'}>An error occurred</Alert>
+      ) : (
+        <>
+          <Stack gap={'xl'}>
+            {!!pastEpisodes.length && (
+              <PastEpisodes episodes={pastEpisodes} hasMore={hasNextPage && !Object.keys(futureDates).length} />
+            )}
 
-        {Object.entries(futureDates)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([date, episodes]) => (
-            <Stack gap={'sm'} key={date}>
-              <Title order={2}>{DateTime.fromFormat(date, DateFormat.YMD).toFormat(DateFormat.DOW_DMY)}</Title>
-              <GroupedEpisodes episodes={episodes} />
-            </Stack>
-          ))}
-      </Stack>
-      <InfiniteScrollSentinel
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        fetchNextPage={fetchNextPage}
-        loadedCount={episodes.length}
-      />
+            {Object.entries(futureDates)
+              .sort(([a], [b]) => a.localeCompare(b))
+              .map(([date, episodes], index) => {
+                const day = DateTime.fromFormat(date, DateFormat.YMD);
+                const relative = relativeDayLabel(day);
+                return (
+                  <Stack
+                    gap={'sm'}
+                    key={date}
+                    className={classes.day}
+                    style={{ '--reveal-delay': `${Math.min(index, 6) * 60}ms` }}
+                  >
+                    <Title order={2}>
+                      {relative && (
+                        <>
+                          {relative}{' '}
+                          <Text span c="dimmed" fw={500} fz="md">
+                            {day.toFormat(DateFormat.DOW_DMY)}
+                          </Text>
+                        </>
+                      )}
+                      {!relative && day.toFormat(DateFormat.DOW_DMY)}
+                    </Title>
+                    <GroupedEpisodes episodes={episodes} />
+                  </Stack>
+                );
+              })}
+            {!pastEpisodes.length && !Object.keys(futureDates).length && (
+              <EmptyState
+                icon={<CalendarCheck size={40} aria-hidden />}
+                title={search.trim() ? 'No episodes match' : "You're all caught up"}
+                description={
+                  search.trim()
+                    ? 'Try a different search.'
+                    : 'New episodes from the shows you follow will appear here when they air.'
+                }
+              />
+            )}
+          </Stack>
+          <InfiniteScrollSentinel
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            loadedCount={episodes.length}
+          />
+        </>
+      )}
     </>
   );
 };

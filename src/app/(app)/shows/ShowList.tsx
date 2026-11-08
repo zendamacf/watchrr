@@ -1,6 +1,6 @@
 'use client';
 
-import { SimpleGrid } from '@mantine/core';
+import { MediaGrid } from '@/components/MediaGrid';
 import type { SubscribedShow } from '@/types';
 import { ShowCard } from './ShowCard';
 
@@ -8,10 +8,10 @@ type Props = { shows: SubscribedShow[] };
 
 export const ShowList = ({ shows }: Props) => {
   return (
-    <SimpleGrid cols={{ xs: 1, sm: 2, md: 2, lg: 3, xl: 4 }}>
+    <MediaGrid>
       {shows.map((show) => (
         <ShowCard key={show.id} show={show} />
       ))}
-    </SimpleGrid>
+    </MediaGrid>
   );
 };
