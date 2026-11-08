@@ -4,6 +4,7 @@ import type { ComponentType } from 'react';
 import { routes } from '@/lib/routes';
 import { type AuthUser, guardUser } from '@/utils/auth';
 import { SiteHeader } from '../SiteHeader';
+import classes from './AuthedPage.module.css';
 
 export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: AuthUser }> }) {
   const user = await guardUser();
@@ -15,7 +16,7 @@ export async function AuthedPage({ children: Child }: { children: ComponentType<
         <SiteHeader />
         <Container fluid>
           <Child user={user} />
-          <Space style={{ height: '100px' }} />
+          <Space className={classes.bottomSpace} />
         </Container>
       </main>
     </div>
