@@ -37,13 +37,19 @@ export async function fetchPage<T>(
 }
 
 /**
- * `useInfiniteQuery` options for a paginated list endpoint. The query key is `[key, params]`, so
- * each filter combination caches separately but a `[key]` prefix still matches all of them.
+ * `useInfiniteQuery` options for a paginated list endpoint. The query key is
+ * `[key, params, pageSize]`, so each filter and page size caches separately but a `[key]` prefix
+ * still matches all of them.
  */
-export function pagedQueryOptions<T>(key: string, path: string, params: PagedParams = {}) {
+export function pagedQueryOptions<T>(
+  key: string,
+  path: string,
+  params: PagedParams = {},
+  pageSize = DEFAULT_PAGE_SIZE,
+) {
   return infiniteQueryOptions({
-    queryKey: [key, params] as QueryKey,
-    queryFn: ({ pageParam }) => fetchPage<T>(path, params, pageParam),
+    queryKey: [key, params, pageSize] as QueryKey,
+    queryFn: ({ pageParam }) => fetchPage<T>(path, params, pageParam, pageSize),
     initialPageParam: 0,
     getNextPageParam: (last: Page<T>) => {
       const next = last.offset + last.rows.length;

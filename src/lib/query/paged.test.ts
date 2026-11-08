@@ -52,7 +52,7 @@ describe('pagedQueryOptions', () => {
   const next = pagedQueryOptions('k', '/api/x').getNextPageParam as (last: unknown) => number | undefined;
 
   it('includes params in the query key', () => {
-    expect(pagedQueryOptions('k', '/api/x', { search: 'a' }).queryKey).toEqual(['k', { search: 'a' }]);
+    expect(pagedQueryOptions('k', '/api/x', { search: 'a' }, 5).queryKey).toEqual(['k', { search: 'a' }, 5]);
   });
 
   it('returns the next offset while rows remain', () => {
