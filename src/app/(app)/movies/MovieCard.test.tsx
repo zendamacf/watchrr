@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testMovie } from '@/test/fixtures/movie';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
 import type { Movie } from '@/types';
@@ -45,7 +45,7 @@ describe('MovieCard', () => {
   it('marks a movie as watched via the API', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getMovies], [movie]);
+    queryClient.setQueryData([QueryKey.getMovies, {}], pagedCache([movie]));
     renderWithProviders(<MovieCard movie={movie} />, { queryClient });
 
     const buttons = screen.getAllByRole('button');
@@ -63,14 +63,14 @@ describe('MovieCard', () => {
     stubFetch(mockFetchResponse({ message: 'Not found' }, { ok: false, status: 404 }));
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getMovies], [movie]);
+    queryClient.setQueryData([QueryKey.getMovies, {}], pagedCache([movie]));
     renderWithProviders(<MovieCard movie={movie} />, { queryClient });
 
     await user.click(screen.getByLabelText('Mark watched'));
 
     await waitFor(() => {
       expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Not found' }));
-      expect(queryClient.getQueryData([QueryKey.getMovies])).toEqual([movie]);
+      expect(pagedRows(queryClient.getQueryData([QueryKey.getMovies, {}]))).toEqual([movie]);
     });
   });
 
@@ -83,7 +83,7 @@ describe('MovieCard', () => {
 
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getMovies], [movie]);
+    queryClient.setQueryData([QueryKey.getMovies, {}], pagedCache([movie]));
     renderWithProviders(<MovieCard movie={movie} />, { queryClient });
 
     await user.click(screen.getByLabelText('Unsubscribe'));

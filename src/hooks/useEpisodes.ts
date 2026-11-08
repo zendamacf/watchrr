@@ -1,34 +1,60 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiFetch } from '@/lib/api/fetch';
+import { flattenPages, pagedQueryOptions, totalOf } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse } from '@/types';
-import { isShowSnoozed } from '@/utils/episode-schedule';
 
-export function useEpisodesQuery() {
-  return useQuery<EpisodesResponse>({
-    queryKey: [QueryKey.getEpisodes],
-    queryFn: async () => {
-      const response = await apiFetch(apiRoutes.episode, { method: 'get' });
-      if (response.ok) return await response.json();
-      throw new Error((await response.json()).message);
-    },
+type EpisodeRow = EpisodesResponse[number];
+
+type EpisodeFilters = {
+  search?: string;
+  /** `true` = only snoozed shows, `false` = only scheduled shows, omitted = both. */
+  snoozed?: boolean;
+  /** Rows per request; defaults to the standard page size. */
+  pageSize?: number;
+  /** Set to `false` to defer fetching. */
+  enabled?: boolean;
+};
+
+export function useEpisodesQuery({ search, snoozed, pageSize, enabled }: EpisodeFilters = {}) {
+  const query = useInfiniteQuery({
+    ...pagedQueryOptions<EpisodeRow>(
+      QueryKey.getEpisodes,
+      apiRoutes.episode,
+      {
+        search: search?.trim() || undefined,
+        snoozed: snoozed === undefined ? undefined : String(snoozed),
+      },
+      pageSize,
+    ),
+    placeholderData: keepPreviousData,
+    enabled,
   });
+
+  const episodes = useMemo(() => flattenPages(query.data, (row) => row.episodes.id), [query.data]);
+  return { ...query, episodes, total: totalOf(query.data) };
 }
 
-export function useSnoozedEpisodes() {
-  const { data, isLoading, isError } = useEpisodesQuery();
+/** Snoozed episodes, loaded page by page. Pass `enabled: false` to defer the request. */
+export function useSnoozedEpisodes({ enabled }: { enabled?: boolean } = {}) {
+  const { episodes, total, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useEpisodesQuery({
+    snoozed: true,
+    enabled,
+  });
 
-  const episodes = useMemo(() => data?.filter((row) => isShowSnoozed(row.subscription.snoozed_until)) ?? [], [data]);
-
-  return { episodes, isLoading, isError };
+  return { episodes, total, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage };
 }
 
+/**
+ * Number of snoozed episodes.
+ *
+ * The badge shows on every page, but only needs a count, so this requests a single row and reads
+ * the total from `X-Total-Count` instead of loading a full page of episodes. Its cache entry still
+ * sits under the episodes key, so watched/snooze updates adjust the count immediately.
+ */
 export function useSnoozedEpisodeCount() {
-  const { episodes } = useSnoozedEpisodes();
-
-  return episodes.length;
+  return useEpisodesQuery({ snoozed: true, pageSize: 1 }).total;
 }

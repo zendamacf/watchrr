@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes, routes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -37,7 +37,6 @@ const parsedEpisode: ParsedEpisode = {
     local_date: DateTime.fromSQL('2030-06-01'),
     original_local_date: DateTime.fromSQL('2030-06-01'),
     in_past: false,
-    is_snoozed: false,
     delay_days: 0,
     snoozed_until: null,
   },
@@ -61,7 +60,7 @@ describe('EpisodeCard', () => {
         subscription: parsedEpisode.subscription,
       },
     ];
-    queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     renderWithProviders(<EpisodeCard episode={parsedEpisode} showDate />, { queryClient });
 
     const buttons = screen.getAllByRole('button');
@@ -86,7 +85,7 @@ describe('EpisodeCard', () => {
         subscription: parsedEpisode.subscription,
       },
     ];
-    queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     renderWithProviders(<EpisodeCard episode={parsedEpisode} />, { queryClient });
 
     const buttons = screen.getAllByRole('button');
@@ -94,7 +93,7 @@ describe('EpisodeCard', () => {
 
     await waitFor(() => {
       expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Server error' }));
-      expect(queryClient.getQueryData([QueryKey.getEpisodes])).toEqual(episodes);
+      expect(pagedRows(queryClient.getQueryData([QueryKey.getEpisodes, {}]))).toEqual(episodes);
     });
   });
 
@@ -128,7 +127,6 @@ describe('EpisodeCard', () => {
       ...parsedEpisode,
       episodes: {
         ...parsedEpisode.episodes,
-        is_snoozed: true,
         snoozed_until: '2099-12-01',
       },
       subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
@@ -161,7 +159,6 @@ describe('EpisodeCard', () => {
       ...parsedEpisode,
       episodes: {
         ...parsedEpisode.episodes,
-        is_snoozed: true,
         snoozed_until: '2099-12-01',
       },
       subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
@@ -181,7 +178,6 @@ describe('EpisodeCard', () => {
       ...parsedEpisode,
       episodes: {
         ...parsedEpisode.episodes,
-        is_snoozed: true,
         snoozed_until: '2099-12-01',
       },
       subscription: { delay_days: 0, snoozed_until: '2099-12-01' },

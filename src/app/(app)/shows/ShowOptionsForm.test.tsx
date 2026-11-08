@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
@@ -134,7 +134,7 @@ describe('ShowOptionsForm', () => {
       subscription: { delay_days: 0, snoozed_until: null },
       episodes: [],
     };
-    queryClient.setQueryData([QueryKey.getEpisodes], episodes);
+    queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     queryClient.setQueryData([QueryKey.getShowEpisodes, baseShow.id], showDetail);
 
     renderWithProviders(<ShowOptionsForm show={baseShow} />, { queryClient });
@@ -144,7 +144,7 @@ describe('ShowOptionsForm', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
-      const cached = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
+      const cached = pagedRows<EpisodesResponse[number]>(queryClient.getQueryData([QueryKey.getEpisodes, {}]));
       expect(cached?.[0]?.subscription.delay_days).toBe(14);
       const detail = queryClient.getQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, baseShow.id]);
       expect(detail?.subscription.delay_days).toBe(14);

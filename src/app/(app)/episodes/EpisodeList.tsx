@@ -5,6 +5,7 @@ import { useDebouncedState } from '@mantine/hooks';
 import { Search } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useMemo } from 'react';
+import { InfiniteScrollSentinel } from '@/components/InfiniteScroll';
 import { useEpisodesQuery } from '@/hooks/useEpisodes';
 import { DateFormat } from '@/utils/dates';
 import { compareParsedEpisodes } from './compareParsedEpisodes';
@@ -16,44 +17,36 @@ import type { ParsedEpisode } from './types';
 export const EpisodeList = () => {
   const [search, setSearch] = useDebouncedState('', 200);
 
-  const { isLoading, isError, data } = useEpisodesQuery();
+  const { isLoading, isError, episodes, hasNextPage, isFetchingNextPage, fetchNextPage } = useEpisodesQuery({
+    search,
+    snoozed: false,
+  });
 
   const { pastEpisodes, futureDates } = useMemo(() => {
-    if (!data) return { pastEpisodes: [], futureDates: {} };
-    const trimmedSearch = search.trim().toLowerCase();
-    const converted = data
-      .filter(
-        (r) =>
-          r.tvshows.name.toLowerCase().includes(trimmedSearch) || r.episodes.name.toLowerCase().includes(trimmedSearch),
-      )
-      .map<ParsedEpisode>((r) => {
-        const delayDays = r.subscription.delay_days ?? 0;
-        const snoozedUntil = r.subscription.snoozed_until;
-        const isSnoozed =
-          !!snoozedUntil && DateTime.fromSQL(snoozedUntil).startOf('day') >= DateTime.now().startOf('day');
-        const { originalLocalDate, effectiveLocalDate, inPast } = parseEpisodeDate(
-          r.episodes.airdate,
-          r.tvshows.country,
-          delayDays,
-        );
+    const converted = episodes.map<ParsedEpisode>((r) => {
+      const delayDays = r.subscription.delay_days ?? 0;
+      const snoozedUntil = r.subscription.snoozed_until;
+      const { originalLocalDate, effectiveLocalDate, inPast } = parseEpisodeDate(
+        r.episodes.airdate,
+        r.tvshows.country,
+        delayDays,
+      );
 
-        return {
-          ...r,
-          episodes: {
-            ...r.episodes,
-            local_date: effectiveLocalDate,
-            original_local_date: originalLocalDate,
-            in_past: inPast,
-            is_snoozed: isSnoozed,
-            delay_days: delayDays,
-            snoozed_until: snoozedUntil,
-          },
-        };
-      });
+      return {
+        ...r,
+        episodes: {
+          ...r.episodes,
+          local_date: effectiveLocalDate,
+          original_local_date: originalLocalDate,
+          in_past: inPast,
+          delay_days: delayDays,
+          snoozed_until: snoozedUntil,
+        },
+      };
+    });
 
-    const scheduledEpisodes = converted.filter((r) => !r.episodes.is_snoozed);
-    const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past).sort(compareParsedEpisodes);
-    const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past).sort(compareParsedEpisodes);
+    const pastEpisodes = converted.filter((r) => r.episodes.in_past).sort(compareParsedEpisodes);
+    const futureEpisodes = converted.filter((r) => !r.episodes.in_past).sort(compareParsedEpisodes);
     const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
       const date = curr.episodes.local_date.toFormat(DateFormat.YMD);
       if (!acc[date]) acc[date] = [];
@@ -62,7 +55,7 @@ export const EpisodeList = () => {
     }, {});
 
     return { pastEpisodes, futureDates };
-  }, [search, data]);
+  }, [episodes]);
 
   if (isLoading)
     return (
@@ -82,7 +75,9 @@ export const EpisodeList = () => {
       />
       <Space h={'md'} />
       <Stack gap={'xl'}>
-        {!!pastEpisodes.length && <PastEpisodes episodes={pastEpisodes} />}
+        {!!pastEpisodes.length && (
+          <PastEpisodes episodes={pastEpisodes} hasMore={hasNextPage && !Object.keys(futureDates).length} />
+        )}
 
         {Object.entries(futureDates)
           .sort(([a], [b]) => a.localeCompare(b))
@@ -93,6 +88,12 @@ export const EpisodeList = () => {
             </Stack>
           ))}
       </Stack>
+      <InfiniteScrollSentinel
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        fetchNextPage={fetchNextPage}
+        loadedCount={episodes.length}
+      />
     </>
   );
 };

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
 import { apiRoutes, routes } from '@/lib/routes';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
 import type { SubscribedShow } from '@/types';
@@ -64,7 +64,7 @@ describe('ShowCard', () => {
   it('calls refresh when the refresh action is clicked', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getShows], [show]);
+    queryClient.setQueryData([QueryKey.getShows, {}], pagedCache([show]));
     renderWithProviders(<ShowCard show={show} />, { queryClient });
 
     await user.click(screen.getByLabelText('Refresh metadata'));
@@ -81,7 +81,7 @@ describe('ShowCard', () => {
 
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getShows], [show]);
+    queryClient.setQueryData([QueryKey.getShows, {}], pagedCache([show]));
     renderWithProviders(<ShowCard show={show} />, { queryClient });
 
     await user.click(screen.getByLabelText('Unsubscribe'));
@@ -104,7 +104,7 @@ describe('ShowCard', () => {
 
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
-    queryClient.setQueryData([QueryKey.getShows], [show]);
+    queryClient.setQueryData([QueryKey.getShows, {}], pagedCache([show]));
     renderWithProviders(<ShowCard show={show} />, { queryClient });
 
     await user.click(screen.getByLabelText('Unsubscribe'));
@@ -112,7 +112,7 @@ describe('ShowCard', () => {
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(apiRoutes.tvshowById(show.id), { method: 'delete' });
       expect(mockShowError).toHaveBeenCalledWith(expect.objectContaining({ message: 'Forbidden' }));
-      expect(queryClient.getQueryData([QueryKey.getShows])).toEqual([show]);
+      expect(pagedRows(queryClient.getQueryData([QueryKey.getShows, {}]))).toEqual([show]);
     });
   });
 });

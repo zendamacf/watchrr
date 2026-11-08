@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 import { subscribed_movies } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
-import { nextPost } from '@/test/helpers/api-request';
+import { nextGet, nextPost } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { mockGetMovie, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
 import { seedMovie, seedSubscribedMovie, seedUser } from '@/test/seeds';
@@ -26,10 +26,13 @@ describe('/api/movie', () => {
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 
+  const seedPaged = (i: number) =>
+    seedSubscribedMovie({ watcherId: userId, movie: { moviedb_id: 998_290 + i, name: `Paged Movie ${i}` } });
+
   describe('GET', () => {
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
-      const response = await GET();
+      const response = await GET(nextGet(apiRoutes.movie));
       expect(response.status).toBe(401);
     });
 
@@ -49,11 +52,63 @@ describe('/api/movie', () => {
         .set({ watched: true })
         .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, watchedId)));
 
-      const response = await GET();
+      const response = await GET(nextGet(apiRoutes.movie));
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.some((m: { id: string }) => m.id === unwatched.id)).toBe(true);
       expect(data.every((m: { name: string }) => m.name !== 'Watched Movie')).toBe(true);
+    });
+
+    describe('pagination', () => {
+      it('applies the default page size and reports the total when no params are given', async () => {
+        const response = await GET(nextGet(apiRoutes.movie));
+        expect(response.status).toBe(200);
+        expect(Number(response.headers.get('X-Total-Count'))).toBeGreaterThanOrEqual((await response.json()).length);
+      });
+
+      it('pages through results in a stable order and reports the total', async () => {
+        for (let i = 1; i <= 3; i++) {
+          await seedPaged(i);
+        }
+
+        const all = await (await GET(nextGet(apiRoutes.movie))).json();
+        const first = await GET(nextGet(apiRoutes.movie, { limit: '2', offset: '0' }));
+        const second = await GET(nextGet(apiRoutes.movie, { limit: '2', offset: '2' }));
+
+        expect(Number(first.headers.get('X-Total-Count'))).toBe(all.length);
+        const ids = [...(await first.json()), ...(await second.json())].map((r: { id: string }) => r.id);
+        expect(ids).toEqual(all.slice(0, 4).map((r: { id: string }) => r.id));
+      });
+
+      it('returns an empty page past the end', async () => {
+        const response = await GET(nextGet(apiRoutes.movie, { limit: '10', offset: '100000' }));
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual([]);
+        expect(Number(response.headers.get('X-Total-Count'))).toBeGreaterThan(0);
+      });
+
+      it.each<Record<string, string>>([{ limit: '0' }, { limit: 'abc' }, { limit: '501' }, { offset: '-1' }])(
+        'returns 400 for invalid params %o',
+        async (params) => {
+          const response = await GET(nextGet(apiRoutes.movie, params));
+          expect(response.status).toBe(400);
+        },
+      );
+
+      it('filters by search across the whole library, not just the first page', async () => {
+        await seedSubscribedMovie({ watcherId: userId, movie: { moviedb_id: 998_300, name: 'Zzyzx Needle Movie' } });
+        await seedSubscribedMovie({ watcherId: userId, movie: { moviedb_id: 998_301, name: 'Other Movie' } });
+
+        const response = await GET(nextGet(apiRoutes.movie, { search: 'zzyzx needle', limit: '1' }));
+        const data = await response.json();
+        expect(data.map((m: { name: string }) => m.name)).toEqual(['Zzyzx Needle Movie']);
+        expect(response.headers.get('X-Total-Count')).toBe('1');
+      });
+
+      it('treats LIKE wildcards in search literally', async () => {
+        const response = await GET(nextGet(apiRoutes.movie, { search: '%' }));
+        expect(await response.json()).toEqual([]);
+      });
     });
   });
 

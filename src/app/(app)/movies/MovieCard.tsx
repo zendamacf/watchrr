@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
+import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { Movie, MoviesResponse } from '@/types';
 import { BaseMovieCard } from './BaseMovieCard';
@@ -16,7 +17,7 @@ type Props = {
   movie: Movie;
 };
 
-type MutationContext = { previousMovies: MoviesResponse | undefined };
+type MutationContext = { previousMovies: ReturnType<typeof snapshotPaged> };
 
 export const MovieCard = ({ movie }: Props) => {
   const { showError, showSuccess } = useAlert();
@@ -24,15 +25,17 @@ export const MovieCard = ({ movie }: Props) => {
 
   const onMutate = async (movieId: string, callback?: () => void): Promise<MutationContext> => {
     await queryClient.cancelQueries({ queryKey: [QueryKey.getMovies] });
-    const previousMovies = queryClient.getQueryData<MoviesResponse>([QueryKey.getMovies]);
-    queryClient.setQueryData<MoviesResponse>([QueryKey.getMovies], (old) => old?.filter((o) => o.id !== movieId));
+    const previousMovies = snapshotPaged(queryClient, QueryKey.getMovies);
+    updatePaged<MoviesResponse[number]>(queryClient, QueryKey.getMovies, (rows) =>
+      rows.filter((o) => o.id !== movieId),
+    );
     if (callback) callback();
     return { previousMovies };
   };
 
   const onError = (error: Error, _vars: unknown, context: MutationContext | undefined) => {
     showError({ title: 'An error occurred', message: error.message });
-    queryClient.setQueryData([QueryKey.getMovies], context?.previousMovies);
+    restorePaged(queryClient, context?.previousMovies);
   };
 
   const { mutate: watched, isPending: pendingWatched } = useMutation<unknown, Error, string, MutationContext>({

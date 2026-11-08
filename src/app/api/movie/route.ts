@@ -1,38 +1,52 @@
-import { and, eq, exists } from 'drizzle-orm';
+import { and, count, eq, exists, ilike, or } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { type NextRequest, NextResponse } from 'next/server';
+import { paginatedJson, parsePagination, parseSearchPattern } from '@/lib/api/pagination';
 import { db } from '@/lib/db';
 import { movies, subscribed_movies } from '@/lib/db/schema';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
 
 /**
- * Get all movies currently subscribed to.
+ * Get unwatched movies currently subscribed to.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-  const data = await db
-    .select()
-    .from(movies)
-    .where(
-      exists(
-        db
-          .select()
-          .from(subscribed_movies)
-          .where(
-            and(
-              eq(subscribed_movies.movie_id, movies.id),
-              eq(subscribed_movies.watcher_id, user.id),
-              eq(subscribed_movies.watched, false),
-            ),
-          ),
-      ),
-    )
-    .orderBy(movies.releasedate, movies.name);
+  const url = new URL(request.url);
+  const pagination = parsePagination(url);
+  if (pagination instanceof NextResponse) return pagination;
+  const search = parseSearchPattern(url);
 
-  return NextResponse.json(data, { status: 200 });
+  const filter = and(
+    exists(
+      db
+        .select()
+        .from(subscribed_movies)
+        .where(
+          and(
+            eq(subscribed_movies.movie_id, movies.id),
+            eq(subscribed_movies.watcher_id, user.id),
+            eq(subscribed_movies.watched, false),
+          ),
+        ),
+    ),
+    search ? or(ilike(movies.name, search), ilike(movies.description, search)) : undefined,
+  );
+
+  const [data, [totalRow]] = await Promise.all([
+    db
+      .select()
+      .from(movies)
+      .where(filter)
+      .orderBy(movies.releasedate, movies.name, movies.id)
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db.select({ total: count() }).from(movies).where(filter),
+  ]);
+
+  return paginatedJson(data, totalRow?.total ?? 0);
 }
 
 /**

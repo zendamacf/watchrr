@@ -20,7 +20,6 @@ const parsedEpisode: ParsedEpisode = {
     local_date: DateTime.fromSQL('2030-06-01'),
     original_local_date: DateTime.fromSQL('2030-06-01'),
     in_past: false,
-    is_snoozed: false,
     delay_days: 0,
     snoozed_until: null,
   },

@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderWithProviders } from '@/test/render';
 import { ShowPage } from './ShowPage';
@@ -48,7 +48,10 @@ describe('ShowPage', () => {
       { ...testShow, id: '00000000-0000-4000-8000-000000000097', name: 'Alpha Show' },
       { ...testShow, id: '00000000-0000-4000-8000-000000000098', name: 'Beta Series' },
     ];
-    stubFetch(mockFetchResponse(shows));
+    stubFetch(async (input: RequestInfo | URL) => {
+      const search = new URL(String(input), 'http://localhost').searchParams.get('search');
+      return mockPagedResponse(search ? shows.filter((s) => s.name.toLowerCase().includes(search)) : shows);
+    });
     const user = userEvent.setup();
     renderWithProviders(<ShowPage />);
 
@@ -68,7 +71,10 @@ describe('ShowPage', () => {
       { ...testShow, id: '00000000-0000-4000-8000-000000000097', name: 'Airing Show', status: 'Returning Series' },
       { ...testShow, id: '00000000-0000-4000-8000-000000000098', name: 'Finished Show', status: 'Ended' },
     ];
-    stubFetch(mockFetchResponse(shows));
+    stubFetch(async (input: RequestInfo | URL) => {
+      const status = new URL(String(input), 'http://localhost').searchParams.get('status');
+      return mockPagedResponse(status ? shows.filter((s) => s.status === status) : shows);
+    });
     const user = userEvent.setup();
     renderWithProviders(<ShowPage />);
 

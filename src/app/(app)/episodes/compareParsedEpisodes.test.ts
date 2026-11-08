@@ -22,7 +22,6 @@ function makeParsedEpisode(overrides: {
       local_date: effectiveDate,
       original_local_date: effectiveDate,
       in_past: false,
-      is_snoozed: false,
       delay_days: 0,
       snoozed_until: null,
     },

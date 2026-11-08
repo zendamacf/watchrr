@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
+import { updatePaged } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
 import type { EpisodesResponse, ShowEpisodesResponse, ShowSubscription, SubscribedShow } from '@/types';
 import { DELAY_UI_COLOR, MAX_DELAY_DAYS, SNOOZE_UI_COLOR } from '@/utils/episode-schedule';
@@ -90,8 +91,8 @@ export const ShowOptionsForm = ({ show }: Props) => {
     },
     onSuccess: (preferences) => {
       showSuccess({ title: 'Saved', message: `Updated options for ${show.name}` });
-      queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.map((row) => (row.tvshows.id === show.id ? { ...row, subscription: preferences } : row)),
+      updatePaged<EpisodesResponse[number]>(queryClient, QueryKey.getEpisodes, (rows) =>
+        rows.map((row) => (row.tvshows.id === show.id ? { ...row, subscription: preferences } : row)),
       );
       queryClient.setQueryData<ShowEpisodesResponse>([QueryKey.getShowEpisodes, show.id], (old) =>
         old ? { ...old, subscription: preferences } : old,

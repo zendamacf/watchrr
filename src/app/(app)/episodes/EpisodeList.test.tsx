@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
 import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
@@ -32,17 +32,6 @@ const pastEpisode: EpisodesResponse[number] = {
   episodes: { ...testEpisode, id: '00000000-0000-4000-8000-000000000090', airdate: '2020-01-01', name: 'Old Pilot' },
   tvshows: { ...testShow, name: 'Past Show', country: 'US' },
   subscription: testSubscription,
-};
-
-const snoozedEpisode: EpisodesResponse[number] = {
-  episodes: {
-    ...testEpisode,
-    id: '00000000-0000-4000-8000-000000000091',
-    airdate: '2020-01-01',
-    name: 'Snoozed Pilot',
-  },
-  tvshows: { ...testShow, name: 'Snoozed Show', country: 'US' },
-  subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
 };
 
 describe('EpisodeList', () => {
@@ -86,15 +75,14 @@ describe('EpisodeList', () => {
     });
   });
 
-  it('excludes snoozed episodes from the main schedule', async () => {
-    stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
+  it('asks the API for scheduled (non-snoozed) episodes only', async () => {
+    stubFetch(mockPagedResponse([futureEpisode]));
     renderWithProviders(<EpisodeList />);
 
     await waitFor(() => {
-      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
       expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
-      expect(screen.queryByText(/snoozed/i)).not.toBeInTheDocument();
     });
+    expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toContain('snoozed=false');
   });
 
   it('orders future date sections by effective airdate when delay shifts schedule', async () => {
@@ -134,7 +122,11 @@ describe('EpisodeList', () => {
   });
 
   it('groups past and future episodes and filters by search', async () => {
-    stubFetch(mockFetchResponse([pastEpisode, futureEpisode]));
+    stubFetch(async (input: RequestInfo | URL) => {
+      const search = new URL(String(input), 'http://localhost').searchParams.get('search');
+      const rows = [pastEpisode, futureEpisode];
+      return mockPagedResponse(search ? rows.filter((r) => r.tvshows.name.toLowerCase().includes(search)) : rows);
+    });
     const user = userEvent.setup();
     renderWithProviders(<EpisodeList />);
 

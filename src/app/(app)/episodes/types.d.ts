@@ -6,7 +6,6 @@ export type ParsedEpisode = {
     local_date: DateTime;
     original_local_date: DateTime;
     in_past: boolean;
-    is_snoozed: boolean;
     delay_days: number;
     snoozed_until: string | null;
   };

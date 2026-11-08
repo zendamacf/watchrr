@@ -57,9 +57,3 @@ export function tvShowStatusBadgeColor(status: string): string {
       return 'gray';
   }
 }
-
-export function showMatchesStatusFilter(show: Pick<Show, 'status'>, filter: TvShowStatusFilter): boolean {
-  if (filter === TV_SHOW_STATUS_FILTER_ALL) return true;
-  if (filter === TV_SHOW_STATUS_FILTER_UNKNOWN) return !show.status;
-  return show.status === filter;
-}

@@ -21,6 +21,7 @@ import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
+import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes, routes } from '@/lib/routes';
 import type { EpisodesResponse } from '@/types';
 import { DateFormat } from '@/utils/dates';
@@ -35,7 +36,7 @@ type Props = {
   variant?: 'scheduled' | 'snoozed';
 };
 
-type MutationContext = { previousEpisodes: EpisodesResponse | undefined };
+type MutationContext = { previousEpisodes: ReturnType<typeof snapshotPaged> };
 
 export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props) => {
   const { showError, showSuccess, showInfo } = useAlert();
@@ -50,9 +51,9 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
     },
     onMutate: async (episodeId) => {
       await queryClient.cancelQueries({ queryKey: [QueryKey.getEpisodes] });
-      const previousEpisodes = queryClient.getQueryData<EpisodesResponse>([QueryKey.getEpisodes]);
-      queryClient.setQueryData<EpisodesResponse>([QueryKey.getEpisodes], (old) =>
-        old?.filter((o) => o.episodes.id !== episodeId),
+      const previousEpisodes = snapshotPaged(queryClient, QueryKey.getEpisodes);
+      updatePaged<EpisodesResponse[number]>(queryClient, QueryKey.getEpisodes, (rows) =>
+        rows.filter((o) => o.episodes.id !== episodeId),
       );
       showSuccess({
         title: 'Nice!',
@@ -63,7 +64,7 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] }),
     onError(error, _vars, context) {
       showError({ title: 'An error occurred', message: error.message });
-      queryClient.setQueryData([QueryKey.getEpisodes], context?.previousEpisodes);
+      restorePaged(queryClient, context?.previousEpisodes);
     },
   });
 

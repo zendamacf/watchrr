@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockFetchResponse, stubFetch } from '@/test/fetch';
+import { mockFetchResponse, mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testMovie } from '@/test/fixtures/movie';
 import { renderWithProviders } from '@/test/render';
 import { MoviePage } from './MoviePage';
@@ -48,7 +48,10 @@ describe('MoviePage', () => {
       { ...testMovie, id: '00000000-0000-4000-8000-000000000095', name: 'Alpha Movie' },
       { ...testMovie, id: '00000000-0000-4000-8000-000000000096', name: 'Beta Film' },
     ];
-    stubFetch(mockFetchResponse(movies));
+    stubFetch(async (input: RequestInfo | URL) => {
+      const search = new URL(String(input), 'http://localhost').searchParams.get('search');
+      return mockPagedResponse(search ? movies.filter((m) => m.name.toLowerCase().includes(search)) : movies);
+    });
     const user = userEvent.setup();
     renderWithProviders(<MoviePage />);
 
@@ -61,5 +64,6 @@ describe('MoviePage', () => {
       expect(screen.getByTestId('movie-list')).toHaveTextContent('Alpha Movie');
       expect(screen.getByTestId('movie-list')).not.toHaveTextContent('Beta Film');
     });
+    expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).includes('search=alpha'))).toBe(true);
   });
 });
