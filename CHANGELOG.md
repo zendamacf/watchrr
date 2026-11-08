@@ -1,5 +1,22 @@
 # watchrr
 
+## 3.2.0
+
+### Minor Changes
+
+- 5c2ce48: Paginate the episode, TV show, and movie list APIs and load their pages with infinite scroll. `GET /api/episode`, `/api/tvshow`, and `/api/movie` now return at most 100 rows by default (`limit` up to 500, plus `offset`) and report the total in the `X-Total-Count` header. Search (and show status / snoozed filters) now run server-side.
+- 4ae80b1: Refresh the UI:
+   - New "signal" pink-red and teal theme with Bricolage Grotesque and Figtree fonts and larger corner radii. Logo has also been update to match.
+   - Show, movie and episode cards now display their backdrop art at full strength with a text scrim, and use a 2:3 poster.
+   - The header is sticky and translucent, and mobile gets a bottom tab bar.
+   - Lists load with card-shaped skeletons and show empty states.
+   - Episode day headers read "Today" and "Tomorrow".
+
+### Patch Changes
+
+- c6a7a7f: Updated minimatch, @sentry/nextjs.
+- e82c825: Updated glob, @sentry/nextjs.
+
 ## 3.1.2
 
 ### Patch Changes
