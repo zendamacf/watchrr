@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPagedResponse } from '@/test/fetch';
 import { fetchPage, flattenPages, pagedQueryOptions, restorePaged, snapshotPaged, totalOf, updatePaged } from './paged';
 
+const byId = (row: { id: number }) => String(row.id);
+
 const cache = (rows: { id: number }[], total = rows.length) => ({
   pages: [{ rows, total, offset: 0 }],
   pageParams: [0],
@@ -73,10 +75,21 @@ describe('paged cache helpers', () => {
       ],
       pageParams: [0, 1],
     };
-    expect(flattenPages(data)).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(flattenPages(data, byId)).toEqual([{ id: 1 }, { id: 2 }]);
     expect(totalOf(data)).toBe(3);
-    expect(flattenPages(undefined)).toEqual([]);
+    expect(flattenPages(undefined, byId)).toEqual([]);
     expect(totalOf(undefined)).toBe(0);
+  });
+
+  it('drops rows repeated across pages', () => {
+    const data = {
+      pages: [
+        { rows: [{ id: 1 }, { id: 2 }], total: 3, offset: 0 },
+        { rows: [{ id: 2 }, { id: 3 }], total: 3, offset: 1 },
+      ],
+      pageParams: [0, 1],
+    };
+    expect(flattenPages(data, byId)).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }]);
   });
 
   it('updates every cached variant, lowers totals on removal, and restores from a snapshot', () => {
@@ -88,14 +101,14 @@ describe('paged cache helpers', () => {
 
     updatePaged<{ id: number }>(client, 'k', (rows) => rows.filter((r) => r.id !== 1));
 
-    expect(flattenPages(client.getQueryData(['k', {}]))).toEqual([{ id: 2 }]);
+    expect(flattenPages(client.getQueryData(['k', {}]), byId)).toEqual([{ id: 2 }]);
     expect(totalOf(client.getQueryData(['k', {}]))).toBe(4);
-    expect(flattenPages(client.getQueryData(['k', { search: 'a' }]))).toEqual([]);
+    expect(flattenPages(client.getQueryData(['k', { search: 'a' }]), byId)).toEqual([]);
     expect(totalOf(client.getQueryData(['k', { search: 'a' }]))).toBe(0);
-    expect(flattenPages(client.getQueryData(['other', {}]))).toEqual([{ id: 1 }]);
+    expect(flattenPages(client.getQueryData(['other', {}]), byId)).toEqual([{ id: 1 }]);
 
     restorePaged(client, snapshot);
-    expect(flattenPages(client.getQueryData(['k', {}]))).toEqual([{ id: 1 }, { id: 2 }]);
+    expect(flattenPages(client.getQueryData(['k', {}]), byId)).toEqual([{ id: 1 }, { id: 2 }]);
     expect(totalOf(client.getQueryData(['k', {}]))).toBe(5);
   });
 

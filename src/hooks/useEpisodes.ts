@@ -24,7 +24,7 @@ export function useEpisodesQuery({ search, snoozed }: EpisodeFilters = {}) {
     placeholderData: keepPreviousData,
   });
 
-  const episodes = useMemo(() => flattenPages(query.data), [query.data]);
+  const episodes = useMemo(() => flattenPages(query.data, (row) => row.episodes.id), [query.data]);
   return { ...query, episodes, total: totalOf(query.data) };
 }
 

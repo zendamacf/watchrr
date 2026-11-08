@@ -25,7 +25,7 @@ export const MoviePage = () => {
     placeholderData: keepPreviousData,
   });
 
-  const movies = useMemo(() => flattenPages(data), [data]);
+  const movies = useMemo(() => flattenPages(data, (movie) => movie.id), [data]);
 
   if (isLoading)
     return (

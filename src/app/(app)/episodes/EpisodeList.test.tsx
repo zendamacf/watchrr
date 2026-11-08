@@ -34,17 +34,6 @@ const pastEpisode: EpisodesResponse[number] = {
   subscription: testSubscription,
 };
 
-const snoozedEpisode: EpisodesResponse[number] = {
-  episodes: {
-    ...testEpisode,
-    id: '00000000-0000-4000-8000-000000000091',
-    airdate: '2020-01-01',
-    name: 'Snoozed Pilot',
-  },
-  tvshows: { ...testShow, name: 'Snoozed Show', country: 'US' },
-  subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
-};
-
 describe('EpisodeList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -86,15 +75,14 @@ describe('EpisodeList', () => {
     });
   });
 
-  it('excludes snoozed episodes from the main schedule', async () => {
-    stubFetch(mockFetchResponse([snoozedEpisode, futureEpisode]));
+  it('asks the API for scheduled (non-snoozed) episodes only', async () => {
+    stubFetch(mockPagedResponse([futureEpisode]));
     renderWithProviders(<EpisodeList />);
 
     await waitFor(() => {
-      expect(screen.queryByTestId('past-episodes')).not.toBeInTheDocument();
       expect(screen.getByTestId('grouped-episodes')).toBeInTheDocument();
-      expect(screen.queryByText(/snoozed/i)).not.toBeInTheDocument();
     });
+    expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toContain('snoozed=false');
   });
 
   it('orders future date sections by effective airdate when delay shifts schedule', async () => {

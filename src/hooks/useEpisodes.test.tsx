@@ -2,7 +2,6 @@ import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockPagedResponse, stubFetch } from '@/test/fetch';
 import { testEpisode } from '@/test/fixtures/episode';
-import { testSubscription } from '@/test/fixtures/subscription';
 import { testShow } from '@/test/fixtures/tvshow';
 import { renderHookWithProviders } from '@/test/renderHook';
 import type { EpisodesResponse } from '@/types';
@@ -14,10 +13,9 @@ const snoozedEpisode: EpisodesResponse[number] = {
   subscription: { delay_days: 0, snoozed_until: '2099-12-01' },
 };
 
-const scheduledEpisode: EpisodesResponse[number] = {
-  episodes: { ...testEpisode, id: '00000000-0000-4000-8000-000000000092', name: 'Scheduled Pilot' },
-  tvshows: testShow,
-  subscription: testSubscription,
+const secondSnoozedEpisode: EpisodesResponse[number] = {
+  ...snoozedEpisode,
+  episodes: { ...snoozedEpisode.episodes, id: '00000000-0000-4000-8000-000000000093' },
 };
 
 describe('useSnoozedEpisodeCount', () => {
@@ -26,7 +24,7 @@ describe('useSnoozedEpisodeCount', () => {
   });
 
   it('returns the number of snoozed unwatched episodes', async () => {
-    stubFetch(mockPagedResponse([snoozedEpisode, snoozedEpisode], 2));
+    stubFetch(mockPagedResponse([snoozedEpisode, secondSnoozedEpisode], 2));
     const { result } = renderHookWithProviders(() => useSnoozedEpisodeCount());
 
     await waitFor(() => {
@@ -80,7 +78,7 @@ describe('useSnoozedEpisodes', () => {
   });
 
   it('returns only snoozed episodes', async () => {
-    stubFetch(mockPagedResponse([snoozedEpisode, snoozedEpisode], 2));
+    stubFetch(mockPagedResponse([snoozedEpisode, secondSnoozedEpisode], 2));
     const { result } = renderHookWithProviders(() => useSnoozedEpisodes());
 
     await waitFor(() => {

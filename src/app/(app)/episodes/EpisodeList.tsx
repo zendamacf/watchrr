@@ -26,8 +26,6 @@ export const EpisodeList = () => {
     const converted = episodes.map<ParsedEpisode>((r) => {
       const delayDays = r.subscription.delay_days ?? 0;
       const snoozedUntil = r.subscription.snoozed_until;
-      const isSnoozed =
-        !!snoozedUntil && DateTime.fromSQL(snoozedUntil).startOf('day') >= DateTime.now().startOf('day');
       const { originalLocalDate, effectiveLocalDate, inPast } = parseEpisodeDate(
         r.episodes.airdate,
         r.tvshows.country,
@@ -41,16 +39,14 @@ export const EpisodeList = () => {
           local_date: effectiveLocalDate,
           original_local_date: originalLocalDate,
           in_past: inPast,
-          is_snoozed: isSnoozed,
           delay_days: delayDays,
           snoozed_until: snoozedUntil,
         },
       };
     });
 
-    const scheduledEpisodes = converted.filter((r) => !r.episodes.is_snoozed);
-    const pastEpisodes = scheduledEpisodes.filter((r) => r.episodes.in_past).sort(compareParsedEpisodes);
-    const futureEpisodes = scheduledEpisodes.filter((r) => !r.episodes.in_past).sort(compareParsedEpisodes);
+    const pastEpisodes = converted.filter((r) => r.episodes.in_past).sort(compareParsedEpisodes);
+    const futureEpisodes = converted.filter((r) => !r.episodes.in_past).sort(compareParsedEpisodes);
     const futureDates = futureEpisodes.reduce<Record<string, ParsedEpisode[]>>((acc, curr) => {
       const date = curr.episodes.local_date.toFormat(DateFormat.YMD);
       if (!acc[date]) acc[date] = [];

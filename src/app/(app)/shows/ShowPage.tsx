@@ -32,7 +32,7 @@ export const ShowPage = () => {
     placeholderData: keepPreviousData,
   });
 
-  const shows = useMemo(() => flattenPages(data), [data]);
+  const shows = useMemo(() => flattenPages(data, (show) => show.id), [data]);
 
   if (isLoading)
     return (

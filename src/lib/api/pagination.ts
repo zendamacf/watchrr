@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server';
-
-/** Default page size. */
-export const DEFAULT_PAGE_SIZE = 100;
-/** Largest accepted `limit`. */
-export const MAX_PAGE_SIZE = 500;
-
-export const TOTAL_COUNT_HEADER = 'X-Total-Count';
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, TOTAL_COUNT_HEADER } from './paginationConstants';
 
 export type Pagination = { limit: number; offset: number };
 

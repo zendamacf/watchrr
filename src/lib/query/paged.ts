@@ -1,6 +1,6 @@
 import { type InfiniteData, infiniteQueryOptions, type QueryClient, type QueryKey } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/fetch';
-import { DEFAULT_PAGE_SIZE, TOTAL_COUNT_HEADER } from '@/lib/api/pagination';
+import { DEFAULT_PAGE_SIZE, TOTAL_COUNT_HEADER } from '@/lib/api/paginationConstants';
 
 /** One loaded page: its rows, the server's total match count, and its starting offset. */
 export type Page<T> = { rows: T[]; total: number; offset: number };
@@ -52,9 +52,20 @@ export function pagedQueryOptions<T>(key: string, path: string, params: PagedPar
   });
 }
 
-/** All loaded rows, in order. */
-export function flattenPages<T>(data: PagedData<T> | undefined): T[] {
-  return data?.pages.flatMap((page) => page.rows) ?? [];
+/**
+ * All loaded rows, in order, without duplicates. Offsets are server positions, so a row removed
+ * optimistically can make the next page repeat a row until the list refetches.
+ */
+export function flattenPages<T>(data: PagedData<T> | undefined, getId: (row: T) => string): T[] {
+  const seen = new Set<string>();
+  return (data?.pages ?? []).flatMap((page) =>
+    page.rows.filter((row) => {
+      const id = getId(row);
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    }),
+  );
 }
 
 /** Server-side total matching the current filters, including rows not yet loaded. */
