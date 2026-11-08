@@ -1,5 +1,11 @@
 # watchrr
 
+## 3.2.1
+
+### Patch Changes
+
+- 0dacdef: Fix mobile bottom tab bar floating above the bottom of the screen when scrolled to the top
+
 ## 3.2.0
 
 ### Minor Changes
