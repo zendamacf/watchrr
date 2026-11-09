@@ -1,15 +1,16 @@
 'use client';
 
-import { UnstyledButton, type UnstyledButtonProps } from '@mantine/core';
+import { Group, UnstyledButton, type UnstyledButtonProps } from '@mantine/core';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { apiRoutes, routes } from '@/lib/routes';
 
 type SignOutButtonProps = UnstyledButtonProps & {
   onSignedOut?: () => void;
+  icon?: ReactNode;
 };
 
-export function SignOutButton({ onSignedOut, ...props }: SignOutButtonProps) {
+export function SignOutButton({ onSignedOut, icon, ...props }: SignOutButtonProps) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -27,7 +28,14 @@ export function SignOutButton({ onSignedOut, ...props }: SignOutButtonProps) {
 
   return (
     <UnstyledButton {...props} onClick={handleSignOut} data-disabled={pending || undefined}>
-      Sign out
+      {icon ? (
+        <Group gap="xs" component="span">
+          {icon}
+          Sign out
+        </Group>
+      ) : (
+        'Sign out'
+      )}
     </UnstyledButton>
   );
 }

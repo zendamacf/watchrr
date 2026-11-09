@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import type { ComponentType } from 'react';
 import { routes } from '@/lib/routes';
 import { type AuthUser, guardUser } from '@/utils/auth';
-import { SiteHeader } from '../SiteHeader';
+import { AppFooter, SiteHeader } from '../SiteHeader';
 import classes from './AuthedPage.module.css';
 
 export async function AuthedPage({ children: Child }: { children: ComponentType<{ user: AuthUser }> }) {
@@ -17,6 +17,7 @@ export async function AuthedPage({ children: Child }: { children: ComponentType<
         <Container fluid>
           <Child user={user} />
           <Space className={classes.bottomSpace} />
+          <AppFooter className={classes.footer} />
         </Container>
       </main>
     </div>

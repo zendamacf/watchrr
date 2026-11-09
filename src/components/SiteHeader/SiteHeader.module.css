@@ -82,3 +82,11 @@
   font-size: var(--mantine-font-size-xs);
   font-weight: 500;
 }
+
+.drawerFooter {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding-bottom: calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom));
+}
