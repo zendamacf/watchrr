@@ -1,6 +1,7 @@
 import { Container, Paper, Stack, Text, Title } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/Logo';
+import { AppFooter } from '@/components/SiteHeader';
 import classes from './PublicPage.module.css';
 
 export function PublicPage({
@@ -26,6 +27,8 @@ export function PublicPage({
       <Paper withBorder shadow="sm" p="lg" mt="xl">
         {children}
       </Paper>
+
+      <AppFooter />
     </Container>
   );
 }

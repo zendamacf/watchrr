@@ -1,8 +1,10 @@
 import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
+import { version } from './package.json';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  env: { NEXT_PUBLIC_APP_VERSION: version },
 };
 
 const isDockerBuild = process.env.DOCKER_BUILD === '1';

@@ -3,16 +3,18 @@
 import { Burger, Drawer, Group, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
-import { CalendarDays, Film, Tv } from 'lucide-react';
+import { CalendarDays, Film, LogOut, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { routes } from '@/lib/routes';
 import { Logo } from '../Logo';
+import { AppFooter } from './AppFooter';
 import { isActiveRoute } from './isActiveRoute';
 import classes from './SiteHeader.module.css';
 import { SnoozedIndicator } from './SnoozedIndicator';
+import { ThemeMenuItem } from './ThemeMenuItem';
 import { ThemeToggle } from './ThemeToggle';
 
 const links: { label: string; href: string; icon: ReactNode }[] = [
@@ -86,9 +88,15 @@ function MobileMenu({ drawerOpened, closeDrawer }: { drawerOpened: boolean; clos
       zIndex={1000000}
     >
       <Stack gap="md">
-        <ThemeToggle />
-        <SignOutButton className={classes.link} style={{ paddingLeft: 0 }} onSignedOut={closeDrawer} />
+        <ThemeMenuItem className={classes.link} style={{ paddingInline: 0 }} />
+        <SignOutButton
+          className={classes.link}
+          style={{ paddingLeft: 0 }}
+          icon={<LogOut size={18} aria-hidden />}
+          onSignedOut={closeDrawer}
+        />
       </Stack>
+      <AppFooter className={classes.drawerFooter} />
     </Drawer>
   );
 }

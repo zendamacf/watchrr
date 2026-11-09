@@ -6,3 +6,13 @@
     height: 100px;
   }
 }
+
+/* On mobile the footer lives in the side menu instead */
+.footer {
+  display: none;
+
+  @media (min-width: $mantine-breakpoint-sm) {
+    display: block;
+    margin-top: calc(-1 * var(--mantine-spacing-xl));
+  }
+}

@@ -14,5 +14,6 @@ describe('PublicPage', () => {
     expect(screen.getByRole('heading', { name: 'Test title' })).toBeInTheDocument();
     expect(screen.getByText('Test subtitle')).toBeInTheDocument();
     expect(screen.getByText('Form body')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'GitHub' })).toBeInTheDocument();
   });
 });
