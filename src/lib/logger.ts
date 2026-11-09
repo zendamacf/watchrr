@@ -1,3 +1,5 @@
+import { redactSecrets } from '@/lib/redact';
+
 type LogLevel = 'info' | 'warn' | 'error';
 
 export type LogFields = Record<string, string | number | boolean | null | undefined>;
@@ -28,7 +30,8 @@ function write(level: LogLevel, message: string, fields?: LogFields) {
     ...fields,
   };
 
-  const line = JSON.stringify(entry);
+  // Central safety net: no log line may contain a configured secret.
+  const line = redactSecrets(JSON.stringify(entry));
   if (level === 'error') {
     console.error(line);
     return;

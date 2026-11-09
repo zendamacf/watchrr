@@ -62,6 +62,9 @@ For backups, HTTPS in front of the app, and production cron setup, see [docs/sel
 | `THEMOVIEDB_ACCESS_TOKEN` | Both | TMDB API v4 read token |
 | `CRON_SECRET` | Both | Bearer token for `/api/refresh` |
 | `ALLOW_SIGNUP` | Both | `false` disables new registrations |
+| `RESEND_API_KEY` | Optional | [Resend](https://resend.com) API key; without it, emails are logged instead of sent |
+| `EMAIL_FROM` | Optional | Sender, e.g. `watchrr <noreply@yourdomain.com>` (domain must be verified in Resend) |
+| `APP_URL` | Optional | Public base URL used for links in emails (default `http://localhost:3000`) |
 | `APP_PORT` / `PORT` | Docker / local | HTTP port (default 3000) |
 | `SENTRY_TRACES_SAMPLE_RATE` | Optional | Production trace sampling (0–1) |
 | `UMAMI_WEBSITE_ID` | Optional | Umami site id; enables analytics in production |

@@ -26,9 +26,6 @@ describe('/api/tvshow', () => {
     mockGuardUser.mockResolvedValue({ id: userId });
   });
 
-  const seedPaged = (i: number) =>
-    seedSubscribedTvShow({ watcherId: userId, show: { moviedb_id: 998_690 + i, name: `Paged Show ${i}` } });
-
   describe('GET', () => {
     it('returns 401 when not authenticated', async () => {
       mockGuardUser.mockResolvedValue(null);
@@ -58,8 +55,15 @@ describe('/api/tvshow', () => {
       });
 
       it('pages through results in a stable order and reports the total', async () => {
+        // Dedicated user: other test files insert subscriptions for apiUser in parallel,
+        // which made the exact-total assertion below flaky.
+        const pagingUser = await seedUser({ email: seedEmails.tvshowPagination, password: seedPassword });
+        mockGuardUser.mockResolvedValue({ id: pagingUser.id });
         for (let i = 1; i <= 3; i++) {
-          await seedPaged(i);
+          await seedSubscribedTvShow({
+            watcherId: pagingUser.id,
+            show: { moviedb_id: 998_690 + i, name: `Paged Show ${i}` },
+          });
         }
 
         const all = await (await GET(nextGet(apiRoutes.tvshow))).json();
