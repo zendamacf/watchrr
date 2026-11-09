@@ -1,5 +1,13 @@
 # watchrr
 
+## 3.2.2
+
+### Patch Changes
+
+- fa06d80: Add footer with GitHub link & version.
+- 1d23fab: Fix empty gap under the mobile tab bar by only applying the bottom safe-area inset in installed (standalone) mode.
+- fa06d80: Improve layout of mobile side menu.
+
 ## 3.2.1
 
 ### Patch Changes
