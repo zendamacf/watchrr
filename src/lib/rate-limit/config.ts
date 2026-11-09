@@ -15,6 +15,13 @@ const POLICIES: Record<RateLimitClass, { max: number; windowMs: number }> = {
   api: { max: 300, windowMs: 60 * 1000 },
 };
 
+const AUTH_RATE_LIMITED_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/signup',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+]);
+
 export function getRateLimitPolicy(className: RateLimitClass): RateLimitPolicy {
   const limits = POLICIES[className];
   return { class: className, ...limits };
@@ -26,7 +33,7 @@ export function resolveRateLimitClass(pathname: string, authorization: string | 
     if (secret && authorization === `Bearer ${secret}`) return 'cronAuthed';
     return 'cron';
   }
-  if (pathname === '/api/auth/login' || pathname === '/api/auth/signup') return 'auth';
+  if (AUTH_RATE_LIMITED_PATHS.has(pathname)) return 'auth';
   if (pathname === '/api/movie/search' || pathname === '/api/tvshow/search') return 'search';
   if (pathname.startsWith('/api/')) return 'api';
   return 'api';

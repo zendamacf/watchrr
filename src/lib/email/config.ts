@@ -9,6 +9,14 @@ export function isEmailEnabled(): boolean {
   return Boolean(process.env.RESEND_API_KEY?.trim());
 }
 
+/**
+ * Whether emails can reach people: a real provider is configured, or we're outside production
+ * (where the console provider logs the message for local development).
+ */
+export function canDeliverEmail(): boolean {
+  return isEmailEnabled() || process.env.NODE_ENV !== 'production';
+}
+
 export function getEmailFrom(): string {
   return process.env.EMAIL_FROM?.trim() || DEFAULT_FROM;
 }

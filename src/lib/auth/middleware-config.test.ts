@@ -5,6 +5,8 @@ describe('middleware path config', () => {
   it('marks sign-in, sign-up, and health as public pages', () => {
     expect(isPublicPagePath('/signin')).toBe(true);
     expect(isPublicPagePath('/signup')).toBe(true);
+    expect(isPublicPagePath('/forgot-password')).toBe(true);
+    expect(isPublicPagePath('/reset-password')).toBe(true);
     expect(isPublicPagePath('/health')).toBe(true);
     expect(isProtectedPagePath('/signin')).toBe(false);
   });
@@ -31,6 +33,8 @@ describe('middleware path config', () => {
   it('lists public API routes explicitly', () => {
     expect(isPublicApiPath('/api/auth/login')).toBe(true);
     expect(isPublicApiPath('/api/auth/signup')).toBe(true);
+    expect(isPublicApiPath('/api/auth/forgot-password')).toBe(true);
+    expect(isPublicApiPath('/api/auth/reset-password')).toBe(true);
     expect(isPublicApiPath('/api/auth/logout')).toBe(true);
     expect(isPublicApiPath('/api/refresh')).toBe(true);
     expect(isPublicApiPath('/api/movie')).toBe(false);

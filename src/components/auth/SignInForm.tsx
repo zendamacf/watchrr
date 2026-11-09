@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Button, PasswordInput, TextInput } from '@mantine/core';
+import { Alert, Anchor, Button, PasswordInput, TextInput } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 import { apiRoutes, routes } from '@/lib/routes';
@@ -55,6 +55,9 @@ export function SignInForm() {
       )}
       <TextInput label="Email" name="email" placeholder="email@example.com" required radius="md" />
       <PasswordInput label="Password" name="password" placeholder="Your password" required mt="md" radius="md" />
+      <Anchor href={routes.forgotPassword} size="sm" display="block" mt="xs" ta="right">
+        Forgot password?
+      </Anchor>
       <Button type="submit" fullWidth mt="xl" radius="md" loading={pending}>
         Sign in
       </Button>
