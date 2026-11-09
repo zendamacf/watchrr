@@ -43,7 +43,7 @@ export async function seedUser(options: { email: string; password: string }): Pr
   const passwordHash = await hashPassword(options.password);
 
   try {
-    await db.insert(users).values({ email, passwordHash }).onConflictDoNothing();
+    await db.insert(users).values({ email, passwordHash, emailVerifiedAt: new Date() }).onConflictDoNothing();
   } catch (error) {
     if (!isUniqueViolation(error)) throw error;
   }

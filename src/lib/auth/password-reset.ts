@@ -1,30 +1,29 @@
-import { createHash, randomBytes } from 'node:crypto';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { lower, password_reset_tokens, users } from '@/lib/db/schema';
 import { hashPassword } from './password';
 import { changePassword } from './password-change';
+import { generateToken, hashToken } from './token';
 import { invalidateTokenVersionCache } from './token-version';
 
 export const RESET_TOKEN_TTL_MINUTES = 60;
 /** Minimum gap between reset emails for one account (limits email flooding of a victim). */
 export const RESET_REQUEST_COOLDOWN_MS = 60_000;
 
-export function hashResetToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
-}
+export const hashResetToken = hashToken;
 
 /**
  * Creates a fresh reset token for the account with this email, replacing any unused ones.
- * Returns null (without distinguishing why) for unknown emails or requests inside the cooldown.
+ * Returns null (without distinguishing why) for unknown or unverified emails, or requests inside the cooldown.
  */
 export async function createResetToken(email: string, now = new Date()): Promise<string | null> {
   const [user] = await db
-    .select({ id: users.id })
+    .select({ id: users.id, emailVerifiedAt: users.emailVerifiedAt })
     .from(users)
     .where(eq(lower(users.email), email.trim().toLowerCase()))
     .limit(1);
-  if (!user) return null;
+  // Unverified addresses never get reset email (the caller can't tell why).
+  if (!user?.emailVerifiedAt) return null;
 
   const unused = await db
     .select({ createdAt: password_reset_tokens.created_at })
@@ -33,7 +32,7 @@ export async function createResetToken(email: string, now = new Date()): Promise
   const mostRecent = Math.max(0, ...unused.map((r) => r.createdAt.getTime()));
   if (now.getTime() - mostRecent < RESET_REQUEST_COOLDOWN_MS) return null;
 
-  const token = randomBytes(32).toString('base64url');
+  const token = generateToken();
   await db.transaction(async (tx) => {
     await tx
       .delete(password_reset_tokens)

@@ -11,6 +11,8 @@ describe('rate limit config', () => {
     expect(resolveRateLimitClass('/api/auth/signup', null)).toBe('auth');
     expect(resolveRateLimitClass('/api/auth/forgot-password', null)).toBe('auth');
     expect(resolveRateLimitClass('/api/auth/reset-password', null)).toBe('auth');
+    expect(resolveRateLimitClass('/api/auth/verify-email', null)).toBe('auth');
+    expect(resolveRateLimitClass('/api/auth/resend-verification', null)).toBe('auth');
     expect(resolveRateLimitClass('/api/movie/search', null)).toBe('search');
     expect(resolveRateLimitClass('/api/tvshow/search', null)).toBe('search');
     expect(resolveRateLimitClass('/api/episode', null)).toBe('api');

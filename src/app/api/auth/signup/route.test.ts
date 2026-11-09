@@ -1,9 +1,16 @@
 import { randomUUID } from 'node:crypto';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
+import { db } from '@/lib/db';
+import { email_verification_tokens, lower, users } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { seedUser } from '@/test/seeds';
+
+const mockSendEmail = vi.fn();
+vi.mock('@/lib/email/send', () => ({ sendEmail: (...args: unknown[]) => mockSendEmail(...args) }));
+
 import { POST } from './route';
 
 function signupRequest(body: unknown) {
@@ -20,9 +27,12 @@ describe('POST /api/auth/signup', () => {
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
     delete process.env.ALLOW_SIGNUP;
+    mockSendEmail.mockReset();
+    vi.stubEnv('RESEND_API_KEY', '');
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     if (previousAllowSignup === undefined) {
       delete process.env.ALLOW_SIGNUP;
     } else {
@@ -78,5 +88,58 @@ describe('POST /api/auth/signup', () => {
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toContain(`${AUTH_COOKIE_NAME}=`);
     expect(setCookie).toContain('HttpOnly');
+  });
+
+  it.each([
+    'not-an-email',
+    'a@b',
+    'a b@example.com',
+    '@example.com',
+    'a@@example.com',
+    `${'x'.repeat(250)}@example.com`,
+  ])('returns 400 for malformed email %s', async (email) => {
+    const response = await POST(signupRequest({ email, password: seedPassword }));
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({ message: 'Enter a valid email address' });
+  });
+
+  it('stamps the account verified when email is not configured', async () => {
+    const email = `vitest-signup-${randomUUID()}@example.com`;
+    await POST(signupRequest({ email, password: seedPassword }));
+    const [row] = await db
+      .select()
+      .from(users)
+      .where(eq(lower(users.email), email));
+    expect(row?.emailVerifiedAt).toBeInstanceOf(Date);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it('creates an unverified account and emails a link, without a session, when email is configured', async () => {
+    vi.stubEnv('RESEND_API_KEY', 're_test');
+    vi.stubEnv('APP_URL', 'https://watchrr.test');
+    const email = `vitest-signup-${randomUUID()}@example.com`;
+
+    const response = await POST(signupRequest({ email, password: seedPassword }));
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({ requiresVerification: true });
+    expect(response.headers.get('Set-Cookie')).toBeNull();
+
+    const [row] = await db
+      .select()
+      .from(users)
+      .where(eq(lower(users.email), email));
+    expect(row?.emailVerifiedAt).toBeNull();
+    const tokens = await db
+      .select()
+      .from(email_verification_tokens)
+      .where(eq(email_verification_tokens.user_id, row?.id ?? ''));
+    expect(tokens).toHaveLength(1);
+
+    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+    const [type, to, props] = mockSendEmail.mock.calls[0] as [string, string, { verifyUrl: string }];
+    expect(type).toBe('verifyEmail');
+    expect(to).toBe(email);
+    expect(props.verifyUrl).toMatch(/^https:\/\/watchrr\.test\/verify-email\?token=[\w-]+$/);
   });
 });

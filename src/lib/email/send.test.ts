@@ -7,7 +7,7 @@ import { sendEmail } from './send';
 describe('sendEmail', () => {
   beforeEach(() => {
     vi.stubEnv('RESEND_API_KEY', 're_test');
-    vi.stubEnv('EMAIL_FROM', 'Watchrr <noreply@example.com>');
+    vi.stubEnv('EMAIL_FROM', 'watchrr <noreply@example.com>');
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -28,7 +28,7 @@ describe('sendEmail', () => {
     expect(url).toBe('https://api.resend.com/emails');
     expect(init.headers.Authorization).toBe('Bearer re_test');
     const body = JSON.parse(init.body);
-    expect(body).toMatchObject({ from: 'Watchrr <noreply@example.com>', to: ['a@b.com'] });
+    expect(body).toMatchObject({ from: 'watchrr <noreply@example.com>', to: ['a@b.com'] });
     expect(body.text).toContain('https://x.test/reset?token=abc');
   });
 

@@ -25,6 +25,8 @@ export const users = pgTable(
     passwordHash: text('password_hash').notNull(),
     /** Bumped on password change; session JWTs carry it and are rejected when stale. */
     tokenVersion: integer('token_version').notNull().default(0),
+    /** Null until the owner proves control of the address via the emailed link. */
+    emailVerifiedAt: timestamp('email_verified_at'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [uniqueIndex('users_email_unique_idx').on(lower(table.email))],
@@ -44,6 +46,22 @@ export const password_reset_tokens = pgTable(
     created_at: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [index('password_reset_tokens_user_id_idx').on(table.user_id)],
+);
+
+export const email_verification_tokens = pgTable(
+  'email_verification_tokens',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    user_id: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** SHA-256 of the emailed token; the raw token is never stored. */
+    token_hash: text('token_hash').notNull().unique(),
+    expires_at: timestamp('expires_at').notNull(),
+    used_at: timestamp('used_at'),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('email_verification_tokens_user_id_idx').on(table.user_id)],
 );
 
 export const tvshows = pgTable('tvshows', {

@@ -2,7 +2,7 @@ import { consoleProvider } from './providers/console';
 import { createResendProvider } from './providers/resend';
 import type { EmailProvider } from './types';
 
-const DEFAULT_FROM = 'Watchrr <onboarding@resend.dev>';
+const DEFAULT_FROM = 'watchrr <onboarding@resend.dev>';
 
 /** True when a real provider is configured (otherwise emails are only logged). */
 export function isEmailEnabled(): boolean {

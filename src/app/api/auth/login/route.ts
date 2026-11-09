@@ -5,6 +5,7 @@ import { signAccessToken } from '@/lib/auth/jwt';
 import { verifyPassword } from '@/lib/auth/password';
 import { db } from '@/lib/db';
 import { lower, users } from '@/lib/db/schema';
+import { isEmailEnabled } from '@/lib/email/config';
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -40,6 +41,13 @@ export async function POST(request: Request) {
 
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     return NextResponse.json({ message: 'Invalid email or password' }, { status: 401 });
+  }
+
+  if (!user.emailVerifiedAt && isEmailEnabled()) {
+    return NextResponse.json(
+      { code: 'email_not_verified', message: 'Confirm your email address to sign in' },
+      { status: 403 },
+    );
   }
 
   const token = await signAccessToken(user.id, user.tokenVersion);

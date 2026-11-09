@@ -20,6 +20,8 @@ const AUTH_RATE_LIMITED_PATHS = new Set([
   '/api/auth/signup',
   '/api/auth/forgot-password',
   '/api/auth/reset-password',
+  '/api/auth/verify-email',
+  '/api/auth/resend-verification',
 ]);
 
 export function getRateLimitPolicy(className: RateLimitClass): RateLimitPolicy {

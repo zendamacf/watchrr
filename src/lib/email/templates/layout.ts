@@ -72,8 +72,8 @@ export function renderLayout(bodyHtml: string): string {
   </head>
   <body class="page" style="margin:0;padding:24px 16px;background:${l.page};font-family:${FONT_STACK};">
     <div class="card" style="max-width:480px;margin:0 auto;background:${l.card};color:${l.text};border-radius:16px;padding:28px;font-size:16px;line-height:1.5;">
-      <img class="logo-light-mode" src="${appUrl}/watchrr-dark.png" alt="Watchrr" width="140" style="display:block;margin:0 0 24px;height:auto;">
-      <img class="logo-dark-mode" src="${appUrl}/watchrr-light.png" alt="Watchrr" width="140" style="margin:0 0 24px;height:auto;">
+      <img class="logo-light-mode" src="${appUrl}/watchrr-dark.png" alt="watchrr" width="140" style="display:block;margin:0 0 24px;height:auto;">
+      <img class="logo-dark-mode" src="${appUrl}/watchrr-light.png" alt="watchrr" width="140" style="margin:0 0 24px;height:auto;">
       ${bodyHtml}
     </div>
   </body>
