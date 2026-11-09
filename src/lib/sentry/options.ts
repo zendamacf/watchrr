@@ -1,4 +1,5 @@
 import type { BrowserOptions, EdgeOptions, NodeOptions } from '@sentry/nextjs';
+import { redactDeep } from '@/lib/redact';
 
 const dsn = 'https://a42d84a2023c9b94b8feb5d7f5b69479@o4509541345591296.ingest.de.sentry.io/4509671716749392';
 
@@ -20,4 +21,7 @@ export const sentryInitOptions: NodeOptions & EdgeOptions & BrowserOptions = {
     ? 0
     : parseTracesSampleRate(process.env.SENTRY_TRACES_SAMPLE_RATE, DEFAULT_PRODUCTION_TRACES_SAMPLE_RATE),
   debug: false,
+  // Scrub configured secrets from every event/breadcrumb before it leaves the process.
+  beforeSend: (event) => redactDeep(event),
+  beforeBreadcrumb: (breadcrumb) => redactDeep(breadcrumb),
 };
