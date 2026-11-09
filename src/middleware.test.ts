@@ -9,7 +9,7 @@ import { middleware } from '@/middleware';
 const userId = 'e1e31db5-d029-4ba7-aa65-fd6a5e7fdea';
 
 async function authedRequest(url: string) {
-  const token = await signAccessToken(userId);
+  const token = await signAccessToken(userId, 0);
   return new NextRequest(url, {
     headers: { cookie: `${AUTH_COOKIE_NAME}=${token}` },
   });

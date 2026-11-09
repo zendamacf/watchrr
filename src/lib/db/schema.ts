@@ -23,6 +23,8 @@ export const users = pgTable(
     id: uuid('id').defaultRandom().primaryKey(),
     email: text('email').notNull(),
     passwordHash: text('password_hash').notNull(),
+    /** Bumped on password change; session JWTs carry it and are rejected when stale. */
+    tokenVersion: integer('token_version').notNull().default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (table) => [uniqueIndex('users_email_unique_idx').on(lower(table.email))],

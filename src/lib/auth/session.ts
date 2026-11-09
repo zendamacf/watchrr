@@ -24,17 +24,17 @@ export function resolveAuthToken(headers: Headers): string | null {
   return getTokenFromCookie(headers.get('cookie'), AUTH_COOKIE_NAME);
 }
 
-export async function authenticateHeaders(headers: Headers): Promise<{ userId: string } | null> {
+export async function authenticateHeaders(headers: Headers): Promise<{ userId: string; tokenVersion: number } | null> {
   const token = resolveAuthToken(headers);
   if (!token) return null;
   try {
-    const { sub } = await verifyAccessToken(token);
-    return { userId: sub };
+    const { sub, tv } = await verifyAccessToken(token);
+    return { userId: sub, tokenVersion: tv };
   } catch {
     return null;
   }
 }
 
-export async function authenticateRequest(request: Request): Promise<{ userId: string } | null> {
+export async function authenticateRequest(request: Request): Promise<{ userId: string; tokenVersion: number } | null> {
   return authenticateHeaders(request.headers);
 }
