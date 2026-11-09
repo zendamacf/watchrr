@@ -1,5 +1,18 @@
 # watchrr
 
+## 3.3.0
+
+### Minor Changes
+
+- 9b81eba: Add session invalidation groundwork: session tokens now carry a per-user version (`users.token_version`) that is checked on authenticated requests and bumped when a password changes.
+- a1f22ac: Add a transactional email module (Resend, with a console fallback) configured via `RESEND_API_KEY`, `EMAIL_FROM` and `APP_URL`.
+- 8227c69: Add password recovery: "Forgot password?" on sign-in, emailed single-use reset links (60 minute expiry), and a reset page. Resetting a password signs out every existing session. Requires `RESEND_API_KEY` in production (see README); without it the forgot-password page explains reset isn't available.
+- 74f888e: Validate email addresses at signup and verify ownership by email. Malformed addresses are rejected (in the form and the API). When `RESEND_API_KEY` is set, new accounts must confirm a single-use, 24 hour link before signing in, with a rate-limited "resend" option, and password reset emails go only to verified addresses. Existing accounts are migrated as verified; instances without email configured are unaffected.
+
+### Patch Changes
+
+- a1f22ac: Add redaction for all secrets in logs, error tracking, etc.
+
 ## 3.2.2
 
 ### Patch Changes
