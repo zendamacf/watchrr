@@ -60,15 +60,15 @@ describe('authenticateHeaders', () => {
   });
 
   it('returns userId for a valid Bearer token', async () => {
-    const token = await signAccessToken(userId);
+    const token = await signAccessToken(userId, 0);
     const headers = new Headers({ authorization: `Bearer ${token}` });
-    await expect(authenticateHeaders(headers)).resolves.toEqual({ userId });
+    await expect(authenticateHeaders(headers)).resolves.toEqual({ userId, tokenVersion: 0 });
   });
 
   it('returns userId for a valid cookie token', async () => {
-    const token = await signAccessToken(userId);
+    const token = await signAccessToken(userId, 0);
     const headers = new Headers({ cookie: `${AUTH_COOKIE_NAME}=${token}` });
-    await expect(authenticateHeaders(headers)).resolves.toEqual({ userId });
+    await expect(authenticateHeaders(headers)).resolves.toEqual({ userId, tokenVersion: 0 });
   });
 
   it('returns null when token is missing or invalid', async () => {
@@ -84,10 +84,10 @@ describe('authenticateRequest', () => {
   });
 
   it('delegates to request headers', async () => {
-    const token = await signAccessToken(userId);
+    const token = await signAccessToken(userId, 0);
     const request = new Request(`http://localhost${apiRoutes.episode}`, {
       headers: { authorization: `Bearer ${token}` },
     });
-    await expect(authenticateRequest(request)).resolves.toEqual({ userId });
+    await expect(authenticateRequest(request)).resolves.toEqual({ userId, tokenVersion: 0 });
   });
 });

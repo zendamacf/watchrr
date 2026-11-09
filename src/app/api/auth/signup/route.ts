@@ -48,13 +48,16 @@ export async function POST(request: Request) {
 
   const passwordHash = await hashPassword(password);
 
-  const [user] = await db.insert(users).values({ email, passwordHash }).returning({ id: users.id });
+  const [user] = await db
+    .insert(users)
+    .values({ email, passwordHash })
+    .returning({ id: users.id, tokenVersion: users.tokenVersion });
 
   if (!user) {
     return NextResponse.json({ message: 'Failed to create account' }, { status: 500 });
   }
 
-  const token = await signAccessToken(user.id);
+  const token = await signAccessToken(user.id, user.tokenVersion);
 
   return NextResponse.json(
     { token },

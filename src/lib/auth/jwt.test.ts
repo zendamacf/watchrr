@@ -14,20 +14,37 @@ describe('jwt', () => {
   });
 
   it('signAccessToken and verifyAccessToken round-trip', async () => {
-    const token = await signAccessToken(userId);
-    const { sub } = await verifyAccessToken(token);
+    const token = await signAccessToken(userId, 0);
+    const { sub, tv } = await verifyAccessToken(token);
     expect(sub).toBe(userId);
+    expect(tv).toBe(0);
+  });
+
+  it('carries the token version claim', async () => {
+    const token = await signAccessToken(userId, 3);
+    await expect(verifyAccessToken(token)).resolves.toEqual({ sub: userId, tv: 3 });
+  });
+
+  it('verifyAccessToken rejects a legacy token without a version claim', async () => {
+    const { SignJWT } = await import('jose');
+    const token = await new SignJWT({})
+      .setProtectedHeader({ alg: 'HS256' })
+      .setSubject(userId)
+      .setIssuedAt()
+      .setExpirationTime('1h')
+      .sign(new TextEncoder().encode('test-jwt-secret'));
+    await expect(verifyAccessToken(token)).rejects.toThrow('Invalid token version');
   });
 
   it('verifyAccessToken rejects a tampered token', async () => {
-    const token = await signAccessToken(userId);
+    const token = await signAccessToken(userId, 0);
     const parts = token.split('.');
     parts[2] = 'invalid-signature';
     await expect(verifyAccessToken(parts.join('.'))).rejects.toThrow();
   });
 
   it('verifyAccessToken rejects a token signed with a different secret', async () => {
-    const token = await signAccessToken(userId);
+    const token = await signAccessToken(userId, 0);
     process.env.AUTH_JWT_SECRET = 'other-secret';
     await expect(verifyAccessToken(token)).rejects.toThrow();
   });

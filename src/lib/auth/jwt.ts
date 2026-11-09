@@ -7,8 +7,8 @@ export function getJwtSecret(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-export async function signAccessToken(userId: string): Promise<string> {
-  return new SignJWT({})
+export async function signAccessToken(userId: string, tokenVersion: number): Promise<string> {
+  return new SignJWT({ tv: tokenVersion })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(userId)
     .setIssuedAt()
@@ -16,10 +16,14 @@ export async function signAccessToken(userId: string): Promise<string> {
     .sign(getJwtSecret());
 }
 
-export async function verifyAccessToken(token: string): Promise<{ sub: string }> {
+export async function verifyAccessToken(token: string): Promise<{ sub: string; tv: number }> {
   const { payload } = await jwtVerify(token, getJwtSecret());
   if (typeof payload.sub !== 'string' || !payload.sub) {
     throw new Error('Invalid token subject');
   }
-  return { sub: payload.sub };
+  // Tokens without a version claim predate session invalidation and are rejected.
+  if (typeof payload.tv !== 'number' || !Number.isInteger(payload.tv)) {
+    throw new Error('Invalid token version');
+  }
+  return { sub: payload.sub, tv: payload.tv };
 }
