@@ -8,8 +8,15 @@ import { invalidateTokenVersionCache } from './token-version';
  * every existing session (JWT) for the user. Shared by reset-password and any future
  * change-password endpoint. Returns the new token version, or null if the user doesn't exist.
  */
-export async function changePassword(userId: string, passwordHash: string): Promise<number | null> {
-  const [row] = await db
+/** Either the global db or a transaction handle. */
+export type DbExecutor = Pick<typeof db, 'update'>;
+
+export async function changePassword(
+  userId: string,
+  passwordHash: string,
+  executor: DbExecutor = db,
+): Promise<number | null> {
+  const [row] = await executor
     .update(users)
     .set({ passwordHash, tokenVersion: sql`${users.tokenVersion} + 1` })
     .where(eq(users.id, userId))

@@ -1,10 +1,17 @@
 /** Paths that never require a session (pages and route handlers). */
-const PUBLIC_PAGE_PATHS = new Set(['/signin', '/signup', '/health']);
+const PUBLIC_PAGE_PATHS = new Set(['/signin', '/signup', '/forgot-password', '/reset-password', '/health']);
 
 /** Prefixes for infrastructure routes (e.g. Sentry tunnel) that must stay public. */
 const PUBLIC_PAGE_PREFIXES = ['/monitoring'];
 
-const PUBLIC_API_PATHS = new Set(['/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/refresh']);
+const PUBLIC_API_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/signup',
+  '/api/auth/logout',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/refresh',
+]);
 
 const STATIC_FILE_PATTERN = /\.[a-zA-Z0-9]+$/;
 

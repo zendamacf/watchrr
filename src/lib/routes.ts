@@ -6,6 +6,8 @@ export const routes = {
   movies: '/movies',
   signin: '/signin',
   signup: '/signup',
+  forgotPassword: '/forgot-password',
+  resetPassword: '/reset-password',
 } as const;
 
 export const apiRoutes = {
@@ -13,6 +15,8 @@ export const apiRoutes = {
     login: '/api/auth/login',
     signup: '/api/auth/signup',
     logout: '/api/auth/logout',
+    forgotPassword: '/api/auth/forgot-password',
+    resetPassword: '/api/auth/reset-password',
   },
   episode: '/api/episode',
   episodeById: (episodeId: string) => `/api/episode/${episodeId}/`,

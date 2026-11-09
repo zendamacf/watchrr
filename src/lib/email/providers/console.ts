@@ -9,7 +9,8 @@ export const consoleProvider: EmailProvider = {
       from,
       to: message.to,
       subject: message.subject,
-      text: message.text,
+      // Bodies can contain credentials (e.g. reset links), so only log them outside production.
+      ...(process.env.NODE_ENV === 'production' ? {} : { text: message.text }),
     });
   },
 };
