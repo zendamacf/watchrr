@@ -63,4 +63,30 @@ describe('SignInForm', () => {
 
     expect(await screen.findByText('Sign in failed')).toBeInTheDocument();
   });
+
+  it('offers to resend the verification email when the account is unverified', async () => {
+    stubFetch(
+      mockFetchResponse(
+        { code: 'email_not_verified', message: 'Confirm your email address to sign in' },
+        { ok: false, status: 403 },
+      ),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(<SignInForm />);
+    await submitForm(user);
+
+    expect(await screen.findByText('Confirm your email address to sign in')).toBeInTheDocument();
+
+    stubFetch(mockFetchResponse({ message: 'ok' }));
+    await user.click(screen.getByRole('button', { name: 'Resend verification email' }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(apiRoutes.auth.resendVerification, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'user@example.com' }),
+      });
+    });
+    expect(await screen.findByText(/new link is on its way/)).toBeInTheDocument();
+  });
 });

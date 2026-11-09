@@ -7,7 +7,7 @@ export type PasswordResetProps = {
 
 export function passwordResetTemplate({ resetUrl, expiresInMinutes }: PasswordResetProps) {
   return {
-    subject: 'Reset your Watchrr password',
+    subject: 'Reset your watchrr password',
     html: renderLayout(
       `<h1 style="font-family:${DISPLAY_FONT_STACK};font-size:24px;line-height:1.2;margin:0 0 12px;">Reset your password</h1>
       <p style="margin:0 0 20px;">We received a request to reset your password. Click the button below to choose a new one.</p>

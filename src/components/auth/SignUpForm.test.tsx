@@ -63,4 +63,27 @@ describe('SignUpForm', () => {
 
     expect(await screen.findByText('Sign up failed')).toBeInTheDocument();
   });
+
+  it('rejects a malformed email without calling the API', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<SignUpForm />);
+    await user.type(screen.getByPlaceholderText('email@example.com'), 'not-an-email');
+    await user.type(screen.getByPlaceholderText('Your password'), 'secret');
+    await user.click(screen.getByRole('button', { name: 'Sign Up' }));
+
+    expect(await screen.findByText('Enter a valid email address')).toBeInTheDocument();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('shows a check-your-email state when verification is required', async () => {
+    stubFetch(mockFetchResponse({ requiresVerification: true }, { status: 201 }));
+    const user = userEvent.setup();
+    renderWithProviders(<SignUpForm />);
+    await submitForm(user);
+
+    expect(await screen.findByText('Check your email')).toBeInTheDocument();
+    expect(screen.getByText(/new@example\.com/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Resend verification email' })).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
 });

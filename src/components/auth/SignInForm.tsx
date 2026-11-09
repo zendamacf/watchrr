@@ -4,11 +4,13 @@ import { Alert, Anchor, Button, PasswordInput, TextInput } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { type FormEvent, useState } from 'react';
 import { apiRoutes, routes } from '@/lib/routes';
+import { ResendVerification } from './ResendVerification';
 
 export function SignInForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,6 +25,7 @@ export function SignInForm() {
 
     setPending(true);
     setError(null);
+    setUnverifiedEmail(null);
 
     try {
       const response = await fetch(apiRoutes.auth.login, {
@@ -30,9 +33,10 @@ export function SignInForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const body = (await response.json()) as { message?: string };
+      const body = (await response.json()) as { message?: string; code?: string };
 
       if (!response.ok) {
+        if (body.code === 'email_not_verified') setUnverifiedEmail(email);
         setError(body.message ?? 'Sign in failed');
         return;
       }
@@ -61,6 +65,11 @@ export function SignInForm() {
       <Button type="submit" fullWidth mt="xl" radius="md" loading={pending}>
         Sign in
       </Button>
+      {unverifiedEmail && (
+        <div style={{ marginTop: 'var(--mantine-spacing-md)' }}>
+          <ResendVerification email={unverifiedEmail} />
+        </div>
+      )}
     </form>
   );
 }

@@ -34,6 +34,15 @@ describe('password reset tokens', () => {
     expect(await createResetToken('nobody-here@example.com')).toBeNull();
   });
 
+  it('returns null for an unverified account', async () => {
+    await db.update(users).set({ emailVerifiedAt: null }).where(eq(users.id, userId));
+    try {
+      expect(await createResetToken(EMAIL)).toBeNull();
+    } finally {
+      await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.id, userId));
+    }
+  });
+
   it('stores only a hash of the token, expiring in the configured window', async () => {
     const now = new Date('2030-01-01T00:00:00Z');
     const token = await createResetToken(EMAIL.toUpperCase(), now);

@@ -8,6 +8,7 @@ export const routes = {
   signup: '/signup',
   forgotPassword: '/forgot-password',
   resetPassword: '/reset-password',
+  verifyEmail: '/verify-email',
 } as const;
 
 export const apiRoutes = {
@@ -17,6 +18,8 @@ export const apiRoutes = {
     logout: '/api/auth/logout',
     forgotPassword: '/api/auth/forgot-password',
     resetPassword: '/api/auth/reset-password',
+    verifyEmail: '/api/auth/verify-email',
+    resendVerification: '/api/auth/resend-verification',
   },
   episode: '/api/episode',
   episodeById: (episodeId: string) => `/api/episode/${episodeId}/`,

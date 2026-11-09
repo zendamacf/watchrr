@@ -63,6 +63,10 @@ Test restores on a non-production copy of the database periodically.
 
 Set `ALLOW_SIGNUP=false` in `.env` to block new registrations while existing users keep signing in.
 
+## Email verification
+
+When `RESEND_API_KEY` is set, new accounts must confirm their email address (via an emailed link, valid for 24 hours) before they can sign in, and only confirmed addresses receive password reset emails. Without `RESEND_API_KEY`, verification is skipped and new accounts can sign in immediately. Accounts that existed before verification was introduced are marked as verified by the migration, so nobody is locked out on upgrade.
+
 ## Umami analytics (optional)
 
 Set `UMAMI_WEBSITE_ID` in `.env` for privacy-friendly page analytics in production. For self-hosted Umami, set `UMAMI_HOST_URL` to your instance origin. Use `trackUmamiEvent` from `@/lib/analytics/umami/track` for custom events.

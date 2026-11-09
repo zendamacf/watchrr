@@ -1,5 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { eq } from 'drizzle-orm';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AUTH_COOKIE_NAME } from '@/lib/auth/constants';
+import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { seedUser } from '@/test/seeds';
@@ -16,7 +19,10 @@ function loginRequest(body: unknown) {
 describe('POST /api/auth/login', () => {
   beforeEach(() => {
     process.env.AUTH_JWT_SECRET = 'test-jwt-secret';
+    vi.stubEnv('RESEND_API_KEY', '');
   });
+
+  afterEach(() => vi.unstubAllEnvs());
 
   it('returns 400 for invalid JSON', async () => {
     const response = await POST(
@@ -63,5 +69,37 @@ describe('POST /api/auth/login', () => {
     const setCookie = response.headers.get('Set-Cookie');
     expect(setCookie).toContain(`${AUTH_COOKIE_NAME}=`);
     expect(setCookie).toContain('HttpOnly');
+  });
+
+  describe('unverified accounts', () => {
+    const email = 'vitest-login-unverified@example.com';
+
+    async function seedUnverified() {
+      const { id } = await seedUser({ email, password: seedPassword });
+      await db.update(users).set({ emailVerifiedAt: null }).where(eq(users.id, id));
+      return id;
+    }
+
+    it('returns 403 without a session when email is configured', async () => {
+      await seedUnverified();
+      vi.stubEnv('RESEND_API_KEY', 're_test');
+      const response = await POST(loginRequest({ email, password: seedPassword }));
+      expect(response.status).toBe(403);
+      expect((await response.json()).code).toBe('email_not_verified');
+      expect(response.headers.get('Set-Cookie')).toBeNull();
+    });
+
+    it('still reports invalid credentials for a wrong password', async () => {
+      await seedUnverified();
+      vi.stubEnv('RESEND_API_KEY', 're_test');
+      const response = await POST(loginRequest({ email, password: 'wrong' }));
+      expect(response.status).toBe(401);
+    });
+
+    it('allows sign-in when email is not configured', async () => {
+      await seedUnverified();
+      const response = await POST(loginRequest({ email, password: seedPassword }));
+      expect(response.status).toBe(200);
+    });
   });
 });

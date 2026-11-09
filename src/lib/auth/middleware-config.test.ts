@@ -7,6 +7,7 @@ describe('middleware path config', () => {
     expect(isPublicPagePath('/signup')).toBe(true);
     expect(isPublicPagePath('/forgot-password')).toBe(true);
     expect(isPublicPagePath('/reset-password')).toBe(true);
+    expect(isPublicPagePath('/verify-email')).toBe(true);
     expect(isPublicPagePath('/health')).toBe(true);
     expect(isProtectedPagePath('/signin')).toBe(false);
   });
@@ -35,6 +36,8 @@ describe('middleware path config', () => {
     expect(isPublicApiPath('/api/auth/signup')).toBe(true);
     expect(isPublicApiPath('/api/auth/forgot-password')).toBe(true);
     expect(isPublicApiPath('/api/auth/reset-password')).toBe(true);
+    expect(isPublicApiPath('/api/auth/verify-email')).toBe(true);
+    expect(isPublicApiPath('/api/auth/resend-verification')).toBe(true);
     expect(isPublicApiPath('/api/auth/logout')).toBe(true);
     expect(isPublicApiPath('/api/refresh')).toBe(true);
     expect(isPublicApiPath('/api/movie')).toBe(false);
