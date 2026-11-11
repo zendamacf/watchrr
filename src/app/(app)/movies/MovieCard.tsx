@@ -7,6 +7,7 @@ import { Check, X } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes } from '@/lib/routes';
@@ -45,7 +46,10 @@ export const MovieCard = ({ movie }: Props) => {
     },
     onMutate: (movieId) =>
       onMutate(movieId, () => showSuccess({ title: 'Nice!', message: `You watched ${movie.name}` })),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
+      invalidateStats(queryClient);
+    },
     onError,
   });
 
@@ -58,7 +62,10 @@ export const MovieCard = ({ movie }: Props) => {
       onMutate(movieId, () =>
         showSuccess({ title: 'All done!', message: `You are no longer following ${movie.name}` }),
       ),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
+      invalidateStats(queryClient);
+    },
     onError,
   });
 

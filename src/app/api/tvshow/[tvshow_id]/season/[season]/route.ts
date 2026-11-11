@@ -42,9 +42,10 @@ export async function PUT(
 
   if (episodeRows.length === 0) return NextResponse.json({ message: 'Not found' }, { status: 404 });
 
+  const watchedAt = new Date();
   await db
     .insert(watched_episodes)
-    .values(episodeRows.map((row) => ({ episode_id: row.id, watcher_id: user.id })))
+    .values(episodeRows.map((row) => ({ episode_id: row.id, watcher_id: user.id, watched_at: watchedAt })))
     .onConflictDoNothing();
 
   return NextResponse.json({ message: 'Success', marked_count: episodeRows.length }, { status: 200 });

@@ -33,6 +33,7 @@ export const refreshMovie = async (movieId: string) => {
       { dbKey: 'poster_slug', apiKey: 'poster' },
       { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
       { dbKey: 'releasedate', apiKey: 'releasedate', compare: optionalDateCompare },
+      { dbKey: 'runtime', apiKey: 'runtime' },
     ];
 
     const diffs = getDiff(dbMovie, apiMovie, movieLookup);
@@ -51,6 +52,7 @@ export const refreshMovie = async (movieId: string) => {
           ...(apiMovie.releasedate != null ? { releasedate: isoToSqlDate(apiMovie.releasedate) } : {}),
           poster_slug: apiMovie.poster,
           backdrop_slug: apiMovie.backdrop,
+          runtime: apiMovie.runtime,
         })
         .where(eq(movies.id, movieId));
     }

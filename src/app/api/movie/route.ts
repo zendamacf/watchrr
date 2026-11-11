@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
         poster_slug: found.poster,
         backdrop_slug: found.backdrop,
         description: found.description,
+        runtime: found.runtime,
       })
       .onConflictDoNothing({ target: movies.moviedb_id })
       .returning();
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
     .values({ watcher_id: user.id, movie_id: movie.id })
     .onConflictDoUpdate({
       target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
-      set: { watched: false },
+      set: { watched: false, watched_at: null },
     });
 
   return NextResponse.json({ message: 'Success', movie_id: movie.id }, { status: 201 });

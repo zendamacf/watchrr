@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { isUuid, resolveMovieId } from '@/lib/db/resolve-id';
@@ -20,7 +20,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
 
   await db
     .update(subscribed_movies)
-    .set({ watched: true })
+    .set({ watched: true, watched_at: sql`coalesce(${subscribed_movies.watched_at}, now())` })
     .where(and(eq(subscribed_movies.watcher_id, user.id), eq(subscribed_movies.movie_id, movieId)));
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });

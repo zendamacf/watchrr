@@ -38,7 +38,7 @@ export async function PUT(_request: NextRequest, { params }: { params: Promise<{
 
   await db
     .insert(watched_episodes)
-    .values({ episode_id: result.episode.id, watcher_id: user.id })
+    .values({ episode_id: result.episode.id, watcher_id: user.id, watched_at: new Date() })
     .onConflictDoNothing();
 
   return NextResponse.json({ message: 'Success' }, { status: 200 });

@@ -90,6 +90,8 @@ export const episodes = pgTable(
     moviedb_id: integer().notNull().unique(),
     backdrop_slug: text(),
     description: text(),
+    /** Minutes, from TMDB. Null until the next refresh. */
+    runtime: integer(),
   },
   (table) => [
     // Episode list + refresher load episodes per show ordered by airdate.
@@ -126,6 +128,8 @@ export const watched_episodes = pgTable(
     watcher_id: uuid('watcher_id')
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
+    /** Null for rows created before watch times were recorded. */
+    watched_at: timestamp('watched_at', { withTimezone: true }),
   },
   (t) => [
     primaryKey({ columns: [t.episode_id, t.watcher_id] }),
@@ -142,6 +146,8 @@ export const movies = pgTable('movies', {
   poster_slug: text(),
   backdrop_slug: text(),
   description: text(),
+  /** Minutes, from TMDB. Null until the next refresh. */
+  runtime: integer(),
   metadata_refreshed_at: timestamp('metadata_refreshed_at'),
 });
 
@@ -155,6 +161,8 @@ export const subscribed_movies = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     watched: boolean().notNull().default(false),
+    /** Null for rows created before watch times were recorded. */
+    watched_at: timestamp('watched_at', { withTimezone: true }),
   },
   (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
 );

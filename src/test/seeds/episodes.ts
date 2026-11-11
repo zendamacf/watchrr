@@ -24,6 +24,7 @@ export async function seedEpisode(options: {
       moviedb_id: values.moviedb_id,
       backdrop_slug: values.backdrop_slug,
       description: values.description,
+      runtime: values.runtime,
     })
     .returning();
 

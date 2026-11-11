@@ -105,6 +105,9 @@ describe('PUT /api/tvshow/[tvshow_id]/season/[season]', () => {
       overrides: { moviedb_id: 998_516, name: 'S2E1', season: 2, episode: 1 },
     });
 
+    // The test DB is not reset between runs; clear rows left by earlier runs so watched_at is freshly recorded.
+    await db.delete(watched_episodes).where(inArray(watched_episodes.episode_id, [s1e1.id, s1e2.id, s2e1.id]));
+
     const response = await PUT(
       nextPut(apiRoutes.tvshowSeasonWatch(tvshowId, 1)),
       routeParams({ tvshow_id: tvshowId, season: '1' }),
@@ -120,6 +123,7 @@ describe('PUT /api/tvshow/[tvshow_id]/season/[season]', () => {
         and(eq(watched_episodes.watcher_id, userId), inArray(watched_episodes.episode_id, [s1e1.id, s1e2.id, s2e1.id])),
       );
     expect(watchedRows.map((row) => row.episode_id).sort()).toEqual([s1e1.id, s1e2.id].sort());
+    expect(watchedRows.every((row) => row.watched_at instanceof Date)).toBe(true);
   });
 
   it('is idempotent when called twice', async () => {

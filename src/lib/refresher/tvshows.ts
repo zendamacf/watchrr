@@ -71,6 +71,7 @@ export const refreshTvShow = async (tvshowId: string) => {
       { dbKey: 'name', apiKey: 'name' },
       { dbKey: 'description', apiKey: 'description' },
       { dbKey: 'backdrop_slug', apiKey: 'backdrop' },
+      { dbKey: 'runtime', apiKey: 'runtime' },
       { dbKey: 'airdate', apiKey: 'airdate', compare: dateCompare },
     ];
     let inserted = 0;
@@ -91,6 +92,7 @@ export const refreshTvShow = async (tvshowId: string) => {
               moviedb_id: apiEpisode.id,
               backdrop_slug: apiEpisode.backdrop,
               description: apiEpisode.description,
+              runtime: apiEpisode.runtime,
             })
             .where(eq(episodes.id, dbEpisode.id));
           updated++;
@@ -107,6 +109,7 @@ export const refreshTvShow = async (tvshowId: string) => {
           moviedb_id: apiEpisode.id,
           backdrop_slug: apiEpisode.backdrop,
           description: apiEpisode.description,
+          runtime: apiEpisode.runtime,
         });
         inserted++;
       }

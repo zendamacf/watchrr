@@ -20,6 +20,8 @@ export type TMDBEpisode = {
   description: string | null;
   airdate: string;
   backdrop: string | null;
+  /** Runtime in minutes */
+  runtime: number | null;
 };
 
 /**
@@ -85,6 +87,7 @@ export const getAllEpisodes = async (moviedb_id: number): Promise<TMDBEpisode[]>
           description: d.overview,
           airdate: DateTime.fromJSDate(new Date(d.air_date)).toISO()!,
           backdrop: d.still_path,
+          runtime: d.runtime || null,
         })),
     );
   }
