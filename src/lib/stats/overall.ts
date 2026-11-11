@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { db } from '@/lib/db';
-import type { ActivityPoint, OverallStats, ShowStatusCounts, WatchCounts, WeekdayPoint } from './types';
+import type { ActivityPoint, GenreStat, OverallStats, ShowStatusCounts, WatchCounts, WeekdayPoint } from './types';
 
 const ENDED_STATUSES = new Set(['Ended', 'Canceled']);
 const DEFAULT_RANGE_WEEKS = 12;
@@ -80,7 +80,7 @@ export async function getOverallStats(options: OverallStatsOptions): Promise<Ove
   const monthStart = now.startOf('month').toISO();
   const yearStart = now.startOf('year').toISO();
 
-  const [countRows, activityRows, weekdayRows, dayRows, showRows] = await Promise.all([
+  const [countRows, activityRows, weekdayRows, dayRows, showRows, genreRows] = await Promise.all([
     db.execute<{
       kind: string;
       total: number;
@@ -124,7 +124,39 @@ export async function getOverallStats(options: OverallStatsOptions): Promise<Ove
         LEFT JOIN watched_episodes we ON we.episode_id = e.id AND we.watcher_id = ${userId}
        WHERE st.watcher_id = ${userId}
        GROUP BY st.tvshow_id, s.status, st.snoozed_until`),
+    db.execute<{ genre_id: number | null; name: string | null; episodes: number; movies: number; minutes: number }>(sql`
+      SELECT g.id AS genre_id, g.name,
+             count(*) FILTER (WHERE w.kind = 'episode')::int AS episodes,
+             count(*) FILTER (WHERE w.kind = 'movie')::int AS movies,
+             coalesce(sum(w.runtime), 0)::int AS minutes
+        FROM (
+          SELECT 'episode' AS kind, e.runtime, e.tvshow_id AS item_id
+            FROM watched_episodes we JOIN episodes e ON e.id = we.episode_id
+           WHERE we.watcher_id = ${userId}
+          UNION ALL
+          SELECT 'movie' AS kind, m.runtime, m.id AS item_id
+            FROM subscribed_movies sm JOIN movies m ON m.id = sm.movie_id
+           WHERE sm.watcher_id = ${userId} AND sm.watched
+        ) w
+        LEFT JOIN tvshow_genres tg ON w.kind = 'episode' AND tg.tvshow_id = w.item_id
+        LEFT JOIN movie_genres mg ON w.kind = 'movie' AND mg.movie_id = w.item_id
+        LEFT JOIN genres g ON g.id = coalesce(tg.genre_id, mg.genre_id)
+       GROUP BY g.id, g.name`),
   ]);
+
+  const genres: GenreStat[] = genreRows
+    .map((row) => ({
+      id: row.genre_id,
+      name: row.name ?? 'Unknown',
+      episodes: row.episodes,
+      movies: row.movies,
+      minutes: row.minutes,
+    }))
+    .sort((a, b) => {
+      // Unknown always last, otherwise most watched first.
+      if ((a.id === null) !== (b.id === null)) return a.id === null ? 1 : -1;
+      return b.episodes + b.movies - (a.episodes + a.movies) || a.name.localeCompare(b.name);
+    });
 
   const episodes = emptyCounts();
   const movies = emptyCounts();
@@ -179,5 +211,6 @@ export async function getOverallStats(options: OverallStatsOptions): Promise<Ove
       dayRows.map((r) => r.day),
       today,
     ),
+    genres,
   };
 }

@@ -11,6 +11,7 @@ import { db } from '../db';
 import { movies } from '../db/schema';
 import { getMovie, type TMDBMovie } from '../themoviedb/movies';
 import { ResourceNotFound } from './errors';
+import { syncMovieGenres } from './genres';
 import { type DiffLookup, getDiff, isoToSqlDate, optionalDateCompare } from './utils';
 
 export const refreshMovie = async (movieId: string) => {
@@ -56,6 +57,8 @@ export const refreshMovie = async (movieId: string) => {
         })
         .where(eq(movies.id, movieId));
     }
+
+    await syncMovieGenres(movieId, apiMovie.genres);
 
     await db.update(movies).set({ metadata_refreshed_at: new Date() }).where(eq(movies.id, movieId));
 

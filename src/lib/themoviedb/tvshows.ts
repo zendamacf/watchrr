@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon';
 import { tmdb } from './client';
 
+export type TMDBGenre = { id: number; name: string };
+
 export type TMDBTvShow = {
   id: number;
   name: string;
@@ -10,6 +12,8 @@ export type TMDBTvShow = {
   poster: string | null;
   backdrop: string | null;
   status: string | null;
+  /** Only populated by details; search results leave it empty. */
+  genres: TMDBGenre[];
 };
 
 export type TMDBEpisode = {
@@ -40,6 +44,7 @@ export const search = async (query: string): Promise<TMDBTvShow[]> => {
     poster: d.poster_path,
     backdrop: d.backdrop_path,
     status: null,
+    genres: [],
   }));
 };
 
@@ -59,6 +64,7 @@ export const getTvShow = async (moviedb_id: number): Promise<TMDBTvShow> => {
     poster: data.poster_path,
     backdrop: data.backdrop_path,
     status: data.status ?? null,
+    genres: (data.genres ?? []).map((g) => ({ id: g.id, name: g.name })),
   };
 };
 

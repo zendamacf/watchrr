@@ -43,6 +43,7 @@ describe('GET /api/stats', () => {
     expect(body.episodes.total).toBe(0);
     expect(body.movies.total).toBe(0);
     expect(body.timezone).toBe('UTC');
+    expect(body.genres).toEqual([]);
   });
 
   it("only counts the signed-in user's watches", async () => {
@@ -59,5 +60,6 @@ describe('GET /api/stats', () => {
 
     const body = await (await GET(nextGet(apiRoutes.stats()))).json();
     expect(body.episodes.total).toBe(1);
+    expect(body.genres).toEqual([{ id: null, name: 'Unknown', episodes: 1, movies: 0, minutes: 45 }]);
   });
 });

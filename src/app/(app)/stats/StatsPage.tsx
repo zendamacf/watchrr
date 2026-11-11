@@ -74,6 +74,7 @@ export const StatsPage = () => {
     Episodes: point.episodes,
     Movies: point.movies,
   }));
+  const genres = data.genres.map((g) => ({ genre: g.name, Episodes: g.episodes, Movies: g.movies }));
   const weekdays = data.weekdays.map((point) => ({ day: WEEKDAY_LABELS[point.weekday - 1], Watched: point.count }));
 
   return (
@@ -147,6 +148,31 @@ export const StatsPage = () => {
           Most active days
         </Title>
         <BarChart h={220} data={weekdays} dataKey="day" series={[{ name: 'Watched', color: 'signal.6' }]} />
+      </Paper>
+
+      <Paper withBorder p="md" radius="md">
+        <Title order={4} mb="sm">
+          Genres
+        </Title>
+        {genres.length === 0 ? (
+          <Text size="sm" c="dimmed">
+            Nothing watched yet.
+          </Text>
+        ) : (
+          <BarChart
+            h={Math.max(160, genres.length * 36)}
+            data={genres}
+            dataKey="genre"
+            orientation="vertical"
+            type="stacked"
+            series={[
+              { name: 'Episodes', color: 'signal.6' },
+              { name: 'Movies', color: 'afterglow.6' },
+            ]}
+            withLegend
+            yAxisProps={{ width: 100 }}
+          />
+        )}
       </Paper>
 
       <Text size="xs" c="dimmed">

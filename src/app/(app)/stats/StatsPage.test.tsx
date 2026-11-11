@@ -26,6 +26,10 @@ const stats: OverallStats = {
   shows: { watching: 2, caughtUp: 1, snoozed: 0, ended: 3 },
   backlog: 7,
   streaks: { current: 1, longest: 4 },
+  genres: [
+    { id: 18, name: 'Drama', episodes: 30, movies: 2, minutes: 900 },
+    { id: null, name: 'Unknown', episodes: 12, movies: 3, minutes: 0 },
+  ],
 };
 
 describe('StatsPage', () => {
@@ -73,6 +77,15 @@ describe('StatsPage', () => {
     expect(screen.getByText('Longest: 4 days')).toBeInTheDocument();
     expect(screen.getByText('2 watching')).toBeInTheDocument();
     expect(screen.getByText('3 ended')).toBeInTheDocument();
+    expect(screen.getAllByTestId('bar-chart')).toHaveLength(3);
+    expect(screen.getByText('Genres')).toBeInTheDocument();
+    expect(screen.getByText('Activity by week')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder when there is no genre data', async () => {
+    stubFetch(mockFetchResponse({ ...stats, genres: [] }));
+    renderWithProviders(<StatsPage />);
+    expect(await screen.findByText('Nothing watched yet.')).toBeInTheDocument();
     expect(screen.getAllByTestId('bar-chart')).toHaveLength(2);
   });
 
