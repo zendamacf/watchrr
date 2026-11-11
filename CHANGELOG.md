@@ -1,5 +1,13 @@
 # watchrr
 
+## 3.4.0
+
+### Minor Changes
+
+- 201c610: Store genres for shows and movies on TMDB refresh, show them on the show page, and add a genre breakdown to the Stats page. Existing items pick up their genres on their next refresh; until then they appear as "Unknown" in stats.
+- 201c610: Add a movie details page (linked from each movie card) showing genres, runtime and watched status.
+- 781390f: Add watch statistics: a Stats page with totals, watch time, backlog, streaks and activity charts, and per-show progress and pace on the show page. Watch times and runtimes are now recorded, so older watches show as "unknown date".
+
 ## 3.3.0
 
 ### Minor Changes
