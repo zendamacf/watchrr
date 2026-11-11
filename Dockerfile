@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:26-bookworm-slim AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
@@ -23,7 +23,7 @@ RUN npm run build \
     --bundle --platform=node --format=esm --minify \
     --outfile=/app/migrate.mjs
 
-FROM node:26-bookworm-slim AS runtime
+FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production \
   HOSTNAME=0.0.0.0 \
@@ -31,11 +31,9 @@ ENV NODE_ENV=production \
   HUSKY=0 \
   HOME=/home/nextjs
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends dumb-init \
-  && rm -rf /var/lib/apt/lists/* \
-  && groupadd --system --gid 1001 nodejs \
-  && useradd --system --uid 1001 --gid nodejs --create-home --home-dir /home/nextjs nextjs \
+RUN apk add --no-cache dumb-init \
+  && addgroup -S -g 1001 nodejs \
+  && adduser -S -u 1001 -G nodejs -h /home/nextjs nextjs \
   && chown nextjs:nodejs /app
 
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
