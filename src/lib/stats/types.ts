@@ -27,6 +27,18 @@ export type ShowStatusCounts = {
   ended: number;
 };
 
+export type GenreStat = {
+  /** TMDB genre id; null for the "Unknown" bucket (items with no genre data yet). */
+  id: number | null;
+  name: string;
+  /** Watched episodes of shows in this genre. */
+  episodes: number;
+  /** Watched movies in this genre. */
+  movies: number;
+  /** Estimated minutes watched; items without a runtime are excluded. */
+  minutes: number;
+};
+
 export type OverallStats = {
   range: { from: string; to: string };
   timezone: string;
@@ -42,6 +54,8 @@ export type OverallStats = {
   /** Aired, unwatched episodes across subscribed shows. */
   backlog: number;
   streaks: { current: number; longest: number };
+  /** Watched items per genre, most watched first. An item in several genres counts in each. */
+  genres: GenreStat[];
 };
 
 export type SeasonProgress = {

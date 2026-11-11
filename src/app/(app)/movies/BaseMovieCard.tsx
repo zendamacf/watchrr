@@ -1,6 +1,17 @@
 'use client';
 
-import { type CardProps, Group, Popover, PopoverDropdown, PopoverTarget, Text, Title } from '@mantine/core';
+import {
+  Anchor,
+  type CardProps,
+  Group,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
+import { ChevronRight } from 'lucide-react';
 import { DateTime } from 'luxon';
 import type { ReactNode } from 'react';
 import { MediaCard } from '@/components/MediaCard';
@@ -14,9 +25,10 @@ type Props = {
   releaseDate?: boolean;
   description?: boolean;
   actions?: ReactNode;
+  titleHref?: string;
 } & CardProps;
 
-export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...props }: Props) => {
+export const BaseMovieCard = ({ movie, releaseDate, description, actions, titleHref, ...props }: Props) => {
   const inPast = !!movie.releaseDate && movie.releaseDate.startOf('day') < DateTime.now().startOf('day');
 
   return (
@@ -33,7 +45,21 @@ export const BaseMovieCard = ({ movie, releaseDate, description, actions, ...pro
         )
       }
     >
-      <Title order={3}>{movie.name}</Title>
+      {titleHref ? (
+        <Anchor href={titleHref} underline="never" c="inherit">
+          <Stack gap={2}>
+            <Title order={3}>{movie.name}</Title>
+            <Group gap={4} wrap="nowrap" c="var(--mantine-color-anchor)">
+              <Text size="sm" fw={500} component="span">
+                View movie
+              </Text>
+              <ChevronRight size={16} aria-hidden />
+            </Group>
+          </Stack>
+        </Anchor>
+      ) : (
+        <Title order={3}>{movie.name}</Title>
+      )}
       {releaseDate && (
         <Text c={inPast ? 'orange' : undefined} size={'sm'}>
           {movie.releaseDate?.toFormat(DateFormat.DMY) ?? 'Unknown release date'}

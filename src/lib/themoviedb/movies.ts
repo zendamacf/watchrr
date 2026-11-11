@@ -1,5 +1,6 @@
 import { tmdb } from './client';
 import { tmdbDateToIso } from './dates';
+import type { TMDBGenre } from './tvshows';
 
 export type TMDBMovie = {
   id: number;
@@ -10,6 +11,8 @@ export type TMDBMovie = {
   releasedate: string | null;
   /** Runtime in minutes */
   runtime: number | null;
+  /** Only populated by details; search results leave it empty. */
+  genres: TMDBGenre[];
 };
 
 /**
@@ -27,6 +30,7 @@ export const search = async (query: string): Promise<TMDBMovie[]> => {
     backdrop: d.backdrop_path,
     releasedate: tmdbDateToIso(d.release_date),
     runtime: null,
+    genres: [],
   }));
 };
 
@@ -45,5 +49,6 @@ export const getMovie = async (moviedb_id: number): Promise<TMDBMovie> => {
     backdrop: data.backdrop_path,
     releasedate: tmdbDateToIso(data.release_date),
     runtime: data.runtime || null,
+    genres: (data.genres ?? []).map((g) => ({ id: g.id, name: g.name })),
   };
 };

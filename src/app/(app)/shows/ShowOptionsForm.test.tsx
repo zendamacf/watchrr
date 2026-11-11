@@ -133,6 +133,7 @@ describe('ShowOptionsForm', () => {
       tvshow: baseShow,
       subscription: { delay_days: 0, snoozed_until: null },
       episodes: [],
+      genres: [],
     };
     queryClient.setQueryData([QueryKey.getEpisodes, {}], pagedCache(episodes));
     queryClient.setQueryData([QueryKey.getShowEpisodes, baseShow.id], showDetail);

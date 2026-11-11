@@ -55,6 +55,7 @@ describe('themoviedb movies', () => {
       backdrop_path: '/backdrop.jpg',
       release_date: '1999-10-15',
       runtime: 139,
+      genres: [{ id: 18, name: 'Drama' }],
     });
 
     const movie = await getMovie(550);
@@ -65,6 +66,7 @@ describe('themoviedb movies', () => {
       poster: '/poster.jpg',
       backdrop: '/backdrop.jpg',
       runtime: 139,
+      genres: [{ id: 18, name: 'Drama' }],
     });
     expect(DateTime.fromISO(movie.releasedate!).toISODate()).toBe('1999-10-15');
     expect(mockMovieDetails).toHaveBeenCalledWith(550);

@@ -2,7 +2,14 @@ import { eq } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { subscribed_movies, subscribed_tvshows, watched_episodes } from '@/lib/db/schema';
+import {
+  genres,
+  movie_genres,
+  subscribed_movies,
+  subscribed_tvshows,
+  tvshow_genres,
+  watched_episodes,
+} from '@/lib/db/schema';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { seedEpisode, seedMovie, seedSubscribedTvShow, seedUser } from '@/test/seeds';
 import { computeStreaks, getOverallStats, isValidTimezone } from './overall';
@@ -108,6 +115,56 @@ describe('getOverallStats', () => {
     const thisWeek = stats.activity.find((p) => p.weekStart === '2026-11-09');
     expect(thisWeek).toEqual({ weekStart: '2026-11-09', episodes: 2, movies: 0 });
     expect(stats.activity.find((p) => p.weekStart === '2026-09-28')?.movies).toBe(1);
+  });
+
+  it('breaks watched items down by genre, with an Unknown bucket for items without genres', async () => {
+    await db
+      .insert(genres)
+      .values([
+        { id: 990_021, name: 'Test Action' },
+        { id: 990_022, name: 'Test Drama' },
+      ])
+      .onConflictDoNothing();
+    const { tvshowId } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 997_031, name: 'Genre Show' },
+    });
+    await db
+      .insert(tvshow_genres)
+      .values([
+        { tvshow_id: tvshowId, genre_id: 990_021 },
+        { tvshow_id: tvshowId, genre_id: 990_022 },
+      ])
+      .onConflictDoNothing();
+    const eps = [];
+    for (const n of [1, 2]) {
+      eps.push(
+        await seedEpisode({
+          tvshowId,
+          overrides: { moviedb_id: 997_040 + n, episode: n, airdate: '2026-01-01', runtime: 30 },
+        }),
+      );
+    }
+    await db.insert(watched_episodes).values(eps.map((e) => ({ episode_id: e.id, watcher_id: userId })));
+    const action = await seedMovie({ moviedb_id: 997_051, name: 'Action Movie', runtime: 100 });
+    const bare = await seedMovie({ moviedb_id: 997_052, name: 'Bare Movie', runtime: 90 });
+    await db.insert(movie_genres).values({ movie_id: action.id, genre_id: 990_021 }).onConflictDoNothing();
+    await db.insert(subscribed_movies).values([
+      { movie_id: action.id, watcher_id: userId, watched: true },
+      { movie_id: bare.id, watcher_id: userId, watched: true },
+    ]);
+
+    const stats = await getOverallStats({ userId, now });
+
+    expect(stats.genres).toEqual([
+      { id: 990_021, name: 'Test Action', episodes: 2, movies: 1, minutes: 160 },
+      { id: 990_022, name: 'Test Drama', episodes: 2, movies: 0, minutes: 60 },
+      { id: null, name: 'Unknown', episodes: 0, movies: 1, minutes: 90 },
+    ]);
+  });
+
+  it('returns no genres for a user with no history', async () => {
+    expect((await getOverallStats({ userId, now })).genres).toEqual([]);
   });
 
   it('honours the from/to range for charts but not for totals', async () => {

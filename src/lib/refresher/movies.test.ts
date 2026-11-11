@@ -2,7 +2,7 @@ import '@/test/mocks/themoviedb';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { movies } from '@/lib/db/schema';
+import { genres, movie_genres, movies } from '@/lib/db/schema';
 import { mockGetMovie, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
 import { seedMovie } from '@/test/seeds';
 import { ResourceNotFound } from './errors';
@@ -20,6 +20,7 @@ function tmdbMovie(
     backdrop: string | null;
     releasedate: string | null;
     runtime: number | null;
+    genres: { id: number; name: string }[];
   }> = {},
 ) {
   return {
@@ -30,6 +31,7 @@ function tmdbMovie(
     backdrop: '/synced-backdrop.jpg',
     releasedate: '2024-01-15T00:00:00.000Z',
     runtime: 120 as number | null,
+    genres: [] as { id: number; name: string }[],
     ...overrides,
   };
 }
@@ -145,6 +147,42 @@ describe('refreshMovie', () => {
       releasedate: '2020-06-01',
     });
     expect(after?.metadata_refreshed_at).toBeInstanceOf(Date);
+  });
+
+  it('stores genres, replaces removed ones and renames existing genres', async () => {
+    const movie = await seedMovie({ moviedb_id: 999_105, name: 'Genre Movie' });
+    const names = async () =>
+      (
+        await db
+          .select({ name: genres.name })
+          .from(movie_genres)
+          .innerJoin(genres, eq(genres.id, movie_genres.genre_id))
+          .where(eq(movie_genres.movie_id, movie.id))
+      )
+        .map((r) => r.name)
+        .sort();
+
+    mockGetMovie.mockResolvedValue(
+      tmdbMovie(999_105, {
+        name: 'Genre Movie',
+        genres: [
+          { id: 990_001, name: 'Test Drama' },
+          { id: 990_002, name: 'Test Comedy' },
+        ],
+      }),
+    );
+    await refreshMovie(movie.id);
+    expect(await names()).toEqual(['Test Comedy', 'Test Drama']);
+
+    mockGetMovie.mockResolvedValue(
+      tmdbMovie(999_105, { name: 'Genre Movie', genres: [{ id: 990_001, name: 'Test Drama Renamed' }] }),
+    );
+    await refreshMovie(movie.id);
+    expect(await names()).toEqual(['Test Drama Renamed']);
+
+    mockGetMovie.mockResolvedValue(tmdbMovie(999_105, { name: 'Genre Movie', genres: [] }));
+    await refreshMovie(movie.id);
+    expect(await names()).toEqual([]);
   });
 
   it('rethrows when TMDB lookup fails', async () => {

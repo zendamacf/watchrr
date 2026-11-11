@@ -167,6 +167,38 @@ export const subscribed_movies = pgTable(
   (t) => [primaryKey({ columns: [t.movie_id, t.watcher_id] })],
 );
 
+/** TMDB genres, keyed by TMDB's genre id. Names are refreshed with the shows and movies that use them. */
+export const genres = pgTable('genres', {
+  id: integer('id').primaryKey(),
+  name: text().notNull(),
+});
+
+export const tvshow_genres = pgTable(
+  'tvshow_genres',
+  {
+    tvshow_id: uuid('tvshow_id')
+      .notNull()
+      .references(() => tvshows.id, { onDelete: 'cascade' }),
+    genre_id: integer('genre_id')
+      .notNull()
+      .references(() => genres.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.tvshow_id, t.genre_id] })],
+);
+
+export const movie_genres = pgTable(
+  'movie_genres',
+  {
+    movie_id: uuid('movie_id')
+      .notNull()
+      .references(() => movies.id, { onDelete: 'cascade' }),
+    genre_id: integer('genre_id')
+      .notNull()
+      .references(() => genres.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.movie_id, t.genre_id] })],
+);
+
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
 }

@@ -53,6 +53,7 @@ const showDetail: ShowEpisodesResponse = {
   tvshow: testShow,
   subscription: { delay_days: 0, snoozed_until: null },
   episodes: [seasonOneEpisode, seasonOneEpisodeTwo],
+  genres: ['Drama', 'Mystery'],
 };
 
 function stubShowDetailFetch(handler?: (url: string, method: string) => Response | undefined) {
@@ -96,6 +97,19 @@ describe('ShowDetailPage', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(apiRoutes.tvshowEpisodes(testShow.id), { method: 'get' });
+  });
+
+  it('shows genres, and omits the genre list when there are none', async () => {
+    const { unmount } = renderWithProviders(<ShowDetailPage tvshowId={testShow.id} />);
+    const group = await screen.findByLabelText('Genres');
+    expect(group).toHaveTextContent('Drama');
+    expect(group).toHaveTextContent('Mystery');
+    unmount();
+
+    stubFetch(async () => mockFetchResponse({ ...showDetail, genres: [] }));
+    renderWithProviders(<ShowDetailPage tvshowId={testShow.id} />);
+    await screen.findByRole('heading', { name: testShow.name, level: 2 });
+    expect(screen.queryByLabelText('Genres')).not.toBeInTheDocument();
   });
 
   it('marks a season as watched via the API', async () => {

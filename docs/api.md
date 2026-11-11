@@ -40,9 +40,15 @@ Overall watch statistics.
 | `from`, `to` | Optional `yyyy-MM-dd` bounds (inclusive) for the activity and weekday charts. Default: the last 12 weeks. Totals and backlog ignore them. |
 | `tz` | Optional IANA timezone (e.g. `Europe/London`) used to bucket days and weeks. Default `UTC`. |
 
-Invalid values return `400`. The response has watched counts (`total`, `thisWeek`, `thisMonth`, `thisYear`, `unknownDate`) for episodes and movies, `watchMinutes`, `missingRuntimeCount`, weekly `activity`, `weekdays`, show status counts, `backlog` and `streaks`.
+Invalid values return `400`. The response has watched counts (`total`, `thisWeek`, `thisMonth`, `thisYear`, `unknownDate`) for episodes and movies, `watchMinutes`, `missingRuntimeCount`, weekly `activity`, `weekdays`, show status counts, `backlog`, `streaks` and `genres`.
 
 Items watched before watch times were recorded have no date. They count in `total` (and `unknownDate`), but not in the week/month/year counts, charts or streaks.
+
+`genres` lists watched episodes (`episodes`), movies (`movies`) and estimated `minutes` per genre, most watched first. An item in several genres counts in each. Items whose genres haven't been fetched yet are grouped under `{ "id": null, "name": "Unknown" }`, which is always last. Genres are stored by the TMDB refresh, so existing items fill in as they're refreshed.
+
+## `GET /api/movie/{id}`
+
+A subscribed movie with `subscription` (`watched`, `watched_at`) and `genres` (names, alphabetical; empty until the movie's next refresh). Returns `404` when the user is not subscribed. `GET /api/tvshow/{id}/episodes` also returns `genres`.
 
 ## `GET /api/tvshow/{id}/stats`
 

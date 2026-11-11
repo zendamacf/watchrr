@@ -80,6 +80,10 @@ describe('themoviedb tvshows', () => {
       poster_path: '/poster.jpg',
       backdrop_path: '/backdrop.jpg',
       status: 'Ended',
+      genres: [
+        { id: 18, name: 'Drama' },
+        { id: 10765, name: 'Sci-Fi & Fantasy' },
+      ],
     });
 
     const show = await getTvShow(1399);
@@ -91,6 +95,10 @@ describe('themoviedb tvshows', () => {
       poster: '/poster.jpg',
       backdrop: '/backdrop.jpg',
       status: 'Ended',
+      genres: [
+        { id: 18, name: 'Drama' },
+        { id: 10765, name: 'Sci-Fi & Fantasy' },
+      ],
     });
     expect(DateTime.fromISO(show.firstAirDate).toISODate()).toBe('2011-04-17');
   });

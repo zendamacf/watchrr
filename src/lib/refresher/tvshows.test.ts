@@ -2,7 +2,7 @@ import '@/test/mocks/themoviedb';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { episodes, tvshows } from '@/lib/db/schema';
+import { episodes, genres, tvshow_genres, tvshows } from '@/lib/db/schema';
 import { mockGetAllEpisodes, mockGetTvShow, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
 import { seedEpisode, seedTvShow } from '@/test/seeds';
 import { ResourceNotFound } from './errors';
@@ -21,6 +21,7 @@ function tmdbShow(
     poster: string | null;
     backdrop: string | null;
     status: string | null;
+    genres: { id: number; name: string }[];
   }> = {},
 ) {
   return {
@@ -32,6 +33,7 @@ function tmdbShow(
     poster: '/synced-poster.jpg',
     backdrop: '/synced-backdrop.jpg',
     status: 'Returning Series' as string | null,
+    genres: [] as { id: number; name: string }[],
     ...overrides,
   };
 }
@@ -44,6 +46,36 @@ describe('refreshTvShow', () => {
   it('throws ResourceNotFound when the show row does not exist', async () => {
     await expect(refreshTvShow('00000000-0000-4000-8000-000000009999')).rejects.toBeInstanceOf(ResourceNotFound);
     expect(mockGetTvShow).not.toHaveBeenCalled();
+  });
+
+  it('stores genres and replaces removed ones', async () => {
+    const show = await seedTvShow({ moviedb_id: 999_204, name: 'Synced Show' });
+    const names = async () =>
+      (
+        await db
+          .select({ name: genres.name })
+          .from(tvshow_genres)
+          .innerJoin(genres, eq(genres.id, tvshow_genres.genre_id))
+          .where(eq(tvshow_genres.tvshow_id, show.id))
+      )
+        .map((r) => r.name)
+        .sort();
+    mockGetAllEpisodes.mockResolvedValue([]);
+
+    mockGetTvShow.mockResolvedValue(
+      tmdbShow(999_204, {
+        genres: [
+          { id: 990_011, name: 'Test Mystery' },
+          { id: 990_012, name: 'Test Animation' },
+        ],
+      }),
+    );
+    await refreshTvShow(show.id);
+    expect(await names()).toEqual(['Test Animation', 'Test Mystery']);
+
+    mockGetTvShow.mockResolvedValue(tmdbShow(999_204, { genres: [{ id: 990_011, name: 'Test Mystery' }] }));
+    await refreshTvShow(show.id);
+    expect(await names()).toEqual(['Test Mystery']);
   });
 
   it('skips show update when metadata already matches TMDB', async () => {

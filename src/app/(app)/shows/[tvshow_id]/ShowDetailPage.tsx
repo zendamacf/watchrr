@@ -243,6 +243,15 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
                 </Badge>
               )}
             </Group>
+            {data.genres.length > 0 && (
+              <Group gap="xs" aria-label="Genres">
+                {data.genres.map((genre) => (
+                  <Badge key={genre} variant="light" color="signal">
+                    {genre}
+                  </Badge>
+                ))}
+              </Group>
+            )}
           </Stack>
         </Group>
       </BackdropCard>

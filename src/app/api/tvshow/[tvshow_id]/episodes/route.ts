@@ -1,6 +1,7 @@
 import { and, asc, eq, exists } from 'drizzle-orm';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getTvShowGenres } from '@/lib/db/genres';
 import { isUuid } from '@/lib/db/resolve-id';
 import { episodes, subscribed_tvshows, tvshows, watched_episodes } from '@/lib/db/schema';
 import { guardUser } from '@/utils/auth';
@@ -51,6 +52,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     {
       tvshow: showRow.tvshow,
       subscription: showRow.subscription,
+      genres: await getTvShowGenres(tvshowIdParam),
       episodes: rows.map(({ episode, watched }) => ({ ...episode, watched: !!watched })),
     },
     { status: 200 },

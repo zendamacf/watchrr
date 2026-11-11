@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 import { getAllEpisodes, getTvShow, type TMDBEpisode, type TMDBTvShow } from '@/lib/themoviedb/tvshows';
 import type { Episode, Show } from '@/types';
 import { ResourceNotFound } from './errors';
+import { syncTvShowGenres } from './genres';
 import { type DiffLookup, dateCompare, getDiff, isoToSqlDate } from './utils';
 
 /**
@@ -53,6 +54,8 @@ export const refreshTvShow = async (tvshowId: string) => {
         })
         .where(eq(tvshows.id, tvshowId));
     }
+
+    await syncTvShowGenres(tvshowId, apiShow.genres);
 
     const dbEpisodes = await db.select().from(episodes).where(eq(episodes.tvshow_id, dbShow.id));
     const apiEpisodes = await getAllEpisodes(dbShow.moviedb_id);

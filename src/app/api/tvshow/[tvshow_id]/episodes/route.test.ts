@@ -1,7 +1,8 @@
 import '@/test/mocks/auth';
+import { eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { watched_episodes } from '@/lib/db/schema';
+import { genres, tvshow_genres, watched_episodes } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextGet, routeParams } from '@/test/helpers/api-request';
@@ -66,6 +67,37 @@ describe('GET /api/tvshow/[tvshow_id]/episodes', () => {
     expect(body.episodes).toHaveLength(2);
     expect(body.episodes[0]).toMatchObject({ id: watched.id, season: 1, episode: 1, watched: true });
     expect(body.episodes[1]).toMatchObject({ id: unwatched.id, season: 2, episode: 1, watched: false });
+  });
+
+  it('returns the show genres alphabetically, or none before the first refresh', async () => {
+    const { tvshowId } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 998_525, name: 'Genre Detail Show' },
+    });
+    await db.delete(tvshow_genres).where(eq(tvshow_genres.tvshow_id, tvshowId));
+    const before = await (
+      await GET(nextGet(apiRoutes.tvshowEpisodes(tvshowId)), routeParams({ tvshow_id: tvshowId }))
+    ).json();
+    expect(before.genres).toEqual([]);
+
+    await db
+      .insert(genres)
+      .values([
+        { id: 990_031, name: 'Test Zombies' },
+        { id: 990_032, name: 'Test Adventure' },
+      ])
+      .onConflictDoNothing();
+    await db
+      .insert(tvshow_genres)
+      .values([
+        { tvshow_id: tvshowId, genre_id: 990_031 },
+        { tvshow_id: tvshowId, genre_id: 990_032 },
+      ])
+      .onConflictDoNothing();
+    const after = await (
+      await GET(nextGet(apiRoutes.tvshowEpisodes(tvshowId)), routeParams({ tvshow_id: tvshowId }))
+    ).json();
+    expect(after.genres).toEqual(['Test Adventure', 'Test Zombies']);
   });
 
   it('returns an empty episode list when the show has no episodes', async () => {
