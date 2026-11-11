@@ -4,6 +4,7 @@ export const routes = {
   shows: '/shows',
   showById: (tvshowId: string) => `/shows/${tvshowId}`,
   movies: '/movies',
+  movieById: (movieId: string) => `/movies/${movieId}`,
   stats: '/stats',
   signin: '/signin',
   signup: '/signup',

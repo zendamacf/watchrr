@@ -17,5 +17,13 @@ export type ShowEpisodesResponse = {
   tvshow: Show;
   subscription: ShowSubscription;
   episodes: ShowEpisode[];
+  /** Genre names; empty until the show has been refreshed. */
+  genres: string[];
+};
+export type MovieDetailResponse = {
+  movie: Movie;
+  subscription: { watched: boolean; watched_at: Date | string | null };
+  /** Genre names; empty until the movie has been refreshed. */
+  genres: string[];
 };
 export type MoviesResponse = Movie[];

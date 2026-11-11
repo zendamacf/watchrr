@@ -46,6 +46,10 @@ Items watched before watch times were recorded have no date. They count in `tota
 
 `genres` lists watched episodes (`episodes`), movies (`movies`) and estimated `minutes` per genre, most watched first. An item in several genres counts in each. Items whose genres haven't been fetched yet are grouped under `{ "id": null, "name": "Unknown" }`, which is always last. Genres are stored by the TMDB refresh, so existing items fill in as they're refreshed.
 
+## `GET /api/movie/{id}`
+
+A subscribed movie with `subscription` (`watched`, `watched_at`) and `genres` (names, alphabetical; empty until the movie's next refresh). Returns `404` when the user is not subscribed. `GET /api/tvshow/{id}/episodes` also returns `genres`.
+
 ## `GET /api/tvshow/{id}/stats`
 
 Per-show statistics: progress for each season, backlog and its estimated time, first and last watched dates, episodes per week and the next air date. Accepts `tz`. Returns `404` when the user is not subscribed to the show.

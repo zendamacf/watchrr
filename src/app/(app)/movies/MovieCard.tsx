@@ -10,7 +10,7 @@ import { useAlert } from '@/hooks/useAlert';
 import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes, routes } from '@/lib/routes';
 import type { Movie, MoviesResponse } from '@/types';
 import { BaseMovieCard } from './BaseMovieCard';
 
@@ -88,6 +88,7 @@ export const MovieCard = ({ movie }: Props) => {
       }}
       releaseDate
       description
+      titleHref={routes.movieById(movie.id)}
       actions={
         <>
           <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>

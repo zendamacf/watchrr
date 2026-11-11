@@ -2,13 +2,13 @@ import '@/test/mocks/auth';
 import { and, eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { subscribed_movies } from '@/lib/db/schema';
+import { genres, movie_genres, subscribed_movies } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
-import { nextDelete, nextPut, routeParams } from '@/test/helpers/api-request';
+import { nextDelete, nextGet, nextPut, routeParams } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { seedSubscribedMovie, seedUser } from '@/test/seeds';
-import { DELETE, PUT } from './route';
+import { seedMovie, seedSubscribedMovie, seedUser } from '@/test/seeds';
+import { DELETE, GET, PUT } from './route';
 
 const unknownId = '00000000-0000-4000-8000-000000000098';
 
@@ -23,6 +23,54 @@ describe('/api/movie/[movie_id]', () => {
   beforeEach(() => {
     resetAuthGuardMocks();
     mockGuardUser.mockResolvedValue({ id: userId });
+  });
+
+  describe('GET', () => {
+    it('returns 400 for a non-UUID movie id', async () => {
+      const response = await GET(nextGet(apiRoutes.movieById('abc')), routeParams({ movie_id: 'abc' }));
+      expect(response.status).toBe(400);
+    });
+
+    it('returns 401 when not authenticated', async () => {
+      mockGuardUser.mockResolvedValue(null);
+      const response = await GET(nextGet(apiRoutes.movieById(unknownId)), routeParams({ movie_id: unknownId }));
+      expect(response.status).toBe(401);
+    });
+
+    it('returns 404 when the user is not subscribed to the movie', async () => {
+      const movie = await seedMovie({ moviedb_id: 998_310, name: 'Unsubscribed Movie' });
+      const response = await GET(nextGet(apiRoutes.movieById(movie.id)), routeParams({ movie_id: movie.id }));
+      expect(response.status).toBe(404);
+    });
+
+    it('returns the movie, watched state and genres', async () => {
+      const { movieId } = await seedSubscribedMovie({
+        watcherId: userId,
+        movie: { moviedb_id: 998_311, name: 'Detail Movie' },
+        watched: false,
+      });
+      await db
+        .insert(genres)
+        .values([
+          { id: 990_041, name: 'Test Thriller' },
+          { id: 990_042, name: 'Test Comedy' },
+        ])
+        .onConflictDoNothing();
+      await db
+        .insert(movie_genres)
+        .values([
+          { movie_id: movieId, genre_id: 990_041 },
+          { movie_id: movieId, genre_id: 990_042 },
+        ])
+        .onConflictDoNothing();
+
+      const response = await GET(nextGet(apiRoutes.movieById(movieId)), routeParams({ movie_id: movieId }));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.movie).toMatchObject({ id: movieId, name: 'Detail Movie' });
+      expect(body.subscription).toEqual({ watched: false, watched_at: null });
+      expect(body.genres).toEqual(['Test Comedy', 'Test Thriller']);
+    });
   });
 
   describe('PUT', () => {

@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QueryKey } from '@/components/QueryProvider';
-import { apiRoutes } from '@/lib/routes';
+import { apiRoutes, routes } from '@/lib/routes';
 import { mockFetchResponse, pagedCache, pagedRows, stubFetch } from '@/test/fetch';
 import { testMovie } from '@/test/fixtures/movie';
 import { createTestQueryClient, renderWithProviders } from '@/test/render';
@@ -37,6 +37,11 @@ vi.mock('@mantine/modals', async (importOriginal) => {
 const movie: Movie = { ...testMovie, id: '00000000-0000-4000-8000-000000000087', name: 'Card Movie' };
 
 describe('MovieCard', () => {
+  it('links to the movie details page', () => {
+    renderWithProviders(<MovieCard movie={movie} />);
+    expect(screen.getByRole('link', { name: /View movie/ })).toHaveAttribute('href', routes.movieById(movie.id));
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     stubFetch(mockFetchResponse({ message: 'Success' }));
