@@ -92,6 +92,7 @@ describe('refreshTvShow', () => {
         description: 'First ep',
         airdate: '2020-01-01T00:00:00.000Z',
         backdrop: '/ep1.jpg',
+        runtime: 42,
       },
       {
         id: 900_002,
@@ -101,6 +102,7 @@ describe('refreshTvShow', () => {
         description: 'Second ep',
         airdate: '2020-01-08T00:00:00.000Z',
         backdrop: '/ep2.jpg',
+        runtime: null,
       },
     ]);
 
@@ -120,6 +122,8 @@ describe('refreshTvShow', () => {
     expect(afterEpisodes).toHaveLength(2);
     expect(afterEpisodes.map((e) => e.moviedb_id).sort()).toEqual([900_001, 900_002]);
     expect(afterEpisodes.find((e) => e.moviedb_id === 900_001)?.name).toBe('Premiere');
+    expect(afterEpisodes.find((e) => e.moviedb_id === 900_001)?.runtime).toBe(42);
+    expect(afterEpisodes.find((e) => e.moviedb_id === 900_002)?.runtime).toBeNull();
   });
 
   it('updates an existing episode when TMDB metadata differs', async () => {
@@ -153,6 +157,7 @@ describe('refreshTvShow', () => {
         description: 'New ep description',
         airdate: '2019-05-01T00:00:00.000Z',
         backdrop: '/new-ep.jpg',
+        runtime: 55,
       },
     ]);
 
@@ -164,6 +169,7 @@ describe('refreshTvShow', () => {
       description: 'New ep description',
       backdrop_slug: '/new-ep.jpg',
       airdate: '2019-05-01',
+      runtime: 55,
     });
   });
 

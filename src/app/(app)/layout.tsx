@@ -1,3 +1,4 @@
+import '@mantine/charts/styles.css';
 import '@mantine/notifications/styles.css';
 
 import type { ReactNode } from 'react';

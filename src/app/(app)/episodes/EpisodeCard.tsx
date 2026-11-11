@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
+import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { restorePaged, snapshotPaged, updatePaged } from '@/lib/query/paged';
 import { apiRoutes, routes } from '@/lib/routes';
@@ -61,7 +62,10 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
       });
       return { previousEpisodes };
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
+      invalidateStats(queryClient);
+    },
     onError(error, _vars, context) {
       showError({ title: 'An error occurred', message: error.message });
       restorePaged(queryClient, context?.previousEpisodes);

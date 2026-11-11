@@ -54,6 +54,7 @@ describe('themoviedb movies', () => {
       poster_path: '/poster.jpg',
       backdrop_path: '/backdrop.jpg',
       release_date: '1999-10-15',
+      runtime: 139,
     });
 
     const movie = await getMovie(550);
@@ -63,6 +64,7 @@ describe('themoviedb movies', () => {
       description: 'Description',
       poster: '/poster.jpg',
       backdrop: '/backdrop.jpg',
+      runtime: 139,
     });
     expect(DateTime.fromISO(movie.releasedate!).toISODate()).toBe('1999-10-15');
     expect(mockMovieDetails).toHaveBeenCalledWith(550);
@@ -80,6 +82,20 @@ describe('themoviedb movies', () => {
 
     const movie = await getMovie(1486200);
     expect(movie.releasedate).toBeNull();
+  });
+
+  it('getMovie maps a missing or zero runtime to null', async () => {
+    mockMovieDetails.mockResolvedValue({
+      id: 2,
+      title: 'No Runtime',
+      overview: '',
+      poster_path: null,
+      backdrop_path: null,
+      release_date: '2000-01-01',
+      runtime: 0,
+    });
+
+    expect((await getMovie(2)).runtime).toBeNull();
   });
 
   it('getMovie uses null poster when poster_path is missing', async () => {

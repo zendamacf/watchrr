@@ -51,6 +51,24 @@ describe('/api/movie/[movie_id]', () => {
         .from(subscribed_movies)
         .where(and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId)));
       expect(row?.watched).toBe(true);
+      expect(row?.watched_at).toBeInstanceOf(Date);
+    });
+
+    it('keeps the original watched time when marked watched again', async () => {
+      const { movieId } = await seedSubscribedMovie({
+        watcherId: userId,
+        movie: { moviedb_id: 998_302, name: 'Watch Me Twice' },
+        watched: false,
+      });
+      const params = routeParams({ movie_id: movieId });
+      await PUT(nextPut(apiRoutes.movieById(movieId)), params);
+      const where = and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movieId));
+      const [first] = await db.select().from(subscribed_movies).where(where);
+      await PUT(nextPut(apiRoutes.movieById(movieId)), params);
+      const [second] = await db.select().from(subscribed_movies).where(where);
+
+      expect(first?.watched_at).toBeInstanceOf(Date);
+      expect(second?.watched_at?.getTime()).toBe(first?.watched_at?.getTime());
     });
   });
 

@@ -22,6 +22,7 @@ import { BackdropCard } from '@/components/BackdropCard';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useShowEpisodesQuery } from '@/hooks/useShowEpisodes';
+import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes, routes } from '@/lib/routes';
 import { getImageUrl } from '@/lib/themoviedb/images';
@@ -33,6 +34,7 @@ import { formatTvShowStatusLabel, tvShowStatusBadgeColor } from '@/utils/tvshowS
 import { groupEpisodesBySeason } from '../groupEpisodesBySeason';
 import { ShowOptionsForm } from '../ShowOptionsForm';
 import classes from './ShowDetailPage.module.css';
+import { ShowStats } from './ShowStats';
 
 type Props = {
   tvshowId: string;
@@ -84,6 +86,7 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
       queryClient.invalidateQueries({ queryKey: [QueryKey.getShowEpisodes, tvshowId] });
+      invalidateStats(queryClient);
     },
     onError: (err, _season, context) => {
       showError({ title: 'An error occurred', message: err.message });
@@ -132,6 +135,7 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
       queryClient.invalidateQueries({ queryKey: [QueryKey.getShowEpisodes, tvshowId] });
+      invalidateStats(queryClient);
     },
     onError: (err, _episode, context) => {
       showError({ title: 'An error occurred', message: err.message });
@@ -244,6 +248,8 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
       </BackdropCard>
 
       <ShowOptionsForm show={subscribedShow} />
+
+      <ShowStats tvshowId={tvshowId} />
 
       <Title order={3}>Episodes</Title>
 

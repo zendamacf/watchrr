@@ -110,6 +110,7 @@ describe('themoviedb tvshows', () => {
           overview: 'Pilot',
           air_date: '2011-04-17',
           still_path: '/still.jpg',
+          runtime: 62,
         },
         {
           id: 63057,
@@ -133,6 +134,7 @@ describe('themoviedb tvshows', () => {
       name: 'Winter Is Coming',
       description: 'Pilot',
       backdrop: '/still.jpg',
+      runtime: 62,
     });
     expect(DateTime.fromISO(episodes[0]?.airdate ?? '').toISODate()).toBe('2011-04-17');
     expect(mockTvSeasonDetails).toHaveBeenCalledWith({

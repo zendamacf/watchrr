@@ -8,6 +8,7 @@ export const testMovie: Movie = {
   poster_slug: '/poster.jpg',
   backdrop_slug: '/backdrop.jpg',
   description: 'A test movie',
+  runtime: 120,
   metadata_refreshed_at: null,
 };
 
@@ -18,4 +19,5 @@ export const testTmdbMovie = {
   poster: '/poster.jpg',
   backdrop: '/backdrop.jpg',
   releasedate: '2024-01-15T00:00:00.000Z',
+  runtime: 120,
 };

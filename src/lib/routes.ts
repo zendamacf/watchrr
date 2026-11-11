@@ -4,6 +4,7 @@ export const routes = {
   shows: '/shows',
   showById: (tvshowId: string) => `/shows/${tvshowId}`,
   movies: '/movies',
+  stats: '/stats',
   signin: '/signin',
   signup: '/signup',
   forgotPassword: '/forgot-password',
@@ -28,12 +29,18 @@ export const apiRoutes = {
     `/api/movie/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   movieById: (movieId: string) => `/api/movie/${movieId}/`,
   movieRefresh: (movieId: string) => `/api/movie/${movieId}/refresh`,
+  stats: (searchParams?: URLSearchParams | string) =>
+    searchParams
+      ? `/api/stats?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`
+      : '/api/stats',
   tvshow: '/api/tvshow',
   tvshowSearch: (searchParams: URLSearchParams | string) =>
     `/api/tvshow/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   tvshowById: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
   tvshowEpisodes: (tvshowId: string) => `/api/tvshow/${tvshowId}/episodes/`,
   tvshowPreferences: (tvshowId: string) => `/api/tvshow/${tvshowId}/`,
+  tvshowStats: (tvshowId: string, searchParams?: URLSearchParams | string) =>
+    `/api/tvshow/${tvshowId}/stats${searchParams ? `?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}` : ''}`,
   tvshowRefresh: (tvshowId: string) => `/api/tvshow/${tvshowId}/refresh`,
   tvshowSeasonWatch: (tvshowId: string, season: number) => `/api/tvshow/${tvshowId}/season/${season}/`,
 } as const;

@@ -24,6 +24,7 @@
     "*": "npm run lint:fix && npm run format"
   },
   "dependencies": {
+    "@mantine/charts": "^9.6.3",
     "@mantine/core": "^9.6.3",
     "@mantine/hooks": "^9.6.3",
     "@mantine/modals": "^9.6.3",
@@ -43,6 +44,7 @@
     "postgres": "^3.4.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "recharts": "^3.10.1",
     "tmdb-ts": "^2.3.0"
   },
   "devDependencies": {

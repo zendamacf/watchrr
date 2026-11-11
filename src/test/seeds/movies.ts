@@ -19,6 +19,7 @@ export async function seedMovie(overrides: Partial<typeof testMovie> = {}): Prom
       poster_slug: values.poster_slug,
       backdrop_slug: values.backdrop_slug,
       description: values.description,
+      runtime: values.runtime,
     })
     .returning();
 
@@ -64,6 +65,7 @@ export async function seedSubscribedMovies(options: {
       poster_slug: merged.poster_slug,
       backdrop_slug: merged.backdrop_slug,
       description: merged.description,
+      runtime: merged.runtime,
     };
   });
 

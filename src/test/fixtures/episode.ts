@@ -10,6 +10,7 @@ export const testEpisode: Episode = {
   moviedb_id: 63056,
   backdrop_slug: '/backdrop.jpg',
   description: 'First episode',
+  runtime: 45,
 };
 
 export const testTmdbEpisode = {
@@ -20,4 +21,5 @@ export const testTmdbEpisode = {
   description: 'First episode',
   airdate: '2011-04-17T00:00:00.000Z',
   backdrop: '/backdrop.jpg',
+  runtime: 45,
 };

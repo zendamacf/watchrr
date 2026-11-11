@@ -8,6 +8,8 @@ export type TMDBMovie = {
   poster: string | null;
   backdrop: string | null;
   releasedate: string | null;
+  /** Runtime in minutes */
+  runtime: number | null;
 };
 
 /**
@@ -24,6 +26,7 @@ export const search = async (query: string): Promise<TMDBMovie[]> => {
     poster: d.poster_path,
     backdrop: d.backdrop_path,
     releasedate: tmdbDateToIso(d.release_date),
+    runtime: null,
   }));
 };
 
@@ -41,5 +44,6 @@ export const getMovie = async (moviedb_id: number): Promise<TMDBMovie> => {
     poster: data.poster_path ?? null,
     backdrop: data.backdrop_path,
     releasedate: tmdbDateToIso(data.release_date),
+    runtime: data.runtime || null,
   };
 };

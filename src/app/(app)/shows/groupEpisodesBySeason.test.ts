@@ -15,6 +15,7 @@ describe('groupEpisodesBySeason', () => {
         moviedb_id: 1,
         backdrop_slug: null,
         description: null,
+        runtime: null,
         watched: false,
       },
       {
@@ -27,6 +28,7 @@ describe('groupEpisodesBySeason', () => {
         moviedb_id: 2,
         backdrop_slug: null,
         description: null,
+        runtime: null,
         watched: true,
       },
       {
@@ -39,6 +41,7 @@ describe('groupEpisodesBySeason', () => {
         moviedb_id: 3,
         backdrop_slug: null,
         description: null,
+        runtime: null,
         watched: false,
       },
     ];

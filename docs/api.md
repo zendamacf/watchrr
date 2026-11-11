@@ -26,3 +26,24 @@ To read everything, request pages until `offset + rows.length >= X-Total-Count` 
 GET /api/movie?search=alien&limit=50&offset=50
 X-Total-Count: 132
 ```
+
+# Statistics API
+
+Both routes require a session cookie and only ever return the signed-in user's data.
+
+## `GET /api/stats`
+
+Overall watch statistics.
+
+| Param | Meaning |
+|-------|---------|
+| `from`, `to` | Optional `yyyy-MM-dd` bounds (inclusive) for the activity and weekday charts. Default: the last 12 weeks. Totals and backlog ignore them. |
+| `tz` | Optional IANA timezone (e.g. `Europe/London`) used to bucket days and weeks. Default `UTC`. |
+
+Invalid values return `400`. The response has watched counts (`total`, `thisWeek`, `thisMonth`, `thisYear`, `unknownDate`) for episodes and movies, `watchMinutes`, `missingRuntimeCount`, weekly `activity`, `weekdays`, show status counts, `backlog` and `streaks`.
+
+Items watched before watch times were recorded have no date. They count in `total` (and `unknownDate`), but not in the week/month/year counts, charts or streaks.
+
+## `GET /api/tvshow/{id}/stats`
+
+Per-show statistics: progress for each season, backlog and its estimated time, first and last watched dates, episodes per week and the next air date. Accepts `tz`. Returns `404` when the user is not subscribed to the show.

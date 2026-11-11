@@ -45,6 +45,8 @@ describe('PUT /api/episode/[episode_id]', () => {
       tvshowId,
       overrides: { moviedb_id: 998_502, name: 'Ep to watch' },
     });
+    // The test DB is not reset between runs; clear rows left by earlier runs so watched_at is freshly recorded.
+    await db.delete(watched_episodes).where(eq(watched_episodes.episode_id, episode.id));
 
     const response = await PUT(nextPut(apiRoutes.episodeById(episode.id)), routeParams({ episode_id: episode.id }));
     expect(response.status).toBe(200);
@@ -54,6 +56,7 @@ describe('PUT /api/episode/[episode_id]', () => {
       .from(watched_episodes)
       .where(and(eq(watched_episodes.watcher_id, userId), eq(watched_episodes.episode_id, episode.id)));
     expect(row).toBeDefined();
+    expect(row?.watched_at).toBeInstanceOf(Date);
   });
 
   it('returns 404 when the user is not subscribed to the show', async () => {

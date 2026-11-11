@@ -19,6 +19,7 @@ function tmdbMovie(
     poster: string | null;
     backdrop: string | null;
     releasedate: string | null;
+    runtime: number | null;
   }> = {},
 ) {
   return {
@@ -28,6 +29,7 @@ function tmdbMovie(
     poster: '/synced-poster.jpg',
     backdrop: '/synced-backdrop.jpg',
     releasedate: '2024-01-15T00:00:00.000Z',
+    runtime: 120 as number | null,
     ...overrides,
   };
 }
@@ -82,6 +84,7 @@ describe('refreshMovie', () => {
         poster: '/fresh-poster.jpg',
         backdrop: '/fresh-backdrop.jpg',
         releasedate: '2024-03-20T00:00:00.000Z',
+        runtime: 95,
       }),
     );
 
@@ -94,6 +97,7 @@ describe('refreshMovie', () => {
       poster_slug: '/fresh-poster.jpg',
       backdrop_slug: '/fresh-backdrop.jpg',
       releasedate: '2024-03-20',
+      runtime: 95,
     });
     expect(after?.metadata_refreshed_at).toBeInstanceOf(Date);
   });

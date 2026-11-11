@@ -130,6 +130,20 @@ describe('/api/movie', () => {
       expect(response.status).toBe(404);
     });
 
+    it('clears watched state and time when re-subscribing', async () => {
+      const { movie } = await seedSubscribedMovie({
+        watcherId: userId,
+        movie: { moviedb_id: 998_205, name: 'Resubscribe' },
+      });
+      const where = and(eq(subscribed_movies.watcher_id, userId), eq(subscribed_movies.movie_id, movie.id));
+      await db.update(subscribed_movies).set({ watched: true, watched_at: new Date() }).where(where);
+
+      const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: movie.moviedb_id }));
+      expect(response.status).toBe(201);
+      const [row] = await db.select().from(subscribed_movies).where(where);
+      expect(row).toMatchObject({ watched: false, watched_at: null });
+    });
+
     it('subscribes using an existing movie row', async () => {
       const movie = await seedMovie({ moviedb_id: 998_204, name: 'Existing Row' });
       const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: movie.moviedb_id }));
