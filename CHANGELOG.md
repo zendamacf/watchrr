@@ -1,5 +1,19 @@
 # watchrr
 
+## 3.6.0
+
+### Minor Changes
+
+- c3b66c2: Add an "Already watched" button to Discover recommendations, next to "Not interested".
+- cb978f9: Redesign the movie page with a backdrop hero, an in-place trailer, streaming availability, top cast and a "More like this" row.
+- 6086639: Redesign the show page to match the movie page. Release delay and snooze options now open from a Settings button in the hero.
+- c85b63c: Add an info button to Discover cards that opens a modal with the synopsis, rating, genres, cast, trailer link and streaming availability.
+
+### Patch Changes
+
+- d68251d: Show tooltips on the icon buttons on show, movie, episode and recommendation cards.
+- d668745: Credit TMDB in the footer.
+
 ## 3.5.0
 
 ### Minor Changes
