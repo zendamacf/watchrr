@@ -50,21 +50,22 @@ const movieCandidates = (userId: string) =>
   `,
   );
 
-/** A show is finished when the user watched something and no aired episode is left unwatched. */
-const showFinished = (userId: string) => sql`(
-  EXISTS (
-    SELECT 1 FROM watched_episodes we
-    JOIN episodes e ON e.id = we.episode_id
-    WHERE e.tvshow_id = src.id AND we.watcher_id = ${userId}
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM episodes e
-    WHERE e.tvshow_id = src.id AND e.airdate <= current_date
-    AND NOT EXISTS (
-      SELECT 1 FROM watched_episodes we WHERE we.episode_id = e.id AND we.watcher_id = ${userId}
-    )
-  )
+/**
+ * Per tracked show: whether the user watched anything and whether an aired episode is left.
+ * Computed in one grouped pass over the user's shows, not once per recommendation row.
+ */
+const showProgress = (userId: string) => sql`(
+  SELECT e.tvshow_id,
+    bool_or(we.episode_id IS NOT NULL) AS any_watched,
+    bool_or(we.episode_id IS NULL AND e.airdate <= current_date) AS any_aired_unwatched
+  FROM episodes e
+  LEFT JOIN watched_episodes we ON we.episode_id = e.id AND we.watcher_id = ${userId}
+  WHERE e.tvshow_id IN (SELECT tvshow_id FROM subscribed_tvshows WHERE watcher_id = ${userId})
+  GROUP BY e.tvshow_id
 )`;
+
+/** A show is finished when the user watched something and no aired episode is left unwatched. */
+const showFinished = sql`COALESCE(progress.any_watched AND NOT progress.any_aired_unwatched, false)`;
 
 const showCandidates = (userId: string) =>
   aggregate(
@@ -73,10 +74,11 @@ const showCandidates = (userId: string) =>
     SELECT r.moviedb_id, r.name, r.description, r.poster_slug, r.backdrop_slug,
       NULL::text AS releasedate, r.country,
       src.name AS source_name,
-      ${sourceWeightSql(showFinished(userId))} AS w
+      ${sourceWeightSql(showFinished)} AS w
     FROM tvshow_recommendations r
     JOIN subscribed_tvshows st ON st.tvshow_id = r.source_tvshow_id AND st.watcher_id = ${userId}
     JOIN tvshows src ON src.id = st.tvshow_id
+    LEFT JOIN ${showProgress(userId)} AS progress ON progress.tvshow_id = src.id
     WHERE NOT EXISTS (
       SELECT 1 FROM tvshows s
       JOIN subscribed_tvshows tracked ON tracked.tvshow_id = s.id
