@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { EmptyState } from '@/components/EmptyState';
 import { useAddMovie, useAddShow } from '@/hooks/useAddMedia';
 import { useNotInterested, useRecommendationsQuery, useRemoveRecommendation } from '@/hooks/useRecommendations';
-import type { Recommendation } from '@/lib/recommendations/types';
+import type { DismissalReason, Recommendation } from '@/lib/recommendations/types';
 import { DiscoverSection } from './DiscoverSection';
 import { RecommendationDetailsModal } from './RecommendationDetailsModal';
 
@@ -44,7 +44,7 @@ export const DiscoverPage = () => {
     );
   }
 
-  const hideItem = (target: Recommendation) => hide.mutate(target);
+  const hideItem = (target: Recommendation, reason: DismissalReason) => hide.mutate({ ...target, reason });
   const shared = { onAdd: add, onHide: hideItem, onInfo: setSelected, isBusy };
 
   return (

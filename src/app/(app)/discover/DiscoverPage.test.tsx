@@ -201,8 +201,29 @@ describe('DiscoverPage', () => {
     });
     const post = calls().find((c) => c.init?.method === 'POST');
     expect(post?.url).toBe(apiRoutes.notInterested);
-    expect(JSON.parse(String(post?.init?.body))).toEqual({ type: 'movie', moviedb_id: 680 });
+    expect(JSON.parse(String(post?.init?.body))).toEqual({ type: 'movie', moviedb_id: 680, reason: 'not_interested' });
     expect(screen.getByRole('heading', { name: 'Breaking Bad' })).toBeInTheDocument();
+  });
+
+  it('hides a recommendation with "already watched"', async () => {
+    const user = userEvent.setup();
+    stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (init?.method === 'POST') return mockFetchResponse({ message: 'Success' }, { status: 201 });
+      const type = searchParams(fetchRequestUrl(input)).get('type');
+      return mockPagedResponse([testRecommendation, testShowRecommendation].filter((r) => r.type === type));
+    });
+    renderWithProviders(<DiscoverPage />);
+
+    await user.click(await screen.findByRole('button', { name: 'Already watched Pulp Fiction' }));
+
+    await waitFor(() => {
+      const post = calls().find((c) => c.init?.method === 'POST');
+      expect(JSON.parse(String(post?.init?.body))).toEqual({
+        type: 'movie',
+        moviedb_id: 680,
+        reason: 'already_watched',
+      });
+    });
   });
 
   it('opens a details modal for a card and fetches its details once', async () => {

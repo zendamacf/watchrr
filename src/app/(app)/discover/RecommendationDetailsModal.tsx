@@ -1,9 +1,9 @@
 'use client';
 
 import { Alert, Anchor, Badge, Button, Group, Image, Modal, Skeleton, Stack, Text } from '@mantine/core';
-import { EyeOff, Play, Plus, Star } from 'lucide-react';
+import { CheckCheck, EyeOff, Play, Plus, Star } from 'lucide-react';
 import { useRecommendationDetails } from '@/hooks/useRecommendationDetails';
-import type { Recommendation, RecommendationDetails } from '@/lib/recommendations/types';
+import type { DismissalReason, Recommendation, RecommendationDetails } from '@/lib/recommendations/types';
 import { getImageUrl } from '@/lib/themoviedb/images';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   recommendation: Recommendation | null;
   onClose: () => void;
   onAdd: (recommendation: Recommendation) => void;
-  onHide: (recommendation: Recommendation) => void;
+  onHide: (recommendation: Recommendation, reason: DismissalReason) => void;
 };
 
 const formatRuntime = (minutes: number) => {
@@ -144,11 +144,21 @@ export const RecommendationDetailsModal = ({ recommendation, onClose, onAdd, onH
               variant="default"
               leftSection={<EyeOff size={16} aria-hidden />}
               onClick={() => {
-                onHide(recommendation);
+                onHide(recommendation, 'not_interested');
                 onClose();
               }}
             >
               Not interested
+            </Button>
+            <Button
+              variant="default"
+              leftSection={<CheckCheck size={16} aria-hidden />}
+              onClick={() => {
+                onHide(recommendation, 'already_watched');
+                onClose();
+              }}
+            >
+              Already watched
             </Button>
             <Button
               leftSection={<Plus size={16} aria-hidden />}

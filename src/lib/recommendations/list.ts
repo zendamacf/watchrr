@@ -2,7 +2,7 @@ import { and, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { not_interested_movies, not_interested_tvshows } from '@/lib/db/schema';
 import { FINISHED_BONUS, SOURCE_WEIGHT } from './score';
-import { BECAUSE_LIMIT, type Recommendation, type RecommendationType } from './types';
+import { BECAUSE_LIMIT, type DismissalReason, type Recommendation, type RecommendationType } from './types';
 
 const sourceWeightSql = (finished: ReturnType<typeof sql>) =>
   sql`(${sql.raw(String(SOURCE_WEIGHT))} + CASE WHEN ${finished} THEN ${sql.raw(String(FINISHED_BONUS))} ELSE 0 END)`;
@@ -128,8 +128,16 @@ const notInterestedTable = (type: RecommendationType) =>
   type === 'movie' ? not_interested_movies : not_interested_tvshows;
 
 /** Hide a candidate from the user's Discover list. Safe to repeat. */
-export async function markNotInterested(userId: string, type: RecommendationType, moviedbId: number) {
-  await db.insert(notInterestedTable(type)).values({ watcher_id: userId, moviedb_id: moviedbId }).onConflictDoNothing();
+export async function markNotInterested(
+  userId: string,
+  type: RecommendationType,
+  moviedbId: number,
+  reason: DismissalReason = 'not_interested',
+) {
+  await db
+    .insert(notInterestedTable(type))
+    .values({ watcher_id: userId, moviedb_id: moviedbId, reason })
+    .onConflictDoNothing();
 }
 
 /** Undo `markNotInterested`. Safe to repeat. */

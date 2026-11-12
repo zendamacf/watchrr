@@ -40,7 +40,7 @@ A candidate scores 1 point for each followed item that recommends it, plus 1 mor
 
 ## `POST /api/recommendations/not-interested`
 
-Hides a candidate from the user's list for good. The JSON body is `{ "type": "movie" | "tvshow", "moviedb_id": 123 }`. Returns `201`, and repeating it is safe. Invalid input returns `400`.
+Hides a candidate from the user's list for good. The JSON body is `{ "type": "movie" | "tvshow", "moviedb_id": 123, "reason": "not_interested" | "already_watched" }`. `reason` is optional and defaults to `not_interested`; it is stored for later use and both values hide the item the same way. Returns `201`, and repeating it is safe (the first reason is kept). Invalid input, including an unknown `reason`, returns `400`.
 
 ## `DELETE /api/recommendations/not-interested?type=movie&moviedb_id=123`
 

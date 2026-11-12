@@ -5,6 +5,7 @@ import {
   not_interested_tvshows,
   tvshow_recommendations,
 } from '@/lib/db/schema';
+import type { DismissalReason } from '@/lib/recommendations/types';
 
 /** Cache a movie recommendation for a source movie (idempotent on the primary key). */
 export async function seedMovieRecommendation(options: {
@@ -44,10 +45,15 @@ export async function seedTvShowRecommendation(options: { sourceTvShowId: string
 }
 
 /** Hide a TMDB id from a user's Discover list. */
-export async function seedNotInterested(options: { watcherId: string; type: 'movie' | 'tvshow'; moviedb_id: number }) {
+export async function seedNotInterested(options: {
+  watcherId: string;
+  type: 'movie' | 'tvshow';
+  moviedb_id: number;
+  reason?: DismissalReason;
+}) {
   const table = options.type === 'movie' ? not_interested_movies : not_interested_tvshows;
   await db
     .insert(table)
-    .values({ watcher_id: options.watcherId, moviedb_id: options.moviedb_id })
+    .values({ watcher_id: options.watcherId, moviedb_id: options.moviedb_id, reason: options.reason })
     .onConflictDoNothing();
 }

@@ -151,7 +151,18 @@ describe('RecommendationDetailsModal', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Not interested' }));
 
-    expect(props.onHide).toHaveBeenCalledWith(testRecommendation);
+    expect(props.onHide).toHaveBeenCalledWith(testRecommendation, 'not_interested');
+    expect(props.onClose).toHaveBeenCalled();
+  });
+
+  it('marks as already watched and closes', async () => {
+    stubFetch(mockFetchResponse(details));
+    const user = userEvent.setup();
+    const props = setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Already watched' }));
+
+    expect(props.onHide).toHaveBeenCalledWith(testRecommendation, 'already_watched');
     expect(props.onClose).toHaveBeenCalled();
   });
 });

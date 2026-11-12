@@ -2,6 +2,9 @@
 
 export type RecommendationType = 'movie' | 'tvshow';
 
+/** Why a recommendation was hidden. Mirrors the `dismissal_reason` database enum. */
+export type DismissalReason = 'not_interested' | 'already_watched';
+
 export type Recommendation = {
   type: RecommendationType;
   /** TMDB id. Candidates are not tracked yet, so they have no watchrr id. */
