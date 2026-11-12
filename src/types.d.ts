@@ -19,6 +19,8 @@ export type ShowEpisodesResponse = {
   episodes: ShowEpisode[];
   /** Genre names; empty until the show has been refreshed. */
   genres: string[];
+  /** Cached TMDB recommendations for this show that the user does not follow or hide yet. */
+  similar: import('@/lib/recommendations/types').SimilarShow[];
 };
 export type MovieDetailResponse = {
   movie: Movie;

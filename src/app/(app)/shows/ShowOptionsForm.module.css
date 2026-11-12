@@ -15,3 +15,9 @@
     padding-left: var(--mantine-spacing-lg);
   }
 }
+
+/* Delay and snooze stacked in a narrow container, such as a modal. */
+.settingsSectionStacked {
+  padding-bottom: var(--mantine-spacing-lg);
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}

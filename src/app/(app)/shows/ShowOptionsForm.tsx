@@ -27,6 +27,10 @@ import classes from './ShowOptionsForm.module.css';
 
 type Props = {
   show: SubscribedShow;
+  /** Inside a modal that supplies its own title and border: the form drops its heading and frame, stacks its sections and puts Save below. */
+  embedded?: boolean;
+  /** Called after the options were saved. */
+  onSaved?: () => void;
 };
 
 const DELAY_PRESETS = [7, 14, 21] as const;
@@ -57,7 +61,7 @@ function detectSnoozePreset(snoozedUntil: string | null): SnoozePreset {
   return 'custom';
 }
 
-export const ShowOptionsForm = ({ show }: Props) => {
+export const ShowOptionsForm = ({ show, embedded = false, onSaved }: Props) => {
   const { showError, showSuccess } = useAlert();
   const queryClient = useQueryClient();
 
@@ -99,6 +103,7 @@ export const ShowOptionsForm = ({ show }: Props) => {
       );
       queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
       queryClient.invalidateQueries({ queryKey: [QueryKey.getEpisodes] });
+      onSaved?.();
     },
     onError: (error) => showError({ title: 'An error occurred', message: error.message }),
   });
@@ -115,90 +120,106 @@ export const ShowOptionsForm = ({ show }: Props) => {
     mutate(preferences);
   };
 
+  const saveButton = (
+    <Button loading={isPending} onClick={handleSave}>
+      Save
+    </Button>
+  );
+
+  const sections = (
+    <SimpleGrid cols={{ base: 1, md: embedded ? 1 : 2 }} spacing="lg">
+      <Stack gap="sm" className={embedded ? classes.settingsSectionStacked : classes.settingsSectionDelay}>
+        <Text fw={600}>Release delay</Text>
+        <Text size="sm" c="dimmed">
+          Wait a number of days after the listed air date before episodes appear on your schedule.
+        </Text>
+        <Switch
+          label="Enable delay"
+          color={DELAY_UI_COLOR}
+          checked={delayEnabled}
+          onChange={(event) => setDelayEnabled(event.currentTarget.checked)}
+        />
+        {delayEnabled && (
+          <Stack gap="xs">
+            <NumberInput
+              label="Days"
+              value={delayDays}
+              onChange={(value) => setDelayDays(typeof value === 'number' ? value : 0)}
+              min={0}
+              max={MAX_DELAY_DAYS}
+            />
+            <Group gap="xs">
+              {DELAY_PRESETS.map((preset) => (
+                <Button
+                  key={preset}
+                  variant="light"
+                  color={DELAY_UI_COLOR}
+                  size="xs"
+                  onClick={() => setDelayDays(preset)}
+                >
+                  {preset} days
+                </Button>
+              ))}
+            </Group>
+          </Stack>
+        )}
+      </Stack>
+
+      <Stack gap="sm" className={embedded ? undefined : classes.settingsSectionSnooze}>
+        <Text fw={600}>Snooze</Text>
+        <Text size="sm" c="dimmed">
+          Hide all unwatched episodes until a date.
+        </Text>
+        <Switch
+          label="Snooze this show"
+          color={SNOOZE_UI_COLOR}
+          checked={snoozeEnabled}
+          onChange={(event) => setSnoozeEnabled(event.currentTarget.checked)}
+        />
+        {snoozeEnabled && (
+          <Stack gap="xs">
+            <SegmentedControl
+              color={SNOOZE_UI_COLOR}
+              value={snoozePreset}
+              onChange={(value) => setSnoozePreset(value as SnoozePreset)}
+              data={[
+                { label: '1 week', value: '1w' },
+                { label: '2 weeks', value: '2w' },
+                { label: '1 month', value: '1m' },
+                { label: 'Custom', value: 'custom' },
+              ]}
+            />
+            {snoozePreset === 'custom' && (
+              <TextInput
+                label="Snooze until"
+                type="date"
+                value={customSnoozeDate}
+                onChange={(event) => setCustomSnoozeDate(event.currentTarget.value)}
+              />
+            )}
+          </Stack>
+        )}
+      </Stack>
+    </SimpleGrid>
+  );
+
+  if (embedded) {
+    return (
+      <Stack gap="lg">
+        {sections}
+        <Group justify="end">{saveButton}</Group>
+      </Stack>
+    );
+  }
+
   return (
     <Paper withBorder p="md">
       <Stack gap="lg">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={3}>Settings</Title>
-          <Button loading={isPending} onClick={handleSave}>
-            Save
-          </Button>
+          {saveButton}
         </Group>
-
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-          <Stack gap="sm" className={classes.settingsSectionDelay}>
-            <Text fw={600}>Release delay</Text>
-            <Text size="sm" c="dimmed">
-              Wait a number of days after the listed air date before episodes appear on your schedule.
-            </Text>
-            <Switch
-              label="Enable delay"
-              color={DELAY_UI_COLOR}
-              checked={delayEnabled}
-              onChange={(event) => setDelayEnabled(event.currentTarget.checked)}
-            />
-            {delayEnabled && (
-              <Stack gap="xs">
-                <NumberInput
-                  label="Days"
-                  value={delayDays}
-                  onChange={(value) => setDelayDays(typeof value === 'number' ? value : 0)}
-                  min={0}
-                  max={MAX_DELAY_DAYS}
-                />
-                <Group gap="xs">
-                  {DELAY_PRESETS.map((preset) => (
-                    <Button
-                      key={preset}
-                      variant="light"
-                      color={DELAY_UI_COLOR}
-                      size="xs"
-                      onClick={() => setDelayDays(preset)}
-                    >
-                      {preset} days
-                    </Button>
-                  ))}
-                </Group>
-              </Stack>
-            )}
-          </Stack>
-
-          <Stack gap="sm" className={classes.settingsSectionSnooze}>
-            <Text fw={600}>Snooze</Text>
-            <Text size="sm" c="dimmed">
-              Hide all unwatched episodes until a date.
-            </Text>
-            <Switch
-              label="Snooze this show"
-              color={SNOOZE_UI_COLOR}
-              checked={snoozeEnabled}
-              onChange={(event) => setSnoozeEnabled(event.currentTarget.checked)}
-            />
-            {snoozeEnabled && (
-              <Stack gap="xs">
-                <SegmentedControl
-                  color={SNOOZE_UI_COLOR}
-                  value={snoozePreset}
-                  onChange={(value) => setSnoozePreset(value as SnoozePreset)}
-                  data={[
-                    { label: '1 week', value: '1w' },
-                    { label: '2 weeks', value: '2w' },
-                    { label: '1 month', value: '1m' },
-                    { label: 'Custom', value: 'custom' },
-                  ]}
-                />
-                {snoozePreset === 'custom' && (
-                  <TextInput
-                    label="Snooze until"
-                    type="date"
-                    value={customSnoozeDate}
-                    onChange={(event) => setCustomSnoozeDate(event.currentTarget.value)}
-                  />
-                )}
-              </Stack>
-            )}
-          </Stack>
-        </SimpleGrid>
+        {sections}
       </Stack>
     </Paper>
   );

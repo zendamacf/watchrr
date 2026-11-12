@@ -5,10 +5,12 @@ import {
   Alert,
   Anchor,
   Badge,
+  Button,
   Center,
+  Grid,
   Group,
-  Image,
   Loader,
+  Modal,
   Paper,
   Stack,
   Text,
@@ -16,16 +18,20 @@ import {
 } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronLeft, Undo2 } from 'lucide-react';
+import { Check, ChevronLeft, Play, Settings, Undo2 } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { BackdropCard } from '@/components/BackdropCard';
+import { useState } from 'react';
 import { QueryKey } from '@/components/QueryProvider';
+import { SimilarTitles } from '@/components/SimilarTitles';
+import { Cast, ExtrasSkeleton, WhereToWatch } from '@/components/TitleExtras';
+import { RatingBadge, TitleHero } from '@/components/TitleHero';
+import { TrailerModal } from '@/components/TrailerModal';
 import { useAlert } from '@/hooks/useAlert';
+import { useRecommendationDetails } from '@/hooks/useRecommendationDetails';
 import { useShowEpisodesQuery } from '@/hooks/useShowEpisodes';
 import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes, routes } from '@/lib/routes';
-import { getImageUrl } from '@/lib/themoviedb/images';
 import type { EpisodesResponse, ShowEpisode, ShowEpisodesResponse, SubscribedShow } from '@/types';
 import { DateFormat } from '@/utils/dates';
 import { DELAY_UI_COLOR, isShowSnoozed } from '@/utils/episode-schedule';
@@ -44,6 +50,11 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
   const { showError, showSuccess } = useAlert();
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error } = useShowEpisodesQuery(tvshowId);
+  // Cast, trailer and streaming come from TMDB, so they load after the page itself.
+  const extras = useRecommendationDetails(data ? { type: 'tvshow', moviedb_id: data.tvshow.moviedb_id } : null);
+  const details = extras.data;
+  const [trailer, setTrailer] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const {
     mutate: markSeasonWatched,
@@ -191,6 +202,7 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
 
   const seasons = groupEpisodesBySeason(data.episodes);
   const snoozed = isShowSnoozed(data.subscription.snoozed_until);
+  const showStreaming = (details?.providers.length ?? 0) > 0;
   const subscribedShow: SubscribedShow = {
     ...data.tvshow,
     delay_days: data.subscription.delay_days,
@@ -206,57 +218,91 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
         </Group>
       </Anchor>
 
-      <BackdropCard backdrop={data.tvshow.backdrop_slug} padding="lg">
-        <Group align="flex-start" wrap="nowrap" gap="lg">
-          <Image
-            src={data.tvshow.poster_slug ? getImageUrl(data.tvshow.poster_slug) : undefined}
-            fallbackSrc="/placeholder.jpg"
-            alt={`Poster for ${data.tvshow.name}`}
-            w={{ base: 100, sm: 140 }}
-            radius="md"
-            style={{ aspectRatio: '2 / 3', objectFit: 'cover', flex: '0 0 auto' }}
-          />
-          <Stack gap="xs" flex={1}>
-            <Title order={2}>{data.tvshow.name}</Title>
-            {data.tvshow.description && (
-              <Text c="dimmed" size="sm">
-                {data.tvshow.description}
+      <TitleHero
+        name={data.tvshow.name}
+        poster={data.tvshow.poster_slug}
+        backdrop={data.tvshow.backdrop_slug}
+        tagline={details?.tagline}
+        meta={
+          <>
+            {data.tvshow.status ? (
+              <Badge color={tvShowStatusBadgeColor(data.tvshow.status)} variant="filled">
+                {formatTvShowStatusLabel(data.tvshow.status)}
+              </Badge>
+            ) : null}
+            {data.tvshow.country && <Text size="sm">{data.tvshow.country}</Text>}
+            {details?.seasons ? (
+              <Text size="sm">
+                {details.seasons} {details.seasons === 1 ? 'season' : 'seasons'}
+              </Text>
+            ) : null}
+            <RatingBadge rating={details?.rating} />
+            {data.subscription.delay_days > 0 && (
+              <Badge color={DELAY_UI_COLOR} variant="outline">
+                {data.subscription.delay_days}d delay
+              </Badge>
+            )}
+            {snoozed && data.subscription.snoozed_until && (
+              <Badge color="orange" variant="outline">
+                Snoozed until {DateTime.fromSQL(data.subscription.snoozed_until).toFormat(DateFormat.DMY)}
+              </Badge>
+            )}
+          </>
+        }
+        actions={
+          <>
+            {details?.trailer && (
+              <Button
+                variant="white"
+                color="dark"
+                leftSection={<Play size={16} aria-hidden />}
+                onClick={() => setTrailer(details.trailer)}
+              >
+                Watch trailer
+              </Button>
+            )}
+            <Button
+              variant="filled"
+              color="dark"
+              leftSection={<Settings size={16} aria-hidden />}
+              onClick={() => setSettingsOpen(true)}
+            >
+              Settings
+            </Button>
+          </>
+        }
+      >
+        {data.genres.length > 0 && (
+          <Group gap="xs" aria-label="Genres">
+            {data.genres.map((genre) => (
+              <Badge key={genre} variant="light" color="signal">
+                {genre}
+              </Badge>
+            ))}
+          </Group>
+        )}
+      </TitleHero>
+
+      <Grid gap="xl">
+        <Grid.Col span={{ base: 12, md: showStreaming ? 8 : 12 }}>
+          <Stack gap="md" maw="75ch">
+            {data.tvshow.description && <Text size="lg">{data.tvshow.description}</Text>}
+            {extras.isLoading && <ExtrasSkeleton />}
+            {extras.isError && (
+              <Text size="sm" c="dimmed">
+                Cast, trailer and streaming details could not be loaded from TMDB.
               </Text>
             )}
-            <Group gap="xs">
-              {data.tvshow.status ? (
-                <Badge color={tvShowStatusBadgeColor(data.tvshow.status)} variant="filled">
-                  {formatTvShowStatusLabel(data.tvshow.status)}
-                </Badge>
-              ) : null}
-              <Badge color="gray" variant="filled">
-                {data.tvshow.country}
-              </Badge>
-              {data.subscription.delay_days > 0 && (
-                <Badge color={DELAY_UI_COLOR} variant="outline">
-                  {data.subscription.delay_days}d delay
-                </Badge>
-              )}
-              {snoozed && data.subscription.snoozed_until && (
-                <Badge color="orange" variant="outline">
-                  Snoozed until {DateTime.fromSQL(data.subscription.snoozed_until).toFormat(DateFormat.DMY)}
-                </Badge>
-              )}
-            </Group>
-            {data.genres.length > 0 && (
-              <Group gap="xs" aria-label="Genres">
-                {data.genres.map((genre) => (
-                  <Badge key={genre} variant="light" color="signal">
-                    {genre}
-                  </Badge>
-                ))}
-              </Group>
-            )}
           </Stack>
-        </Group>
-      </BackdropCard>
+        </Grid.Col>
+        {details && showStreaming && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <WhereToWatch details={details} />
+          </Grid.Col>
+        )}
+      </Grid>
 
-      <ShowOptionsForm show={subscribedShow} />
+      {details && <Cast details={details} />}
 
       <ShowStats tvshowId={tvshowId} />
 
@@ -323,6 +369,18 @@ export const ShowDetailPage = ({ tvshowId }: Props) => {
           })}
         </Stack>
       )}
+
+      <SimilarTitles
+        type="tvshow"
+        titles={data.similar}
+        onChanged={() => queryClient.invalidateQueries({ queryKey: [QueryKey.getShowEpisodes, tvshowId] })}
+      />
+
+      <Modal opened={settingsOpen} onClose={() => setSettingsOpen(false)} title="Settings" centered>
+        <ShowOptionsForm embedded show={subscribedShow} onSaved={() => setSettingsOpen(false)} />
+      </Modal>
+
+      <TrailerModal videoKey={trailer} title={data.tvshow.name} onClose={() => setTrailer(null)} />
     </Stack>
   );
 };

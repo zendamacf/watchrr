@@ -50,3 +50,6 @@ export type RecommendationDetails = {
 
 /** A movie TMDB suggests alongside a tracked one, shown on that movie's page. */
 export type SimilarMovie = Pick<Recommendation, 'moviedb_id' | 'name' | 'description' | 'releasedate' | 'poster_slug'>;
+
+/** A show TMDB suggests alongside a tracked one, shown on that show's page. */
+export type SimilarShow = Pick<Recommendation, 'moviedb_id' | 'name' | 'description' | 'country' | 'poster_slug'>;

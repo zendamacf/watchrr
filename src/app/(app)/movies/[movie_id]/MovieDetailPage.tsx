@@ -5,16 +5,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { QueryKey } from '@/components/QueryProvider';
+import { SimilarTitles } from '@/components/SimilarTitles';
+import { Cast, ExtrasSkeleton, WhereToWatch } from '@/components/TitleExtras';
+import { TrailerModal } from '@/components/TrailerModal';
 import { useAlert } from '@/hooks/useAlert';
 import { useMovieQuery } from '@/hooks/useMovie';
 import { useRecommendationDetails } from '@/hooks/useRecommendationDetails';
 import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes, routes } from '@/lib/routes';
-import { Cast, ExtrasSkeleton, WhereToWatch } from './MovieExtras';
 import { MovieHero } from './MovieHero';
-import { SimilarMovies } from './SimilarMovies';
-import { TrailerModal } from './TrailerModal';
 
 type Props = {
   movieId: string;
@@ -106,7 +106,11 @@ export const MovieDetailPage = ({ movieId }: Props) => {
 
       {details && <Cast details={details} />}
 
-      <SimilarMovies movieId={movieId} movies={similar} />
+      <SimilarTitles
+        type="movie"
+        titles={similar}
+        onChanged={() => queryClient.invalidateQueries({ queryKey: [QueryKey.getMovie, movieId] })}
+      />
 
       <TrailerModal videoKey={trailer} title={movie.name} onClose={() => setTrailer(null)} />
     </Stack>
