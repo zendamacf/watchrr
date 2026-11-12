@@ -11,6 +11,7 @@ import {
   Stack,
   Text,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import classNames from 'classnames';
@@ -138,48 +139,56 @@ export const EpisodeCard = ({ episode, showDate, variant = 'scheduled' }: Props)
         <Group justify={'end'} gap={'xs'}>
           {variant === 'snoozed' && (
             <>
-              <ActionIcon
-                component={Link}
-                href={routes.showById(episode.tvshows.id)}
-                aria-label="Show settings"
-                variant="white"
-                color="gray"
-              >
-                <Settings size={'20'} />
-              </ActionIcon>
-              <ActionIcon
-                aria-label="Wake show"
-                variant="white"
-                color="orange"
-                loading={wakePending}
-                onClick={() => wakeShow()}
-              >
-                <AlarmClock size={'20'} />
-              </ActionIcon>
+              <Tooltip label="Show settings">
+                <ActionIcon
+                  component={Link}
+                  href={routes.showById(episode.tvshows.id)}
+                  aria-label="Show settings"
+                  variant="white"
+                  color="gray"
+                >
+                  <Settings size={'20'} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Wake show">
+                <ActionIcon
+                  aria-label="Wake show"
+                  variant="white"
+                  color="orange"
+                  loading={wakePending}
+                  onClick={() => wakeShow()}
+                >
+                  <AlarmClock size={'20'} />
+                </ActionIcon>
+              </Tooltip>
             </>
           )}
           <CopyButton value={`${episode.tvshows.name} ${episodeNumber}`} timeout={2000}>
             {({ copied, copy }) => (
-              <ActionIcon
-                variant={'white'}
-                aria-label={`Copy ${episode.tvshows.name} ${episodeNumber}`}
-                color={copied ? 'afterglow' : 'gray'}
-                onClick={() => {
-                  copy();
-                  showInfo({ message: 'Copied', icon: <ClipboardCheck /> });
-                }}
-              >
-                {copied ? <ClipboardCheck size={'20'} /> : <Copy size={'20'} />}
-              </ActionIcon>
+              <Tooltip label={copied ? 'Copied' : 'Copy title and episode'}>
+                <ActionIcon
+                  variant={'white'}
+                  aria-label={`Copy ${episode.tvshows.name} ${episodeNumber}`}
+                  color={copied ? 'afterglow' : 'gray'}
+                  onClick={() => {
+                    copy();
+                    showInfo({ message: 'Copied', icon: <ClipboardCheck /> });
+                  }}
+                >
+                  {copied ? <ClipboardCheck size={'20'} /> : <Copy size={'20'} />}
+                </ActionIcon>
+              </Tooltip>
             )}
           </CopyButton>
-          <ActionIcon
-            aria-label={`Mark ${episode.tvshows.name} ${episodeNumber} as watched`}
-            loading={isPending}
-            onClick={() => mutate(episode.episodes.id)}
-          >
-            <Check size={'20'} />
-          </ActionIcon>
+          <Tooltip label="Mark watched">
+            <ActionIcon
+              aria-label={`Mark ${episode.tvshows.name} ${episodeNumber} as watched`}
+              loading={isPending}
+              onClick={() => mutate(episode.episodes.id)}
+            >
+              <Check size={'20'} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Group>
     </BackdropCard>

@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionIcon, Group, Text, Title } from '@mantine/core';
+import { ActionIcon, Group, Text, Title, Tooltip } from '@mantine/core';
 import { CheckCheck, EyeOff, Info, Plus } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Fragment } from 'react';
@@ -69,35 +69,43 @@ export const RecommendationCard = ({ recommendation, onAdd, onHide, onInfo, busy
     posterAlt={`Poster for ${recommendation.name}`}
     footer={
       <Group justify="end" gap="xs">
-        <ActionIcon
-          variant="white"
-          color="gray"
-          aria-label={`More about ${recommendation.name}`}
-          onClick={() => onInfo(recommendation)}
-        >
-          <Info size={20} />
-        </ActionIcon>
-        <ActionIcon
-          variant="white"
-          color="gray"
-          aria-label={`Not interested in ${recommendation.name}`}
-          disabled={busy}
-          onClick={() => onHide(recommendation, 'not_interested')}
-        >
-          <EyeOff size={20} />
-        </ActionIcon>
-        <ActionIcon
-          variant="white"
-          color="gray"
-          aria-label={`Already watched ${recommendation.name}`}
-          disabled={busy}
-          onClick={() => onHide(recommendation, 'already_watched')}
-        >
-          <CheckCheck size={20} />
-        </ActionIcon>
-        <ActionIcon aria-label={`Add ${recommendation.name}`} loading={busy} onClick={() => onAdd(recommendation)}>
-          <Plus size={20} />
-        </ActionIcon>
+        <Tooltip label="More info">
+          <ActionIcon
+            variant="white"
+            color="gray"
+            aria-label={`More about ${recommendation.name}`}
+            onClick={() => onInfo(recommendation)}
+          >
+            <Info size={20} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Not interested">
+          <ActionIcon
+            variant="white"
+            color="gray"
+            aria-label={`Not interested in ${recommendation.name}`}
+            disabled={busy}
+            onClick={() => onHide(recommendation, 'not_interested')}
+          >
+            <EyeOff size={20} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Already watched">
+          <ActionIcon
+            variant="white"
+            color="gray"
+            aria-label={`Already watched ${recommendation.name}`}
+            disabled={busy}
+            onClick={() => onHide(recommendation, 'already_watched')}
+          >
+            <CheckCheck size={20} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Add to my list">
+          <ActionIcon aria-label={`Add ${recommendation.name}`} loading={busy} onClick={() => onAdd(recommendation)}>
+            <Plus size={20} />
+          </ActionIcon>
+        </Tooltip>
       </Group>
     }
   >
