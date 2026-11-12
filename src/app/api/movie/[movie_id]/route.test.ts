@@ -7,7 +7,7 @@ import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextDelete, nextGet, nextPut, routeParams } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { seedMovie, seedSubscribedMovie, seedUser } from '@/test/seeds';
+import { seedMovie, seedMovieRecommendation, seedSubscribedMovie, seedUser } from '@/test/seeds';
 import { DELETE, GET, PUT } from './route';
 
 const unknownId = '00000000-0000-4000-8000-000000000098';
@@ -70,6 +70,21 @@ describe('/api/movie/[movie_id]', () => {
       expect(body.movie).toMatchObject({ id: movieId, name: 'Detail Movie' });
       expect(body.subscription).toEqual({ watched: false, watched_at: null });
       expect(body.genres).toEqual(['Test Comedy', 'Test Thriller']);
+      expect(body.similar).toEqual([]);
+    });
+
+    it('returns similar movies from cached recommendations', async () => {
+      const { movieId } = await seedSubscribedMovie({
+        watcherId: userId,
+        movie: { moviedb_id: 998_312, name: 'Has Similar' },
+      });
+      await seedMovieRecommendation({ sourceMovieId: movieId, moviedb_id: 998_313, name: 'Alike' });
+
+      const response = await GET(nextGet(apiRoutes.movieById(movieId)), routeParams({ movie_id: movieId }));
+      const body = await response.json();
+      expect(body.similar).toEqual([
+        { moviedb_id: 998_313, name: 'Alike', releasedate: '2021-06-01', poster_slug: '/rec-poster.jpg' },
+      ]);
     });
   });
 

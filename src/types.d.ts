@@ -25,6 +25,8 @@ export type MovieDetailResponse = {
   subscription: { watched: boolean; watched_at: Date | string | null };
   /** Genre names; empty until the movie has been refreshed. */
   genres: string[];
+  /** Cached TMDB recommendations for this movie that the user does not follow or hide yet. */
+  similar: import('@/lib/recommendations/types').SimilarMovie[];
 };
 export type MoviesResponse = Movie[];
 

@@ -4,10 +4,11 @@ import { db } from '@/lib/db';
 import { getMovieGenres } from '@/lib/db/genres';
 import { isUuid, resolveMovieId } from '@/lib/db/resolve-id';
 import { movies, subscribed_movies } from '@/lib/db/schema';
+import { listSimilarMovies } from '@/lib/recommendations/similar';
 import { guardUser } from '@/utils/auth';
 
 /**
- * A subscribed movie with its watched state and genres.
+ * A subscribed movie with its watched state, genres and similar movies (from cached recommendations).
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ movie_id: string }> }) {
   const user = await guardUser();
@@ -31,7 +32,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
   if (!row) return NextResponse.json({ message: 'Not found' }, { status: 404 });
 
-  return NextResponse.json({ ...row, genres: await getMovieGenres(row.movie.id) }, { status: 200 });
+  const [genres, similar] = await Promise.all([getMovieGenres(row.movie.id), listSimilarMovies(user.id, row.movie.id)]);
+
+  return NextResponse.json({ ...row, genres, similar }, { status: 200 });
 }
 
 /**

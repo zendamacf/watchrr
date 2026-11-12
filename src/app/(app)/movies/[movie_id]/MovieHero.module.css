@@ -1,0 +1,45 @@
+/*
+ * A full-bleed backdrop with the title set over it. The scrim is darkest at the bottom, where the
+ * text sits, and lightest at the top so the artwork stays visible. Colours are scoped to the hero
+ * so it reads the same in light and dark mode.
+ */
+.root {
+  --mantine-color-text: #fff;
+  --mantine-color-dimmed: rgba(255, 255, 255, 0.78);
+
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 22rem;
+  padding: var(--mantine-spacing-lg);
+  overflow: hidden;
+  color: #fff;
+  border-radius: var(--mantine-radius-lg);
+  background:
+    linear-gradient(to top, rgba(14, 11, 22, 0.96) 0%, rgba(14, 11, 22, 0.6) 50%, rgba(14, 11, 22, 0.2) 100%),
+    var(--image-url);
+
+  /* Fallback when a movie has no backdrop */
+  background-color: var(--mantine-color-dark-6);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 20%;
+
+  @media (min-width: 48em) {
+    min-height: 28rem;
+    padding: var(--mantine-spacing-xl);
+  }
+}
+
+.poster {
+  flex: 0 0 auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+}
+
+.title {
+  text-wrap: balance;
+  font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
+  line-height: 1.1;
+}
