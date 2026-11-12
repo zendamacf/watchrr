@@ -16,8 +16,8 @@ const details: RecommendationDetails = {
   seasons: null,
   status: 'Released',
   cast: [
-    { name: 'John Travolta', character: 'Vincent Vega' },
-    { name: 'Uma Thurman', character: null },
+    { name: 'John Travolta', character: 'Vincent Vega', photo: null },
+    { name: 'Uma Thurman', character: null, photo: null },
   ],
   trailer: 'abc123',
   providers: [{ name: 'Neon', logo: '/neon.jpg' }],

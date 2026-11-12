@@ -42,8 +42,8 @@ const extras: RecommendationDetails = {
   seasons: null,
   status: 'Released',
   cast: [
-    { name: 'Edward Norton', character: 'The Narrator' },
-    { name: 'Brad Pitt', character: null },
+    { name: 'Edward Norton', character: 'The Narrator', photo: '/norton.jpg' },
+    { name: 'Brad Pitt', character: null, photo: null },
   ],
   trailer: 'abc123',
   providers: [{ name: 'Netflix', logo: '/netflix.jpg' }],
@@ -129,6 +129,9 @@ describe('MovieDetailPage', () => {
       expect(cast).toHaveTextContent('Edward Norton');
       expect(cast).toHaveTextContent('The Narrator');
       expect(cast).toHaveTextContent('Brad Pitt');
+      // Photos come from TMDB; actors without one show their initials.
+      expect(cast.querySelector('img')).toHaveAttribute('src', 'https://image.tmdb.org/t/p/w500/norton.jpg');
+      expect(cast).toHaveTextContent('BP');
       const where = screen.getByRole('region', { name: 'Where to watch' });
       expect(where).toHaveTextContent('Netflix');
       expect(screen.getByRole('link', { name: 'JustWatch' })).toHaveAttribute('href', extras.providers_link);

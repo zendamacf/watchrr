@@ -12,7 +12,7 @@ const title: TMDBTitleDetails = {
   runtime: 100,
   seasons: null,
   status: 'Released',
-  cast: [{ name: 'A', character: 'B' }],
+  cast: [{ name: 'A', character: 'B', photo: null }],
   trailer: 'key',
   watch: {
     NZ: { link: 'https://tmdb/nz', providers: [{ name: 'Neon', logo: '/neon.jpg' }] },

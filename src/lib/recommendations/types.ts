@@ -39,7 +39,7 @@ export type RecommendationDetails = {
   /** Shows only. */
   seasons: number | null;
   status: string | null;
-  cast: { name: string; character: string | null }[];
+  cast: { name: string; character: string | null; photo: string | null }[];
   /** YouTube video key of a trailer. */
   trailer: string | null;
   /** Subscription streaming services in the requested region. */
