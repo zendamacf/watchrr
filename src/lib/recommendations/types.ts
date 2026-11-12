@@ -23,3 +23,24 @@ export type Recommendation = {
 
 /** How many tracked items a recommendation names as its reason. */
 export const BECAUSE_LIMIT = 3;
+
+/** Extra information about a candidate, fetched from TMDB when its info modal is opened. */
+export type RecommendationDetails = {
+  tagline: string | null;
+  genres: string[];
+  /** TMDB's 0-10 average. Null when nobody has voted. */
+  rating: number | null;
+  votes: number;
+  /** Minutes. Movies only. */
+  runtime: number | null;
+  /** Shows only. */
+  seasons: number | null;
+  status: string | null;
+  cast: { name: string; character: string | null }[];
+  /** YouTube video key of a trailer. */
+  trailer: string | null;
+  /** Subscription streaming services in the requested region. */
+  providers: { name: string; logo: string | null }[];
+  /** TMDB's page listing every way to watch it in the requested region. */
+  providers_link: string | null;
+};

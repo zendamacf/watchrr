@@ -204,4 +204,39 @@ describe('DiscoverPage', () => {
     expect(JSON.parse(String(post?.init?.body))).toEqual({ type: 'movie', moviedb_id: 680 });
     expect(screen.getByRole('heading', { name: 'Breaking Bad' })).toBeInTheDocument();
   });
+
+  it('opens a details modal for a card and fetches its details once', async () => {
+    const user = userEvent.setup();
+    stubFetch(async (input: RequestInfo | URL) => {
+      const url = fetchRequestUrl(input);
+      if (url.startsWith(apiRoutes.recommendationDetails(''))) {
+        return mockFetchResponse({
+          tagline: 'Say what again',
+          genres: [],
+          rating: null,
+          votes: 0,
+          runtime: null,
+          seasons: null,
+          status: null,
+          cast: [],
+          trailer: null,
+          providers: [],
+          providers_link: null,
+        });
+      }
+      return mockPagedResponse(searchParams(url).get('type') === 'movie' ? [testRecommendation] : [], 1);
+    });
+    renderWithProviders(<DiscoverPage />);
+
+    await user.click(await screen.findByRole('button', { name: 'More about Pulp Fiction' }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(await within(dialog).findByText('Say what again')).toBeInTheDocument();
+    const detailRequests = calls().filter((c) => c.url.includes('/details'));
+    expect(detailRequests).toHaveLength(1);
+    expect(searchParams(detailRequests[0]!.url).get('moviedb_id')).toBe(String(testRecommendation.moviedb_id));
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
 });

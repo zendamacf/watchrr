@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 import { tmdb } from './client';
+import { DETAILS_APPEND, mapExtras, type TMDBTitleDetails } from './extras';
 
 export type TMDBGenre = { id: number; name: string };
 
@@ -88,6 +89,24 @@ export const getTvShow = async (moviedb_id: number): Promise<TMDBTvShow> => {
     backdrop: data.backdrop_path,
     status: data.status ?? null,
     genres: (data.genres ?? []).map((g) => ({ id: g.id, name: g.name })),
+  };
+};
+
+/**
+ * Get a show's rating, genres, cast, trailer and streaming providers, in one request.
+ * @param moviedb_id The TV show's ID in The Movie DB.
+ */
+export const getTvShowDetails = async (moviedb_id: number): Promise<TMDBTitleDetails> => {
+  const d = await tmdb.tvShows.details(moviedb_id, [...DETAILS_APPEND]);
+  return {
+    tagline: d.tagline || null,
+    genres: (d.genres ?? []).map((g) => g.name),
+    rating: d.vote_count ? d.vote_average : null,
+    votes: d.vote_count ?? 0,
+    runtime: null,
+    seasons: d.number_of_seasons || null,
+    status: d.status || null,
+    ...mapExtras(d),
   };
 };
 

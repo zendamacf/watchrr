@@ -17,7 +17,22 @@ vi.mock('./client', () => ({
   },
 }));
 
-import { getAllEpisodes, getTvShow, getTvShowRecommendations, search } from './tvshows';
+import { getAllEpisodes, getTvShow, getTvShowDetails, getTvShowRecommendations, search } from './tvshows';
+
+const detailsResponse = {
+  tagline: 'A tagline',
+  genres: [{ id: 18, name: 'Drama' }],
+  vote_average: 8.4,
+  vote_count: 100,
+  runtime: 139,
+  number_of_seasons: 5,
+  status: 'Released',
+  credits: { cast: [{ name: 'Edward Norton', character: 'Narrator' }] },
+  videos: { results: [{ key: 'abc', site: 'YouTube', type: 'Trailer', official: true }] },
+  'watch/providers': {
+    results: { NZ: { link: 'https://tmdb/nz', flatrate: [{ provider_name: 'Neon', logo_path: '/neon.jpg' }] } },
+  },
+};
 
 describe('themoviedb tvshows', () => {
   beforeEach(() => {
@@ -231,5 +246,35 @@ describe('themoviedb tvshows', () => {
     expect(episodes).toHaveLength(2);
     expect(mockTvSeasonDetails).toHaveBeenCalledTimes(2);
     expect(episodes[1]?.name).toBe('S2E1');
+  });
+
+  it('getTvShowDetails maps ratings, seasons and extras from one request', async () => {
+    mockTvShowDetails.mockResolvedValue(detailsResponse);
+
+    expect(await getTvShowDetails(1396)).toEqual({
+      tagline: 'A tagline',
+      genres: ['Drama'],
+      rating: 8.4,
+      votes: 100,
+      runtime: null,
+      seasons: 5,
+      status: 'Released',
+      cast: [{ name: 'Edward Norton', character: 'Narrator' }],
+      trailer: 'abc',
+      watch: { NZ: { link: 'https://tmdb/nz', providers: [{ name: 'Neon', logo: '/neon.jpg' }] } },
+    });
+    expect(mockTvShowDetails).toHaveBeenCalledWith(1396, ['credits', 'videos', 'watch/providers']);
+  });
+
+  it('getTvShowDetails treats missing values as empty', async () => {
+    mockTvShowDetails.mockResolvedValue({ vote_count: 0, number_of_seasons: 0 });
+
+    expect(await getTvShowDetails(1)).toMatchObject({
+      genres: [],
+      rating: null,
+      votes: 0,
+      seasons: null,
+      status: null,
+    });
   });
 });

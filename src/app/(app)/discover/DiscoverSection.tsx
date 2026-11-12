@@ -20,6 +20,7 @@ type Props = {
   fetchNextPage: () => void;
   onAdd: (recommendation: Recommendation) => void;
   onHide: (recommendation: Recommendation) => void;
+  onInfo: (recommendation: Recommendation) => void;
   isBusy: (recommendation: Recommendation) => boolean;
 };
 
@@ -35,6 +36,7 @@ export const DiscoverSection = ({
   fetchNextPage,
   onAdd,
   onHide,
+  onInfo,
   isBusy,
 }: Props) => {
   const headingId = useId();
@@ -67,6 +69,7 @@ export const DiscoverSection = ({
                 busy={isBusy(item)}
                 onAdd={onAdd}
                 onHide={onHide}
+                onInfo={onInfo}
               />
             ))}
           </MediaGrid>

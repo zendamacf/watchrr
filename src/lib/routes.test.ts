@@ -32,6 +32,9 @@ describe('apiRoutes', () => {
     expect(apiRoutes.recommendations(new URLSearchParams({ type: 'movie' }))).toBe('/api/recommendations?type=movie');
     expect(apiRoutes.recommendations('type=tvshow')).toBe('/api/recommendations?type=tvshow');
     expect(apiRoutes.notInterested).toBe('/api/recommendations/not-interested');
+    expect(apiRoutes.recommendationDetails('type=movie&moviedb_id=1')).toBe(
+      '/api/recommendations/details?type=movie&moviedb_id=1',
+    );
   });
 
   it('media routes use UUID path segments', () => {

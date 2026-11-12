@@ -35,6 +35,8 @@ export const apiRoutes = {
     searchParams
       ? `/api/recommendations?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`
       : '/api/recommendations',
+  recommendationDetails: (searchParams: URLSearchParams | string) =>
+    `/api/recommendations/details?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   notInterested: '/api/recommendations/not-interested',
   stats: (searchParams?: URLSearchParams | string) =>
     searchParams
