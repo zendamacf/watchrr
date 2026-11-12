@@ -4,10 +4,12 @@ import { db } from '@/lib/db';
 import { getTvShowGenres } from '@/lib/db/genres';
 import { isUuid } from '@/lib/db/resolve-id';
 import { episodes, subscribed_tvshows, tvshows, watched_episodes } from '@/lib/db/schema';
+import { listSimilarShows } from '@/lib/recommendations/similar';
 import { guardUser } from '@/utils/auth';
 
 /**
- * List all episodes for a subscribed show, including watched state.
+ * List all episodes for a subscribed show, including watched state, plus its genres and similar shows
+ * (from cached recommendations).
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ tvshow_id: string }> }) {
   const user = await guardUser();
@@ -48,11 +50,17 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     .where(eq(episodes.tvshow_id, tvshowIdParam))
     .orderBy(asc(episodes.season), asc(episodes.episode));
 
+  const [genres, similar] = await Promise.all([
+    getTvShowGenres(tvshowIdParam),
+    listSimilarShows(user.id, tvshowIdParam),
+  ]);
+
   return NextResponse.json(
     {
       tvshow: showRow.tvshow,
       subscription: showRow.subscription,
-      genres: await getTvShowGenres(tvshowIdParam),
+      genres,
+      similar,
       episodes: rows.map(({ episode, watched }) => ({ ...episode, watched: !!watched })),
     },
     { status: 200 },

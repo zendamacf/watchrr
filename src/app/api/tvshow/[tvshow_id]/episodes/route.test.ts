@@ -7,7 +7,7 @@ import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextGet, routeParams } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { seedEpisode, seedSubscribedTvShow, seedTvShow, seedUser } from '@/test/seeds';
+import { seedEpisode, seedSubscribedTvShow, seedTvShow, seedTvShowRecommendation, seedUser } from '@/test/seeds';
 import { GET } from './route';
 
 const unknownId = '00000000-0000-4000-8000-000000000097';
@@ -98,6 +98,26 @@ describe('GET /api/tvshow/[tvshow_id]/episodes', () => {
       await GET(nextGet(apiRoutes.tvshowEpisodes(tvshowId)), routeParams({ tvshow_id: tvshowId }))
     ).json();
     expect(after.genres).toEqual(['Test Adventure', 'Test Zombies']);
+  });
+
+  it('returns similar shows from cached recommendations', async () => {
+    const { tvshowId } = await seedSubscribedTvShow({
+      watcherId: userId,
+      show: { moviedb_id: 998_526, name: 'Has Similar Show' },
+    });
+    await seedTvShowRecommendation({ sourceTvShowId: tvshowId, moviedb_id: 998_527, name: 'Alike Show' });
+    const body = await (
+      await GET(nextGet(apiRoutes.tvshowEpisodes(tvshowId)), routeParams({ tvshow_id: tvshowId }))
+    ).json();
+    expect(body.similar).toEqual([
+      {
+        moviedb_id: 998_527,
+        name: 'Alike Show',
+        description: 'A recommended show',
+        country: 'US',
+        poster_slug: '/rec-poster.jpg',
+      },
+    ]);
   });
 
   it('returns an empty episode list when the show has no episodes', async () => {
