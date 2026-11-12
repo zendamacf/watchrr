@@ -1,5 +1,3 @@
-import type { Show } from '@/types';
-
 /** TMDB `status` values on TV show details. */
 export const TMDB_TV_SHOW_STATUSES = [
   'Returning Series',
