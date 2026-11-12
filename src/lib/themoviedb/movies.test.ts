@@ -15,7 +15,22 @@ vi.mock('./client', () => ({
   },
 }));
 
-import { getMovie, getMovieRecommendations, search } from './movies';
+import { getMovie, getMovieDetails, getMovieRecommendations, search } from './movies';
+
+const detailsResponse = {
+  tagline: 'A tagline',
+  genres: [{ id: 18, name: 'Drama' }],
+  vote_average: 8.4,
+  vote_count: 100,
+  runtime: 139,
+  number_of_seasons: 5,
+  status: 'Released',
+  credits: { cast: [{ name: 'Edward Norton', character: 'Narrator' }] },
+  videos: { results: [{ key: 'abc', site: 'YouTube', type: 'Trailer', official: true }] },
+  'watch/providers': {
+    results: { NZ: { link: 'https://tmdb/nz', flatrate: [{ provider_name: 'Neon', logo_path: '/neon.jpg' }] } },
+  },
+};
 
 describe('themoviedb movies', () => {
   beforeEach(() => {
@@ -145,5 +160,40 @@ describe('themoviedb movies', () => {
 
     const movie = await getMovie(1);
     expect(movie.poster).toBeNull();
+  });
+
+  it('getMovieDetails maps ratings, genres and extras from one request', async () => {
+    mockMovieDetails.mockResolvedValue(detailsResponse);
+
+    expect(await getMovieDetails(550)).toEqual({
+      tagline: 'A tagline',
+      genres: ['Drama'],
+      rating: 8.4,
+      votes: 100,
+      runtime: 139,
+      seasons: null,
+      status: 'Released',
+      cast: [{ name: 'Edward Norton', character: 'Narrator' }],
+      trailer: 'abc',
+      watch: { NZ: { link: 'https://tmdb/nz', providers: [{ name: 'Neon', logo: '/neon.jpg' }] } },
+    });
+    expect(mockMovieDetails).toHaveBeenCalledWith(550, ['credits', 'videos', 'watch/providers']);
+  });
+
+  it('getMovieDetails treats missing values as empty', async () => {
+    mockMovieDetails.mockResolvedValue({ vote_average: 0, vote_count: 0, runtime: 0, tagline: '', status: '' });
+
+    expect(await getMovieDetails(1)).toEqual({
+      tagline: null,
+      genres: [],
+      rating: null,
+      votes: 0,
+      runtime: null,
+      seasons: null,
+      status: null,
+      cast: [],
+      trailer: null,
+      watch: {},
+    });
   });
 });

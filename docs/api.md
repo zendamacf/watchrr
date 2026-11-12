@@ -46,6 +46,10 @@ Hides a candidate from the user's list for good. The JSON body is `{ "type": "mo
 
 Undoes the above, so the item can be recommended again. Returns `200`, and repeating it is safe.
 
+## `GET /api/recommendations/details?type=movie&moviedb_id=123&region=NZ`
+
+Extra TMDB information about one candidate, shown when its info modal is opened. This is the only recommendations route that calls TMDB, and it makes one request per title. Results are cached in server memory for a day (shared by all users and regions, at most 500 titles).
+
 The cron refresh (`GET /api/refresh`) also reports `movieRecommendations`, `showRecommendations`, `movieRecommendationFailures` and `showRecommendationFailures` under `refreshed`.
 
 # Statistics API

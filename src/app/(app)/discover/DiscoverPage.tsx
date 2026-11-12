@@ -2,11 +2,13 @@
 
 import { Stack } from '@mantine/core';
 import { Compass } from 'lucide-react';
+import { useState } from 'react';
 import { EmptyState } from '@/components/EmptyState';
 import { useAddMovie, useAddShow } from '@/hooks/useAddMedia';
 import { useNotInterested, useRecommendationsQuery, useRemoveRecommendation } from '@/hooks/useRecommendations';
 import type { Recommendation } from '@/lib/recommendations/types';
 import { DiscoverSection } from './DiscoverSection';
+import { RecommendationDetailsModal } from './RecommendationDetailsModal';
 
 /** Cards shown per shelf before "Show more": two rows on a wide screen. */
 const SECTION_PAGE_SIZE = 6;
@@ -14,6 +16,8 @@ const SECTION_PAGE_SIZE = 6;
 export const DiscoverPage = () => {
   const shows = useRecommendationsQuery({ type: 'tvshow', pageSize: SECTION_PAGE_SIZE });
   const movies = useRecommendationsQuery({ type: 'movie', pageSize: SECTION_PAGE_SIZE });
+
+  const [selected, setSelected] = useState<Recommendation | null>(null);
 
   const remove = useRemoveRecommendation();
   const addMovie = useAddMovie({ onAdded: (item) => remove({ type: 'movie', moviedb_id: item.moviedb_id }) });
@@ -40,7 +44,8 @@ export const DiscoverPage = () => {
     );
   }
 
-  const shared = { onAdd: add, onHide: (target: Recommendation) => hide.mutate(target), isBusy };
+  const hideItem = (target: Recommendation) => hide.mutate(target);
+  const shared = { onAdd: add, onHide: hideItem, onInfo: setSelected, isBusy };
 
   return (
     <Stack gap="xl">
@@ -65,6 +70,12 @@ export const DiscoverPage = () => {
         isFetchingNextPage={movies.isFetchingNextPage}
         fetchNextPage={movies.fetchNextPage}
         {...shared}
+      />
+      <RecommendationDetailsModal
+        recommendation={selected}
+        onClose={() => setSelected(null)}
+        onAdd={add}
+        onHide={hideItem}
       />
     </Stack>
   );

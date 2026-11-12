@@ -1,5 +1,6 @@
 import { tmdb } from './client';
 import { tmdbDateToIso } from './dates';
+import { DETAILS_APPEND, mapExtras, type TMDBTitleDetails } from './extras';
 import type { TMDBGenre } from './tvshows';
 
 export type TMDBMovie = {
@@ -72,5 +73,23 @@ export const getMovie = async (moviedb_id: number): Promise<TMDBMovie> => {
     releasedate: tmdbDateToIso(data.release_date),
     runtime: data.runtime || null,
     genres: (data.genres ?? []).map((g) => ({ id: g.id, name: g.name })),
+  };
+};
+
+/**
+ * Get a movie's rating, genres, cast, trailer and streaming providers, in one request.
+ * @param moviedb_id The movie's ID in The Movie DB.
+ */
+export const getMovieDetails = async (moviedb_id: number): Promise<TMDBTitleDetails> => {
+  const d = await tmdb.movies.details(moviedb_id, [...DETAILS_APPEND]);
+  return {
+    tagline: d.tagline || null,
+    genres: (d.genres ?? []).map((g) => g.name),
+    rating: d.vote_count ? d.vote_average : null,
+    votes: d.vote_count ?? 0,
+    runtime: d.runtime || null,
+    seasons: null,
+    status: d.status || null,
+    ...mapExtras(d),
   };
 };

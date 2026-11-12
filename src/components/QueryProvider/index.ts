@@ -4,6 +4,7 @@ export enum QueryKey {
   getEpisodes = 'getEpisodes',
   getMovie = 'getMovie',
   getMovies = 'getMovies',
+  getRecommendationDetails = 'getRecommendationDetails',
   getRecommendations = 'getRecommendations',
   getShows = 'getShows',
   getShowEpisodes = 'getShowEpisodes',

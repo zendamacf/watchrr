@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionIcon, Group, Text, Title } from '@mantine/core';
-import { EyeOff, Plus } from 'lucide-react';
+import { EyeOff, Info, Plus } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Fragment } from 'react';
 import { MediaCard } from '@/components/MediaCard';
@@ -11,6 +11,8 @@ type Props = {
   recommendation: Recommendation;
   onAdd: (recommendation: Recommendation) => void;
   onHide: (recommendation: Recommendation) => void;
+  /** Opens the details modal. */
+  onInfo: (recommendation: Recommendation) => void;
   /** Disables the actions while this card's request is in flight. */
   busy?: boolean;
 };
@@ -59,7 +61,7 @@ const Reasons = ({ because, more }: { because: string[]; more: number }) => {
   );
 };
 
-export const RecommendationCard = ({ recommendation, onAdd, onHide, busy }: Props) => (
+export const RecommendationCard = ({ recommendation, onAdd, onHide, onInfo, busy }: Props) => (
   <MediaCard
     h={250}
     backdrop={recommendation.backdrop_slug}
@@ -67,6 +69,14 @@ export const RecommendationCard = ({ recommendation, onAdd, onHide, busy }: Prop
     posterAlt={`Poster for ${recommendation.name}`}
     footer={
       <Group justify="end" gap="xs">
+        <ActionIcon
+          variant="white"
+          color="gray"
+          aria-label={`More about ${recommendation.name}`}
+          onClick={() => onInfo(recommendation)}
+        >
+          <Info size={20} />
+        </ActionIcon>
         <ActionIcon
           variant="white"
           color="gray"
