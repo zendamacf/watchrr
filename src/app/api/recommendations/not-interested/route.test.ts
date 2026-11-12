@@ -1,6 +1,9 @@
 import '@/test/mocks/auth';
+import { and, eq, inArray } from 'drizzle-orm';
 import { NextRequest } from 'next/server';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { db } from '@/lib/db';
+import { not_interested_movies } from '@/lib/db/schema';
 import { listRecommendations } from '@/lib/recommendations/list';
 import { apiRoutes } from '@/lib/routes';
 import { seedPassword } from '@/test/fixtures/user';
@@ -39,6 +42,7 @@ describe('/api/recommendations/not-interested', () => {
       [{ type: 'episode', moviedb_id: BASE }],
       [{ type: 'movie', moviedb_id: 'abc' }],
       [{ type: 'movie', moviedb_id: -5 }],
+      [{ type: 'movie', moviedb_id: 5, reason: 'bored' }],
     ])('returns 400 for invalid body %j', async (body) => {
       const response = await POST(nextPost(apiRoutes.notInterested, body));
       expect(response.status).toBe(400);
@@ -64,6 +68,26 @@ describe('/api/recommendations/not-interested', () => {
       expect(second.status).toBe(201);
       expect(await visible()).toEqual([]);
     });
+  });
+
+  it('stores the reason, defaulting to not_interested', async () => {
+    const response = await POST(
+      nextPost(apiRoutes.notInterested, { type: 'movie', moviedb_id: BASE + 40, reason: 'already_watched' }),
+    );
+    await POST(nextPost(apiRoutes.notInterested, { type: 'movie', moviedb_id: BASE + 41 }));
+    expect(response.status).toBe(201);
+
+    const rows = await db
+      .select()
+      .from(not_interested_movies)
+      .where(
+        and(
+          eq(not_interested_movies.watcher_id, userId),
+          inArray(not_interested_movies.moviedb_id, [BASE + 40, BASE + 41]),
+        ),
+      );
+    const reasons = Object.fromEntries(rows.map((r) => [r.moviedb_id, r.reason]));
+    expect(reasons).toEqual({ [BASE + 40]: 'already_watched', [BASE + 41]: 'not_interested' });
   });
 
   describe('DELETE', () => {

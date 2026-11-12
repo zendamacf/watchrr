@@ -101,9 +101,11 @@ describe('RecommendationCard', () => {
     await user.click(screen.getByRole('button', { name: 'More about Pulp Fiction' }));
     await user.click(screen.getByRole('button', { name: 'Add Pulp Fiction' }));
     await user.click(screen.getByRole('button', { name: 'Not interested in Pulp Fiction' }));
+    await user.click(screen.getByRole('button', { name: 'Already watched Pulp Fiction' }));
 
     expect(onAdd).toHaveBeenCalledWith(testRecommendation);
-    expect(onHide).toHaveBeenCalledWith(testRecommendation);
+    expect(onHide).toHaveBeenNthCalledWith(1, testRecommendation, 'not_interested');
+    expect(onHide).toHaveBeenNthCalledWith(2, testRecommendation, 'already_watched');
   });
 
   it('disables hiding while busy', () => {
@@ -111,5 +113,6 @@ describe('RecommendationCard', () => {
       <RecommendationCard recommendation={testRecommendation} onAdd={vi.fn()} onInfo={vi.fn()} onHide={vi.fn()} busy />,
     );
     expect(screen.getByRole('button', { name: 'Not interested in Pulp Fiction' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Already watched Pulp Fiction' })).toBeDisabled();
   });
 });

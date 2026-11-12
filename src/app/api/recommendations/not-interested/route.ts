@@ -1,22 +1,25 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { markNotInterested, unmarkNotInterested } from '@/lib/recommendations/list';
-import { isMoviedbId, isRecommendationType } from '@/lib/recommendations/params';
+import { isDismissalReason, isMoviedbId, isRecommendationType } from '@/lib/recommendations/params';
 import { guardUser } from '@/utils/auth';
 
 /**
- * Hide a recommendation from the user's Discover list.
+ * Hide a recommendation from the user's Discover list. `reason` is optional and defaults to `not_interested`.
  */
 export async function POST(request: NextRequest) {
   const user = await guardUser();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json().catch(() => null);
-  const { type, moviedb_id } = body ?? {};
+  const { type, moviedb_id, reason = 'not_interested' } = body ?? {};
   if (!isRecommendationType(type) || !isMoviedbId(moviedb_id)) {
     return NextResponse.json({ message: 'type and moviedb_id are required' }, { status: 400 });
   }
+  if (!isDismissalReason(reason)) {
+    return NextResponse.json({ message: 'reason is invalid' }, { status: 400 });
+  }
 
-  await markNotInterested(user.id, type, moviedb_id);
+  await markNotInterested(user.id, type, moviedb_id, reason);
   return NextResponse.json({ message: 'Success' }, { status: 201 });
 }
 

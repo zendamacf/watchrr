@@ -5,7 +5,7 @@ import { useId } from 'react';
 import { MediaGrid } from '@/components/MediaGrid';
 import { MediaGridSkeleton } from '@/components/MediaGridSkeleton';
 import { recommendationId } from '@/hooks/useRecommendations';
-import type { Recommendation } from '@/lib/recommendations/types';
+import type { DismissalReason, Recommendation } from '@/lib/recommendations/types';
 import { RecommendationCard } from './RecommendationCard';
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
   onAdd: (recommendation: Recommendation) => void;
-  onHide: (recommendation: Recommendation) => void;
+  onHide: (recommendation: Recommendation, reason: DismissalReason) => void;
   onInfo: (recommendation: Recommendation) => void;
   isBusy: (recommendation: Recommendation) => boolean;
 };

@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -251,6 +252,9 @@ export const tvshow_recommendations = pgTable(
   ],
 );
 
+/** Why a user hid a recommendation. Add values here as new reasons appear. */
+export const dismissal_reason = pgEnum('dismissal_reason', ['not_interested', 'already_watched']);
+
 /** Items a user hid from Discover. Keyed by TMDB id because candidates need not be tracked. */
 export const not_interested_movies = pgTable(
   'not_interested_movies',
@@ -259,6 +263,7 @@ export const not_interested_movies = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     moviedb_id: integer().notNull(),
+    reason: dismissal_reason('reason').default('not_interested').notNull(),
     created_at: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [primaryKey({ columns: [t.watcher_id, t.moviedb_id] })],
@@ -271,6 +276,7 @@ export const not_interested_tvshows = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'restrict' }),
     moviedb_id: integer().notNull(),
+    reason: dismissal_reason('reason').default('not_interested').notNull(),
     created_at: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [primaryKey({ columns: [t.watcher_id, t.moviedb_id] })],

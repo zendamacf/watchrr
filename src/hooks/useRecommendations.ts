@@ -12,7 +12,7 @@ import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { apiFetch } from '@/lib/api/fetch';
 import { flattenPages, pagedQueryOptions, restorePaged, snapshotPaged, totalOf, updatePaged } from '@/lib/query/paged';
-import type { Recommendation, RecommendationType } from '@/lib/recommendations/types';
+import type { DismissalReason, Recommendation, RecommendationType } from '@/lib/recommendations/types';
 import { apiRoutes } from '@/lib/routes';
 
 /** Candidates are not tracked, so a row is identified by type and TMDB id together. */
@@ -43,17 +43,22 @@ export function useRemoveRecommendation() {
   return (target: Pick<Target, 'type' | 'moviedb_id'>) => removeFromCache(queryClient, target);
 }
 
-/** Hide a candidate for good. The card disappears immediately and returns if the request fails. */
+/** Hide a candidate for good, noting why (defaults to "not interested"). The card disappears immediately and returns if the request fails. */
 export function useNotInterested() {
   const queryClient = useQueryClient();
   const { showError } = useAlert();
 
-  return useMutation<unknown, Error, Target, { snapshot: ReturnType<typeof snapshotPaged> }>({
-    mutationFn: async ({ type, moviedb_id }) => {
+  return useMutation<
+    unknown,
+    Error,
+    Target & { reason?: DismissalReason },
+    { snapshot: ReturnType<typeof snapshotPaged> }
+  >({
+    mutationFn: async ({ type, moviedb_id, reason }) => {
       const response = await apiFetch(apiRoutes.notInterested, {
         method: 'POST',
         headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, moviedb_id }),
+        body: JSON.stringify({ type, moviedb_id, reason }),
       });
       if (!response.ok) throw new Error((await response.json()).message);
     },
