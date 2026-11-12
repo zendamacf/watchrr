@@ -1,10 +1,8 @@
 import { ActionIcon, type ModalProps, Popover, PopoverDropdown, PopoverTarget, Text } from '@mantine/core';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { List, Plus } from 'lucide-react';
 import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
-import { useAlert } from '@/hooks/useAlert';
-import { useRefreshShow } from '@/hooks/useRefresh';
+import { useAddShow } from '@/hooks/useAddMedia';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { TMDBTvShow } from '@/lib/themoviedb/tvshows';
@@ -13,37 +11,7 @@ import { BaseShowCard } from './BaseShowCard';
 type Props = ModalProps;
 
 export const AddShowModal = (props: Props) => {
-  const { showSuccess, showError } = useAlert();
-  const { refresh } = useRefreshShow();
-
-  const queryClient = useQueryClient();
-  const { mutate: add, isPending: pendingAdd } = useMutation<
-    { tvshowId: string },
-    Error,
-    { moviedb_id: number; name: string }
-  >({
-    mutationFn: async (tvshow) => {
-      const response = await apiFetch(apiRoutes.tvshow, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ moviedb_id: tvshow.moviedb_id }),
-      });
-      const json = await response.json();
-      if (!response.ok) throw new Error(json.message);
-      return { tvshowId: json.tvshow_id as string };
-    },
-    onSuccess: (data, tvshow) => {
-      refresh({ tvshowId: data.tvshowId, name: tvshow.name });
-      showSuccess({ title: 'Nice!', message: `You're now following ${tvshow.name}` });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getShows] });
-    },
-    onError(error) {
-      showError({ title: 'An error occurred', message: error.message });
-    },
-  });
+  const { mutate: add, isPending: pendingAdd } = useAddShow();
 
   return (
     <AddMediaModal<TMDBTvShow>
@@ -66,6 +34,7 @@ export const AddShowModal = (props: Props) => {
             poster_slug: show.poster,
             backdrop_slug: show.backdrop,
             metadata_refreshed_at: null,
+            recommendations_refreshed_at: null,
           }}
           actions={
             <>

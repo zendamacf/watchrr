@@ -6,6 +6,7 @@ describe('routes', () => {
     expect(routes.home).toBe('/');
     expect(routes.episodes).toBe('/episodes');
     expect(routes.movies).toBe('/movies');
+    expect(routes.discover).toBe('/discover');
     expect(routes.signin).toBe('/signin');
     expect(routes.showById('00000000-0000-4000-8000-000000000001')).toBe('/shows/00000000-0000-4000-8000-000000000001');
   });
@@ -24,6 +25,13 @@ describe('apiRoutes', () => {
   it('tvshowSearch builds query string from URLSearchParams', () => {
     const params = new URLSearchParams({ q: 'breaking bad' });
     expect(apiRoutes.tvshowSearch(params)).toBe('/api/tvshow/search?q=breaking+bad');
+  });
+
+  it('recommendations builds an optional query string', () => {
+    expect(apiRoutes.recommendations()).toBe('/api/recommendations');
+    expect(apiRoutes.recommendations(new URLSearchParams({ type: 'movie' }))).toBe('/api/recommendations?type=movie');
+    expect(apiRoutes.recommendations('type=tvshow')).toBe('/api/recommendations?type=tvshow');
+    expect(apiRoutes.notInterested).toBe('/api/recommendations/not-interested');
   });
 
   it('media routes use UUID path segments', () => {

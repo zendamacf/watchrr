@@ -1,6 +1,6 @@
 # List API pagination
 
-The list endpoints `GET /api/episode`, `GET /api/tvshow`, and `GET /api/movie` are always paginated. All require a session cookie.
+The list endpoints `GET /api/episode`, `GET /api/tvshow`, `GET /api/movie`, and `GET /api/recommendations` are always paginated. All require a session cookie.
 
 ## Query parameters
 
@@ -10,6 +10,7 @@ The list endpoints `GET /api/episode`, `GET /api/tvshow`, and `GET /api/movie` a
 | `offset` | all | `0` | Number of rows to skip. |
 | `search` | all | none | Case-insensitive substring match, up to 100 characters. Episodes match show or episode name; shows and movies match name or description. |
 | `status` | `/api/tvshow` | `all` | A TMDB status (`Returning Series`, `Planned`, `In Production`, `Ended`, `Canceled`, `Pilot`), `unknown`, or `all`. |
+| `type` | `/api/recommendations` | both | `movie` or `tvshow`. |
 | `snoozed` | `/api/episode` | both | `true` for snoozed shows only, `false` for scheduled shows only. "Snoozed" is judged by the database's current date. |
 
 Invalid values return `400` with a `message`.
@@ -26,6 +27,26 @@ To read everything, request pages until `offset + rows.length >= X-Total-Count` 
 GET /api/movie?search=alien&limit=50&offset=50
 X-Total-Count: 132
 ```
+
+# Recommendations API
+
+All routes require a session cookie and only ever use the signed-in user's data. Recommendations are built from TMDB's `recommendations` for the movies and shows the user follows. They are cached in the database and refreshed by the cron job (weekly per item, and when an item is first followed), so these routes never call TMDB.
+
+## `GET /api/recommendations`
+
+Paginated (see above). Each row has `type` (`movie` or `tvshow`), `moviedb_id` (TMDB id), `name`, `description`, `poster_slug`, `backdrop_slug`, `releasedate` (movies) or `country` (shows), `score` and `because`, the name of the followed item that most strongly led to it.
+
+A candidate scores 1 point for each followed item that recommends it, plus 1 more when that item is finished (a watched movie, or a show with every aired episode watched). Ordering is by score, then name. Items the user already follows or hid are left out, so a user who follows nothing gets an empty list. There are no ratings in watchrr, so they do not affect the score.
+
+## `POST /api/recommendations/not-interested`
+
+Hides a candidate from the user's list for good. The JSON body is `{ "type": "movie" | "tvshow", "moviedb_id": 123 }`. Returns `201`, and repeating it is safe. Invalid input returns `400`.
+
+## `DELETE /api/recommendations/not-interested?type=movie&moviedb_id=123`
+
+Undoes the above, so the item can be recommended again. Returns `200`, and repeating it is safe.
+
+The cron refresh (`GET /api/refresh`) also reports `movieRecommendations`, `showRecommendations`, `movieRecommendationFailures` and `showRecommendationFailures` under `refreshed`.
 
 # Statistics API
 

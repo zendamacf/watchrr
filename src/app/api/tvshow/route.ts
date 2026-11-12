@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { paginatedJson, parsePagination, parseSearchPattern } from '@/lib/api/pagination';
 import { db } from '@/lib/db';
 import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
+import { cacheTvShowRecommendationsIfMissing } from '@/lib/refresher/recommendations';
 import { getTvShow } from '@/lib/themoviedb/tvshows';
 import { guardUser } from '@/utils/auth';
 import { TMDB_TV_SHOW_STATUSES, TV_SHOW_STATUS_FILTER_ALL, TV_SHOW_STATUS_FILTER_UNKNOWN } from '@/utils/tvshowStatus';
@@ -103,6 +104,8 @@ export async function POST(request: NextRequest) {
   }
 
   await db.insert(subscribed_tvshows).values({ watcher_id: user.id, tvshow_id: show.id }).onConflictDoNothing();
+
+  await cacheTvShowRecommendationsIfMissing(show);
 
   return NextResponse.json({ message: 'Success', tvshow_id: show.id }, { status: 201 });
 }

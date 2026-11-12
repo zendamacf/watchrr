@@ -4,22 +4,64 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mockSearchTvShows = vi.fn();
 const mockTvShowDetails = vi.fn();
 const mockTvSeasonDetails = vi.fn();
+const mockTvRecommendations = vi.fn();
 
 vi.mock('./client', () => ({
   tmdb: {
     search: { tvShows: (...args: unknown[]) => mockSearchTvShows(...args) },
-    tvShows: { details: (...args: unknown[]) => mockTvShowDetails(...args) },
+    tvShows: {
+      details: (...args: unknown[]) => mockTvShowDetails(...args),
+      recommendations: (...args: unknown[]) => mockTvRecommendations(...args),
+    },
     tvSeasons: { details: (...args: unknown[]) => mockTvSeasonDetails(...args) },
   },
 }));
 
-import { getAllEpisodes, getTvShow, search } from './tvshows';
+import { getAllEpisodes, getTvShow, getTvShowRecommendations, search } from './tvshows';
 
 describe('themoviedb tvshows', () => {
   beforeEach(() => {
     mockSearchTvShows.mockReset();
     mockTvShowDetails.mockReset();
     mockTvSeasonDetails.mockReset();
+    mockTvRecommendations.mockReset();
+  });
+
+  it('getTvShowRecommendations maps TMDB recommendations to TMDBTvShow', async () => {
+    mockTvRecommendations.mockResolvedValue({
+      results: [
+        {
+          id: 1396,
+          name: 'Breaking Bad',
+          overview: 'Desc',
+          origin_country: ['US'],
+          first_air_date: '2008-01-20',
+          poster_path: '/p.jpg',
+          backdrop_path: null,
+        },
+        {
+          id: 1,
+          name: 'No Country',
+          overview: '',
+          origin_country: [],
+          first_air_date: '2010-01-01',
+          poster_path: null,
+          backdrop_path: null,
+        },
+      ],
+    });
+
+    const results = await getTvShowRecommendations(1399);
+    expect(results[0]).toMatchObject({
+      id: 1396,
+      name: 'Breaking Bad',
+      country: 'US',
+      poster: '/p.jpg',
+      status: null,
+      genres: [],
+    });
+    expect(results[1]?.country).toBeNull();
+    expect(mockTvRecommendations).toHaveBeenCalledWith(1399);
   });
 
   it('search maps TMDB search results to TMDBTvShow', async () => {

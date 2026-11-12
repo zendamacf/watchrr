@@ -10,6 +10,7 @@ export const testMovie: Movie = {
   description: 'A test movie',
   runtime: 120,
   metadata_refreshed_at: null,
+  recommendations_refreshed_at: null,
 };
 
 export const testTmdbMovie = {

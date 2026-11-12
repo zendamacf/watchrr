@@ -35,17 +35,40 @@ export type TMDBEpisode = {
  */
 export const search = async (query: string): Promise<TMDBTvShow[]> => {
   const data = await tmdb.search.tvShows({ query });
-  return data.results.map<TMDBTvShow>((d) => ({
-    id: d.id,
-    name: d.name,
-    description: d.overview,
-    country: d.origin_country[0] ?? null,
-    firstAirDate: DateTime.fromJSDate(new Date(d.first_air_date)).toISO()!,
-    poster: d.poster_path,
-    backdrop: d.backdrop_path,
-    status: null,
-    genres: [],
-  }));
+  return data.results.map(mapListResult);
+};
+
+type TMDBTvShowListResult = {
+  id: number;
+  name: string;
+  overview: string;
+  origin_country: string[];
+  first_air_date: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+};
+
+/** Maps a search/recommendation list entry, which lacks status and genres. */
+const mapListResult = (d: TMDBTvShowListResult): TMDBTvShow => ({
+  id: d.id,
+  name: d.name,
+  description: d.overview,
+  country: d.origin_country[0] ?? null,
+  firstAirDate: DateTime.fromJSDate(new Date(d.first_air_date)).toISO()!,
+  poster: d.poster_path,
+  backdrop: d.backdrop_path,
+  status: null,
+  genres: [],
+});
+
+/**
+ * Get TV shows TMDB recommends based on a show (first page only).
+ * @param moviedb_id The TV show's ID in The Movie DB.
+ * @returns A list of recommended TV shows
+ */
+export const getTvShowRecommendations = async (moviedb_id: number): Promise<TMDBTvShow[]> => {
+  const data = await tmdb.tvShows.recommendations(moviedb_id);
+  return data.results.map(mapListResult);
 };
 
 /**

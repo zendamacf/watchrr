@@ -5,14 +5,18 @@ export const mockSearchMovies = vi.fn();
 export const mockGetTvShow = vi.fn();
 export const mockSearchTvShows = vi.fn();
 export const mockGetAllEpisodes = vi.fn();
+export const mockGetMovieRecommendations = vi.fn();
+export const mockGetTvShowRecommendations = vi.fn();
 
 vi.mock('@/lib/themoviedb/movies', () => ({
   getMovie: (...args: unknown[]) => mockGetMovie(...args),
+  getMovieRecommendations: (...args: unknown[]) => mockGetMovieRecommendations(...args),
   search: (...args: unknown[]) => mockSearchMovies(...args),
 }));
 
 vi.mock('@/lib/themoviedb/tvshows', () => ({
   getTvShow: (...args: unknown[]) => mockGetTvShow(...args),
+  getTvShowRecommendations: (...args: unknown[]) => mockGetTvShowRecommendations(...args),
   search: (...args: unknown[]) => mockSearchTvShows(...args),
   getAllEpisodes: (...args: unknown[]) => mockGetAllEpisodes(...args),
 }));
@@ -23,4 +27,6 @@ export function resetThemoviedbMocks() {
   mockGetTvShow.mockReset();
   mockSearchTvShows.mockReset();
   mockGetAllEpisodes.mockReset();
+  mockGetMovieRecommendations.mockReset().mockResolvedValue([]);
+  mockGetTvShowRecommendations.mockReset().mockResolvedValue([]);
 }

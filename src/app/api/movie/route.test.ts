@@ -3,12 +3,12 @@ import '@/test/mocks/themoviedb';
 import { and, eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { subscribed_movies } from '@/lib/db/schema';
+import { movies, subscribed_movies } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextGet, nextPost } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { mockGetMovie, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
+import { mockGetMovie, mockGetMovieRecommendations, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
 import { seedMovie, seedSubscribedMovie, seedUser } from '@/test/seeds';
 import { GET, POST } from './route';
 
@@ -128,6 +128,22 @@ describe('/api/movie', () => {
       mockGetMovie.mockResolvedValue(null);
       const response = await POST(nextPost(apiRoutes.movie, { moviedb_id: 998_203 }));
       expect(response.status).toBe(404);
+    });
+
+    it('caches recommendations when subscribing, and still succeeds if TMDB fails', async () => {
+      const movie = await seedMovie({ moviedb_id: 998_206, name: 'Recs Movie' });
+      // Rows persist between runs, so clear any stamp left by an earlier one.
+      await db.update(movies).set({ recommendations_refreshed_at: null }).where(eq(movies.id, movie.id));
+      mockGetMovieRecommendations.mockResolvedValue([]);
+      const ok = await POST(nextPost(apiRoutes.movie, { moviedb_id: movie.moviedb_id }));
+      expect(ok.status).toBe(201);
+      expect(mockGetMovieRecommendations).toHaveBeenCalledWith(movie.moviedb_id);
+
+      const other = await seedMovie({ moviedb_id: 998_207, name: 'Failing Recs Movie' });
+      await db.update(movies).set({ recommendations_refreshed_at: null }).where(eq(movies.id, other.id));
+      mockGetMovieRecommendations.mockRejectedValue(new Error('TMDB down'));
+      const failed = await POST(nextPost(apiRoutes.movie, { moviedb_id: other.moviedb_id }));
+      expect(failed.status).toBe(201);
     });
 
     it('clears watched state and time when re-subscribing', async () => {

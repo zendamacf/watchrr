@@ -3,6 +3,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { listCronMoviesToRefresh, listCronShowsToRefresh } from '@/lib/refresher/cron-refresh';
 import { refreshMovie } from '@/lib/refresher/movies';
+import {
+  listMoviesNeedingRecommendations,
+  listShowsNeedingRecommendations,
+  refreshMovieRecommendations,
+  refreshTvShowRecommendations,
+} from '@/lib/refresher/recommendations';
 import { refreshTvShow } from '@/lib/refresher/tvshows';
 
 /**
@@ -39,6 +45,21 @@ export async function GET(request: NextRequest) {
     showFailures += countFailures(results);
   }
 
+  // Recommendations are cached after the metadata refresh so new sources are included.
+  const movieRecSources = await listMoviesNeedingRecommendations();
+  let movieRecFailures = 0;
+  for (const sourceChunk of chunk(movieRecSources, 30)) {
+    const results = await Promise.allSettled(sourceChunk.map((m) => refreshMovieRecommendations(m.movie_id)));
+    movieRecFailures += countFailures(results);
+  }
+
+  const showRecSources = await listShowsNeedingRecommendations();
+  let showRecFailures = 0;
+  for (const sourceChunk of chunk(showRecSources, 30)) {
+    const results = await Promise.allSettled(sourceChunk.map((s) => refreshTvShowRecommendations(s.tvshow_id)));
+    showRecFailures += countFailures(results);
+  }
+
   logger.info('cron refresh completed', {
     operation: 'cronRefresh',
     durationMs: Date.now() - started,
@@ -46,6 +67,10 @@ export async function GET(request: NextRequest) {
     showCount: subbedShows.length,
     movieFailures,
     showFailures,
+    movieRecommendationCount: movieRecSources.length,
+    showRecommendationCount: showRecSources.length,
+    movieRecommendationFailures: movieRecFailures,
+    showRecommendationFailures: showRecFailures,
   });
 
   return NextResponse.json(
@@ -56,6 +81,10 @@ export async function GET(request: NextRequest) {
         shows: subbedShows.length,
         movieFailures,
         showFailures,
+        movieRecommendations: movieRecSources.length,
+        showRecommendations: showRecSources.length,
+        movieRecommendationFailures: movieRecFailures,
+        showRecommendationFailures: showRecFailures,
       },
     },
     { status: 200 },

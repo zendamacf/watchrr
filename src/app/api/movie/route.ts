@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { paginatedJson, parsePagination, parseSearchPattern } from '@/lib/api/pagination';
 import { db } from '@/lib/db';
 import { movies, subscribed_movies } from '@/lib/db/schema';
+import { cacheMovieRecommendationsIfMissing } from '@/lib/refresher/recommendations';
 import { getMovie } from '@/lib/themoviedb/movies';
 import { guardUser } from '@/utils/auth';
 
@@ -92,6 +93,8 @@ export async function POST(request: NextRequest) {
       target: [subscribed_movies.movie_id, subscribed_movies.watcher_id],
       set: { watched: false, watched_at: null },
     });
+
+  await cacheMovieRecommendationsIfMissing(movie);
 
   return NextResponse.json({ message: 'Success', movie_id: movie.id }, { status: 201 });
 }
