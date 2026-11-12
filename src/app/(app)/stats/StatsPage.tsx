@@ -74,7 +74,10 @@ export const StatsPage = () => {
     Episodes: point.episodes,
     Movies: point.movies,
   }));
-  const genres = data.genres.map((g) => ({ genre: g.name, Episodes: g.episodes, Movies: g.movies }));
+  // The "Unknown" bucket (id null) is items whose genres were never fetched, e.g. unfollowed shows. It's noise here.
+  const genres = data.genres
+    .filter((g) => g.id !== null)
+    .map((g) => ({ genre: g.name, Episodes: g.episodes, Movies: g.movies }));
   const weekdays = data.weekdays.map((point) => ({ day: WEEKDAY_LABELS[point.weekday - 1], Watched: point.count }));
 
   return (
