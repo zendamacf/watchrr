@@ -3,20 +3,53 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockSearchMovies = vi.fn();
 const mockMovieDetails = vi.fn();
+const mockMovieRecommendations = vi.fn();
 
 vi.mock('./client', () => ({
   tmdb: {
     search: { movies: (...args: unknown[]) => mockSearchMovies(...args) },
-    movies: { details: (...args: unknown[]) => mockMovieDetails(...args) },
+    movies: {
+      details: (...args: unknown[]) => mockMovieDetails(...args),
+      recommendations: (...args: unknown[]) => mockMovieRecommendations(...args),
+    },
   },
 }));
 
-import { getMovie, search } from './movies';
+import { getMovie, getMovieRecommendations, search } from './movies';
 
 describe('themoviedb movies', () => {
   beforeEach(() => {
     mockSearchMovies.mockReset();
     mockMovieDetails.mockReset();
+    mockMovieRecommendations.mockReset();
+  });
+
+  it('getMovieRecommendations maps TMDB recommendations to TMDBMovie', async () => {
+    mockMovieRecommendations.mockResolvedValue({
+      results: [
+        {
+          id: 680,
+          title: 'Pulp Fiction',
+          overview: 'Desc',
+          poster_path: '/p.jpg',
+          backdrop_path: null,
+          release_date: '1994-09-10',
+        },
+      ],
+    });
+
+    const results = await getMovieRecommendations(550);
+    expect(results).toEqual([
+      expect.objectContaining({
+        id: 680,
+        name: 'Pulp Fiction',
+        poster: '/p.jpg',
+        backdrop: null,
+        runtime: null,
+        genres: [],
+      }),
+    ]);
+    expect(mockMovieRecommendations).toHaveBeenCalledWith(550);
   });
 
   it('search maps TMDB search results to TMDBMovie', async () => {

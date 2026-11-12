@@ -4,6 +4,7 @@ export const routes = {
   shows: '/shows',
   showById: (tvshowId: string) => `/shows/${tvshowId}`,
   movies: '/movies',
+  discover: '/discover',
   movieById: (movieId: string) => `/movies/${movieId}`,
   stats: '/stats',
   signin: '/signin',
@@ -30,6 +31,11 @@ export const apiRoutes = {
     `/api/movie/search?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`,
   movieById: (movieId: string) => `/api/movie/${movieId}/`,
   movieRefresh: (movieId: string) => `/api/movie/${movieId}/refresh`,
+  recommendations: (searchParams?: URLSearchParams | string) =>
+    searchParams
+      ? `/api/recommendations?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`
+      : '/api/recommendations',
+  notInterested: '/api/recommendations/not-interested',
   stats: (searchParams?: URLSearchParams | string) =>
     searchParams
       ? `/api/stats?${typeof searchParams === 'string' ? searchParams : searchParams.toString()}`

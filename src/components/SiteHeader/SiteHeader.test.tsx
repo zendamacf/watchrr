@@ -29,6 +29,7 @@ describe('SiteHeader', () => {
     });
     expect(screen.getAllByRole('link', { name: 'Shows' }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: 'Movies' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Discover' }).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', { name: 'Stats' }).length).toBeGreaterThan(0);
   });
 

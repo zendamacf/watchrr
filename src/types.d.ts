@@ -27,3 +27,5 @@ export type MovieDetailResponse = {
   genres: string[];
 };
 export type MoviesResponse = Movie[];
+
+export type RecommendationsResponse = import('@/lib/recommendations/types').Recommendation[];

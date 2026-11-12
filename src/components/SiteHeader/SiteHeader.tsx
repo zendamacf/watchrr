@@ -3,7 +3,7 @@
 import { Burger, Drawer, Group, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classNames from 'classnames';
-import { BarChart3, CalendarDays, Film, LogOut, Tv } from 'lucide-react';
+import { BarChart3, CalendarDays, Compass, Film, LogOut, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -21,6 +21,7 @@ const links: { label: string; href: string; icon: ReactNode }[] = [
   { label: 'Episodes', href: routes.episodes, icon: <CalendarDays size={22} aria-hidden /> },
   { label: 'Shows', href: routes.shows, icon: <Tv size={22} aria-hidden /> },
   { label: 'Movies', href: routes.movies, icon: <Film size={22} aria-hidden /> },
+  { label: 'Discover', href: routes.discover, icon: <Compass size={22} aria-hidden /> },
   { label: 'Stats', href: routes.stats, icon: <BarChart3 size={22} aria-hidden /> },
 ];
 

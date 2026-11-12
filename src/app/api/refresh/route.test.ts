@@ -15,7 +15,15 @@ vi.mock('@/lib/logger', () => ({
 import type { NextRequest } from 'next/server';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { resetRefreshDbMock, setRefreshDbRows } from '@/test/mocks/refresh-db';
-import { mockRefreshMovie, mockRefreshTvShow, resetRefresherMocks } from '@/test/mocks/refresher';
+import {
+  mockListMoviesNeedingRecommendations,
+  mockListShowsNeedingRecommendations,
+  mockRefreshMovie,
+  mockRefreshMovieRecommendations,
+  mockRefreshTvShow,
+  mockRefreshTvShowRecommendations,
+  resetRefresherMocks,
+} from '@/test/mocks/refresher';
 import { seedSubscribedMovie, seedSubscribedMovies, seedSubscribedTvShow, seedUser } from '@/test/seeds';
 import { GET } from './route';
 
@@ -151,4 +159,40 @@ describe('GET /api/refresh', () => {
     }
     expect(refreshedIds).toHaveLength(31);
   }, 30_000);
+
+  it('refreshes cached recommendations for stale sources and counts failures', async () => {
+    mockListMoviesNeedingRecommendations.mockResolvedValue([
+      { movie_id: 'movie-ok', name: 'Ok' },
+      { movie_id: 'movie-bad', name: 'Bad' },
+    ]);
+    mockListShowsNeedingRecommendations.mockResolvedValue([
+      { tvshow_id: 'show-ok', name: 'Ok' },
+      { tvshow_id: 'show-bad', name: 'Bad' },
+    ]);
+    mockRefreshMovieRecommendations.mockImplementation(async (id: string) => {
+      if (id === 'movie-bad') throw new Error('tmdb unavailable');
+    });
+    mockRefreshTvShowRecommendations.mockImplementation(async (id: string) => {
+      if (id === 'show-bad') throw new Error('tmdb unavailable');
+    });
+
+    const response = await GET(makeRequest(`Bearer ${CRON_SECRET}`));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      refreshed: {
+        movieRecommendations: 2,
+        showRecommendations: 2,
+        movieRecommendationFailures: 1,
+        showRecommendationFailures: 1,
+      },
+    });
+    expect(mockRefreshMovieRecommendations).toHaveBeenCalledWith('movie-ok');
+    expect(mockRefreshTvShowRecommendations).toHaveBeenCalledWith('show-ok');
+  });
+
+  it('does not refresh recommendations without a valid bearer token', async () => {
+    await GET(makeRequest());
+    expect(mockListMoviesNeedingRecommendations).not.toHaveBeenCalled();
+  });
 });

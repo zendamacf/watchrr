@@ -22,16 +22,38 @@ export type TMDBMovie = {
  */
 export const search = async (query: string): Promise<TMDBMovie[]> => {
   const data = await tmdb.search.movies({ query });
-  return data.results.map<TMDBMovie>((d) => ({
-    id: d.id,
-    name: d.title,
-    description: d.overview,
-    poster: d.poster_path,
-    backdrop: d.backdrop_path,
-    releasedate: tmdbDateToIso(d.release_date),
-    runtime: null,
-    genres: [],
-  }));
+  return data.results.map(mapListResult);
+};
+
+type TMDBMovieListResult = {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path?: string | null;
+  backdrop_path?: string | null;
+  release_date: string;
+};
+
+/** Maps a search/recommendation list entry, which lacks runtime and genres. */
+const mapListResult = (d: TMDBMovieListResult): TMDBMovie => ({
+  id: d.id,
+  name: d.title,
+  description: d.overview,
+  poster: d.poster_path ?? null,
+  backdrop: d.backdrop_path ?? null,
+  releasedate: tmdbDateToIso(d.release_date),
+  runtime: null,
+  genres: [],
+});
+
+/**
+ * Get movies TMDB recommends based on a movie (first page only).
+ * @param moviedb_id The movie's ID in The Movie DB.
+ * @returns A list of recommended movies
+ */
+export const getMovieRecommendations = async (moviedb_id: number): Promise<TMDBMovie[]> => {
+  const data = await tmdb.movies.recommendations(moviedb_id);
+  return data.results.map(mapListResult);
 };
 
 /**

@@ -10,6 +10,7 @@ export const testShow: Show = {
   description: 'A test show',
   status: 'Returning Series',
   metadata_refreshed_at: null,
+  recommendations_refreshed_at: null,
 };
 
 export const testTmdbTvShow = {

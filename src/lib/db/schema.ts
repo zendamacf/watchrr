@@ -74,6 +74,8 @@ export const tvshows = pgTable('tvshows', {
   description: text(),
   status: text(),
   metadata_refreshed_at: timestamp('metadata_refreshed_at'),
+  /** Last time TMDB recommendations for this show were cached. Null until first fetched. */
+  recommendations_refreshed_at: timestamp('recommendations_refreshed_at'),
 });
 
 export const episodes = pgTable(
@@ -149,6 +151,8 @@ export const movies = pgTable('movies', {
   /** Minutes, from TMDB. Null until the next refresh. */
   runtime: integer(),
   metadata_refreshed_at: timestamp('metadata_refreshed_at'),
+  /** Last time TMDB recommendations for this movie were cached. Null until first fetched. */
+  recommendations_refreshed_at: timestamp('recommendations_refreshed_at'),
 });
 
 export const subscribed_movies = pgTable(
@@ -197,6 +201,79 @@ export const movie_genres = pgTable(
       .references(() => genres.id, { onDelete: 'cascade' }),
   },
   (t) => [primaryKey({ columns: [t.movie_id, t.genre_id] })],
+);
+
+/**
+ * Cached TMDB recommendations, one row per (source movie, recommended movie).
+ * Shared across users; per-user scoring happens at query time. Display fields
+ * are stored so Discover never calls TMDB on page load.
+ */
+export const movie_recommendations = pgTable(
+  'movie_recommendations',
+  {
+    source_movie_id: uuid('source_movie_id')
+      .notNull()
+      .references(() => movies.id, { onDelete: 'cascade' }),
+    moviedb_id: integer().notNull(),
+    name: text().notNull(),
+    releasedate: date(),
+    poster_slug: text(),
+    backdrop_slug: text(),
+    description: text(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.source_movie_id, t.moviedb_id] }),
+    // Candidates are grouped by TMDB id when scoring.
+    index('movie_recommendations_moviedb_id_idx').on(t.moviedb_id),
+  ],
+);
+
+/** Cached TMDB recommendations for shows. See `movie_recommendations`. */
+export const tvshow_recommendations = pgTable(
+  'tvshow_recommendations',
+  {
+    source_tvshow_id: uuid('source_tvshow_id')
+      .notNull()
+      .references(() => tvshows.id, { onDelete: 'cascade' }),
+    moviedb_id: integer().notNull(),
+    name: text().notNull(),
+    country: text(),
+    poster_slug: text(),
+    backdrop_slug: text(),
+    description: text(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.source_tvshow_id, t.moviedb_id] }),
+    // Candidates are grouped by TMDB id when scoring.
+    index('tvshow_recommendations_moviedb_id_idx').on(t.moviedb_id),
+  ],
+);
+
+/** Items a user hid from Discover. Keyed by TMDB id because candidates need not be tracked. */
+export const not_interested_movies = pgTable(
+  'not_interested_movies',
+  {
+    watcher_id: uuid('watcher_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    moviedb_id: integer().notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.watcher_id, t.moviedb_id] })],
+);
+
+export const not_interested_tvshows = pgTable(
+  'not_interested_tvshows',
+  {
+    watcher_id: uuid('watcher_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    moviedb_id: integer().notNull(),
+    created_at: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.watcher_id, t.moviedb_id] })],
 );
 
 export function lower(email: AnyPgColumn): SQL {

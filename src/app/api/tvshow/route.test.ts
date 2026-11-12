@@ -3,12 +3,12 @@ import '@/test/mocks/themoviedb';
 import { and, eq } from 'drizzle-orm';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
-import { subscribed_tvshows } from '@/lib/db/schema';
+import { subscribed_tvshows, tvshows } from '@/lib/db/schema';
 import { apiRoutes } from '@/lib/routes';
 import { seedEmails, seedPassword } from '@/test/fixtures/user';
 import { nextGet, nextPost } from '@/test/helpers/api-request';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
-import { mockGetTvShow, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
+import { mockGetTvShow, mockGetTvShowRecommendations, resetThemoviedbMocks } from '@/test/mocks/themoviedb';
 import { seedSubscribedTvShow, seedTvShow, seedUser } from '@/test/seeds';
 import { GET, POST } from './route';
 
@@ -150,6 +150,22 @@ describe('/api/tvshow', () => {
       const body = await response.json();
       expect(body.tvshow_id).toBe(show.id);
       expect(mockGetTvShow).not.toHaveBeenCalled();
+    });
+
+    it('caches recommendations when subscribing, and still succeeds if TMDB fails', async () => {
+      const show = await seedTvShow({ moviedb_id: 998_604, name: 'Recs Show' });
+      // Rows persist between runs, so clear any stamp left by an earlier one.
+      await db.update(tvshows).set({ recommendations_refreshed_at: null }).where(eq(tvshows.id, show.id));
+      mockGetTvShowRecommendations.mockResolvedValue([]);
+      const ok = await POST(nextPost(apiRoutes.tvshow, { moviedb_id: show.moviedb_id }));
+      expect(ok.status).toBe(201);
+      expect(mockGetTvShowRecommendations).toHaveBeenCalledWith(show.moviedb_id);
+
+      const other = await seedTvShow({ moviedb_id: 998_605, name: 'Failing Recs Show' });
+      await db.update(tvshows).set({ recommendations_refreshed_at: null }).where(eq(tvshows.id, other.id));
+      mockGetTvShowRecommendations.mockRejectedValue(new Error('TMDB down'));
+      const failed = await POST(nextPost(apiRoutes.tvshow, { moviedb_id: other.moviedb_id }));
+      expect(failed.status).toBe(201);
     });
 
     it('inserts a new show from TMDB and subscribes', async () => {

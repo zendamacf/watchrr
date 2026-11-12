@@ -1,10 +1,9 @@
 import { ActionIcon, type ModalProps, Popover, PopoverDropdown, PopoverTarget, Text } from '@mantine/core';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { List, Plus } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { AddMediaModal } from '@/components/AddMediaModal';
 import { QueryKey } from '@/components/QueryProvider';
-import { useAlert } from '@/hooks/useAlert';
+import { useAddMovie } from '@/hooks/useAddMedia';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes } from '@/lib/routes';
 import type { TMDBMovie } from '@/lib/themoviedb/movies';
@@ -13,29 +12,7 @@ import { BaseMovieCard } from './BaseMovieCard';
 type Props = ModalProps;
 
 export const AddMovieModal = (props: Props) => {
-  const { showSuccess, showError } = useAlert();
-
-  const queryClient = useQueryClient();
-  const { mutate: add, isPending: pendingAdd } = useMutation<unknown, Error, { moviedb_id: number; name: string }>({
-    mutationFn: async (movie) => {
-      const response = await apiFetch(apiRoutes.movie, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ moviedb_id: movie.moviedb_id }),
-      });
-      if (!response.ok) throw new Error((await response.json()).message);
-    },
-    onSuccess: (_data, movie) => {
-      showSuccess({ title: 'Nice!', message: `You're now following ${movie.name}` });
-      queryClient.invalidateQueries({ queryKey: [QueryKey.getMovies] });
-    },
-    onError(error) {
-      showError({ title: 'An error occurred', message: error.message });
-    },
-  });
+  const { mutate: add, isPending: pendingAdd } = useAddMovie();
 
   return (
     <AddMediaModal<TMDBMovie>
@@ -58,6 +35,7 @@ export const AddMovieModal = (props: Props) => {
             poster_slug: movie.poster,
             backdrop_slug: movie.backdrop,
             metadata_refreshed_at: null,
+            recommendations_refreshed_at: null,
             releaseDate: movie.releasedate ? DateTime.fromISO(movie.releasedate) : null,
           }}
           releaseDate
