@@ -27,7 +27,7 @@ const detailsResponse = {
   runtime: 139,
   number_of_seasons: 5,
   status: 'Released',
-  credits: { cast: [{ name: 'Edward Norton', character: 'Narrator' }] },
+  credits: { cast: [{ name: 'Edward Norton', character: 'Narrator', profile_path: '/norton.jpg' }] },
   videos: { results: [{ key: 'abc', site: 'YouTube', type: 'Trailer', official: true }] },
   'watch/providers': {
     results: { NZ: { link: 'https://tmdb/nz', flatrate: [{ provider_name: 'Neon', logo_path: '/neon.jpg' }] } },
@@ -259,7 +259,7 @@ describe('themoviedb tvshows', () => {
       runtime: null,
       seasons: 5,
       status: 'Released',
-      cast: [{ name: 'Edward Norton', character: 'Narrator' }],
+      cast: [{ name: 'Edward Norton', character: 'Narrator', photo: '/norton.jpg' }],
       trailer: 'abc',
       watch: { NZ: { link: 'https://tmdb/nz', providers: [{ name: 'Neon', logo: '/neon.jpg' }] } },
     });

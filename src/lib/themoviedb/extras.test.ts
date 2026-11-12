@@ -14,8 +14,16 @@ describe('mapExtras', () => {
     const result = mapExtras({ credits: { cast } });
 
     expect(result.cast).toHaveLength(CAST_LIMIT);
-    expect(result.cast[0]).toEqual({ name: 'Actor 0', character: null });
-    expect(result.cast[1]).toEqual({ name: 'Actor 1', character: 'Role 1' });
+    expect(result.cast[0]).toEqual({ name: 'Actor 0', character: null, photo: null });
+    expect(result.cast[1]).toEqual({ name: 'Actor 1', character: 'Role 1', photo: null });
+  });
+
+  it('keeps the profile photo slug, or null when TMDB has none', () => {
+    const cast = [
+      { name: 'With photo', character: 'A', profile_path: '/photo.jpg' },
+      { name: 'Null photo', character: 'B', profile_path: null },
+    ];
+    expect(mapExtras({ credits: { cast } }).cast.map((c) => c.photo)).toEqual(['/photo.jpg', null]);
   });
 
   it('prefers an official YouTube trailer', () => {

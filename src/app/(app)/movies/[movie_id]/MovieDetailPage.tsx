@@ -1,19 +1,20 @@
 'use client';
 
-import { ActionIcon, Alert, Anchor, Badge, Center, Group, Image, Loader, Stack, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Center, Grid, Group, Loader, Stack, Text } from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, ChevronLeft } from 'lucide-react';
-import { DateTime } from 'luxon';
-import { BackdropCard } from '@/components/BackdropCard';
+import { ChevronLeft } from 'lucide-react';
+import { useState } from 'react';
 import { QueryKey } from '@/components/QueryProvider';
 import { useAlert } from '@/hooks/useAlert';
 import { useMovieQuery } from '@/hooks/useMovie';
+import { useRecommendationDetails } from '@/hooks/useRecommendationDetails';
 import { invalidateStats } from '@/hooks/useStats';
 import { apiFetch } from '@/lib/api/fetch';
 import { apiRoutes, routes } from '@/lib/routes';
-import { getImageUrl } from '@/lib/themoviedb/images';
-import { DateFormat } from '@/utils/dates';
-import { formatDuration } from '@/utils/formatDuration';
+import { Cast, ExtrasSkeleton, WhereToWatch } from './MovieExtras';
+import { MovieHero } from './MovieHero';
+import { SimilarMovies } from './SimilarMovies';
+import { TrailerModal } from './TrailerModal';
 
 type Props = {
   movieId: string;
@@ -23,6 +24,10 @@ export const MovieDetailPage = ({ movieId }: Props) => {
   const { showError, showSuccess } = useAlert();
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error } = useMovieQuery(movieId);
+  // Cast, trailer and streaming come from TMDB, so they load after the page itself.
+  const extras = useRecommendationDetails(data ? { type: 'movie', moviedb_id: data.movie.moviedb_id } : null);
+  const details = extras.data;
+  const [trailer, setTrailer] = useState<string | null>(null);
 
   const { mutate: markWatched, isPending } = useMutation<unknown, Error>({
     mutationFn: async () => {
@@ -60,9 +65,8 @@ export const MovieDetailPage = ({ movieId }: Props) => {
     );
   }
 
-  const { movie, subscription, genres } = data;
-  const releaseDate = movie.releasedate ? DateTime.fromSQL(movie.releasedate) : null;
-  const watchedAt = subscription.watched_at ? DateTime.fromISO(String(subscription.watched_at)) : null;
+  const { movie, similar } = data;
+  const showStreaming = !data.subscription.watched && (details?.providers.length ?? 0) > 0;
 
   return (
     <Stack gap="xl">
@@ -73,50 +77,38 @@ export const MovieDetailPage = ({ movieId }: Props) => {
         </Group>
       </Anchor>
 
-      <BackdropCard backdrop={movie.backdrop_slug} padding="lg">
-        <Group align="flex-start" wrap="nowrap" gap="lg">
-          <Image
-            src={movie.poster_slug ? getImageUrl(movie.poster_slug) : undefined}
-            fallbackSrc="/placeholder.jpg"
-            alt={`Poster for ${movie.name}`}
-            w={{ base: 100, sm: 140 }}
-            radius="md"
-            style={{ aspectRatio: '2 / 3', objectFit: 'cover', flex: '0 0 auto' }}
-          />
-          <Stack gap="xs" flex={1}>
-            <Title order={2}>{movie.name}</Title>
-            <Text size="sm">
-              {releaseDate?.toFormat(DateFormat.DMY) ?? 'Unknown release date'}
-              {movie.runtime ? ` · ${formatDuration(movie.runtime)}` : ''}
-            </Text>
-            {movie.description && (
-              <Text c="dimmed" size="sm">
-                {movie.description}
+      <MovieHero
+        data={data}
+        details={details}
+        onPlayTrailer={() => setTrailer(details?.trailer ?? null)}
+        onMarkWatched={() => markWatched()}
+        markingWatched={isPending}
+      />
+
+      <Grid gap="xl">
+        <Grid.Col span={{ base: 12, md: showStreaming ? 8 : 12 }}>
+          <Stack gap="md" maw="75ch">
+            {movie.description && <Text size="lg">{movie.description}</Text>}
+            {extras.isLoading && <ExtrasSkeleton />}
+            {extras.isError && (
+              <Text size="sm" c="dimmed">
+                Cast, trailer and streaming details could not be loaded from TMDB.
               </Text>
             )}
-            {genres.length > 0 && (
-              <Group gap="xs" aria-label="Genres">
-                {genres.map((genre) => (
-                  <Badge key={genre} variant="light" color="signal">
-                    {genre}
-                  </Badge>
-                ))}
-              </Group>
-            )}
-            <Group gap="xs">
-              {subscription.watched ? (
-                <Badge color="afterglow" variant="filled">
-                  Watched{watchedAt?.isValid ? ` ${watchedAt.toFormat(DateFormat.DMY)}` : ''}
-                </Badge>
-              ) : (
-                <ActionIcon aria-label="Mark watched" loading={isPending} onClick={() => markWatched()}>
-                  <Check size={20} />
-                </ActionIcon>
-              )}
-            </Group>
           </Stack>
-        </Group>
-      </BackdropCard>
+        </Grid.Col>
+        {details && showStreaming && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <WhereToWatch details={details} />
+          </Grid.Col>
+        )}
+      </Grid>
+
+      {details && <Cast details={details} />}
+
+      <SimilarMovies movieId={movieId} movies={similar} />
+
+      <TrailerModal videoKey={trailer} title={movie.name} onClose={() => setTrailer(null)} />
     </Stack>
   );
 };

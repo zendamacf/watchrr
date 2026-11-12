@@ -73,7 +73,7 @@ Items watched before watch times were recorded have no date. They count in `tota
 
 ## `GET /api/movie/{id}`
 
-A subscribed movie with `subscription` (`watched`, `watched_at`) and `genres` (names, alphabetical; empty until the movie's next refresh). Returns `404` when the user is not subscribed. `GET /api/tvshow/{id}/episodes` also returns `genres`.
+A subscribed movie with `subscription` (`watched`, `watched_at`), `genres` (names, alphabetical; empty until the movie's next refresh) and `similar` (up to 12 cached TMDB recommendations for it, each with `moviedb_id`, `name`, `description`, `releasedate` and `poster_slug`; movies the user follows or hid are left out, and no TMDB request is made). Returns `404` when the user is not subscribed. `GET /api/tvshow/{id}/episodes` also returns `genres`.
 
 ## `GET /api/tvshow/{id}/stats`
 

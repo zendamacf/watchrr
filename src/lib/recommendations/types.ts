@@ -39,7 +39,7 @@ export type RecommendationDetails = {
   /** Shows only. */
   seasons: number | null;
   status: string | null;
-  cast: { name: string; character: string | null }[];
+  cast: { name: string; character: string | null; photo: string | null }[];
   /** YouTube video key of a trailer. */
   trailer: string | null;
   /** Subscription streaming services in the requested region. */
@@ -47,3 +47,6 @@ export type RecommendationDetails = {
   /** TMDB's page listing every way to watch it in the requested region. */
   providers_link: string | null;
 };
+
+/** A movie TMDB suggests alongside a tracked one, shown on that movie's page. */
+export type SimilarMovie = Pick<Recommendation, 'moviedb_id' | 'name' | 'description' | 'releasedate' | 'poster_slug'>;

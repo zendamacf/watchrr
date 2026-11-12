@@ -9,7 +9,8 @@ export const DETAILS_APPEND = ['credits', 'videos', 'watch/providers'] as const;
 /** How many cast members are kept; TMDB lists dozens, in billing order. */
 export const CAST_LIMIT = 6;
 
-export type TMDBCastMember = { name: string; character: string | null };
+/** `photo` is a TMDB image slug for the actor's profile picture, if they have one. */
+export type TMDBCastMember = { name: string; character: string | null; photo: string | null };
 export type TMDBProvider = { name: string; logo: string | null };
 /** Streaming providers in one region, with TMDB's page that lists every option. */
 export type TMDBWatchRegion = { link: string | null; providers: TMDBProvider[] };
@@ -32,7 +33,7 @@ export type TMDBTitleDetails = {
 };
 
 type Extras = {
-  credits?: { cast?: { name: string; character?: string | null }[] };
+  credits?: { cast?: { name: string; character?: string | null; profile_path?: string | null }[] };
   videos?: { results?: { key: string; site: string; type: string; official?: boolean }[] };
   /** TMDB types the results as an interface keyed by every region, which has no index signature. */
   'watch/providers'?: { results?: object };
@@ -58,7 +59,7 @@ const mapWatch = (results: object = {}): Record<string, TMDBWatchRegion> => {
 export const mapExtras = (d: Extras): Pick<TMDBTitleDetails, 'cast' | 'trailer' | 'watch'> => ({
   cast: (d.credits?.cast ?? [])
     .slice(0, CAST_LIMIT)
-    .map((c) => ({ name: c.name, character: c.character?.trim() || null })),
+    .map((c) => ({ name: c.name, character: c.character?.trim() || null, photo: c.profile_path ?? null })),
   trailer: pickTrailer(d.videos?.results),
   watch: mapWatch(d['watch/providers']?.results),
 });
