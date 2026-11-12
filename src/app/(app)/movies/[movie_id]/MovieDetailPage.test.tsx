@@ -178,8 +178,14 @@ describe('MovieDetailPage', () => {
 
   describe('More like this', () => {
     const similar = [
-      { moviedb_id: 1001, name: 'Alike One', releasedate: '2019-05-01', poster_slug: '/a.jpg' },
-      { moviedb_id: 1002, name: 'Alike Two', releasedate: null, poster_slug: null },
+      {
+        moviedb_id: 1001,
+        name: 'Alike One',
+        description: 'First lookalike',
+        releasedate: '2019-05-01',
+        poster_slug: '/a.jpg',
+      },
+      { moviedb_id: 1002, name: 'Alike Two', description: null, releasedate: null, poster_slug: null },
     ];
 
     it('lists similar movies', async () => {
@@ -196,6 +202,49 @@ describe('MovieDetailPage', () => {
       renderWithProviders(<MovieDetailPage movieId={testMovie.id} />);
       await screen.findByRole('heading', { name: testMovie.name, level: 2 });
       expect(screen.queryByRole('region', { name: 'More like this' })).not.toBeInTheDocument();
+    });
+
+    it('opens the details modal for a similar movie', async () => {
+      stubPage({ ...detail, similar });
+      const user = userEvent.setup();
+      renderWithProviders(<MovieDetailPage movieId={testMovie.id} />);
+
+      await user.click(await screen.findByRole('button', { name: 'More about Alike One' }));
+
+      expect(await screen.findByText('First lookalike')).toBeInTheDocument();
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/api/recommendations/details?type=movie&moviedb_id=1001'),
+        undefined,
+      );
+    });
+
+    it('hides a similar movie from the modal and reloads the page data', async () => {
+      let hidden = false;
+      stubFetch(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = fetchRequestUrl(input);
+        if (url === apiRoutes.notInterested && init?.method === 'POST') {
+          hidden = true;
+          return mockFetchResponse({ message: 'Success' }, { status: 201 });
+        }
+        if (url.startsWith('/api/recommendations/details')) return mockFetchResponse(extras);
+        return mockFetchResponse({ ...detail, similar: hidden ? [similar[1]] : similar });
+      });
+      const user = userEvent.setup();
+      renderWithProviders(<MovieDetailPage movieId={testMovie.id} />);
+
+      await user.click(await screen.findByRole('button', { name: 'More about Alike One' }));
+      await user.click(await screen.findByRole('button', { name: 'Already watched' }));
+
+      await waitFor(() =>
+        expect(screen.queryByRole('button', { name: 'More about Alike One' })).not.toBeInTheDocument(),
+      );
+      expect(
+        JSON.parse(vi.mocked(fetch).mock.calls.find(([, init]) => init?.method === 'POST')?.[1]?.body as string),
+      ).toMatchObject({
+        type: 'movie',
+        moviedb_id: 1001,
+        reason: 'already_watched',
+      });
     });
 
     it('follows a similar movie and reloads the page data', async () => {

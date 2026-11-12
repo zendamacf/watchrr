@@ -43,3 +43,23 @@
   font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3rem);
   line-height: 1.1;
 }
+
+/* Poster and title on the left; the actions drop below on narrow screens and sit bottom-right on wide ones. */
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-md);
+  width: 100%;
+
+  @media (min-width: 48em) {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--mantine-spacing-xl);
+  }
+}
+
+.actions {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}

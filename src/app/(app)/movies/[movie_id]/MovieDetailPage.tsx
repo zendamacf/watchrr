@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Anchor, Center, Group, Loader, Stack, Text } from '@mantine/core';
+import { Alert, Anchor, Center, Grid, Group, Loader, Stack, Text } from '@mantine/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
@@ -66,6 +66,7 @@ export const MovieDetailPage = ({ movieId }: Props) => {
   }
 
   const { movie, similar } = data;
+  const showStreaming = !data.subscription.watched && (details?.providers.length ?? 0) > 0;
 
   return (
     <Stack gap="xl">
@@ -84,17 +85,26 @@ export const MovieDetailPage = ({ movieId }: Props) => {
         markingWatched={isPending}
       />
 
-      <Stack gap="xl" maw="70ch">
-        {movie.description && <Text>{movie.description}</Text>}
-        {extras.isLoading && <ExtrasSkeleton />}
-        {extras.isError && (
-          <Text size="sm" c="dimmed">
-            Cast, trailer and streaming details could not be loaded from TMDB.
-          </Text>
+      <Grid gap="xl">
+        <Grid.Col span={{ base: 12, md: showStreaming ? 8 : 12 }}>
+          <Stack gap="md" maw="75ch">
+            {movie.description && <Text size="lg">{movie.description}</Text>}
+            {extras.isLoading && <ExtrasSkeleton />}
+            {extras.isError && (
+              <Text size="sm" c="dimmed">
+                Cast, trailer and streaming details could not be loaded from TMDB.
+              </Text>
+            )}
+          </Stack>
+        </Grid.Col>
+        {details && showStreaming && (
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <WhereToWatch details={details} />
+          </Grid.Col>
         )}
-        {details && !data.subscription.watched && <WhereToWatch details={details} />}
-        {details && <Cast details={details} />}
-      </Stack>
+      </Grid>
+
+      {details && <Cast details={details} />}
 
       <SimilarMovies movieId={movieId} movies={similar} />
 

@@ -34,72 +34,74 @@ export const MovieHero = ({ data, details, onPlayTrailer, onMarkWatched, marking
         } as CSSProperties
       }
     >
-      <Group align="flex-end" wrap="nowrap" gap="lg" w="100%">
-        <Image
-          className={classes.poster}
-          src={movie.poster_slug ? getImageUrl(movie.poster_slug) : undefined}
-          fallbackSrc="/placeholder.jpg"
-          alt={`Poster for ${movie.name}`}
-          w={{ base: 96, xs: 120, sm: 190 }}
-          radius="md"
-        />
-        <Stack gap="sm" flex={1} miw={0}>
-          <Stack gap={4}>
-            <Title order={2} className={classes.title}>
-              {movie.name}
-            </Title>
-            {tagline && (
-              <Text fs="italic" c="dimmed">
-                {tagline}
-              </Text>
+      <div className={classes.inner}>
+        <Group align="flex-end" wrap="nowrap" gap="lg" flex={1} miw={0}>
+          <Image
+            className={classes.poster}
+            src={movie.poster_slug ? getImageUrl(movie.poster_slug) : undefined}
+            fallbackSrc="/placeholder.jpg"
+            alt={`Poster for ${movie.name}`}
+            w={{ base: 96, xs: 120, sm: 190 }}
+            radius="md"
+          />
+          <Stack gap="sm" flex={1} miw={0}>
+            <Stack gap={4}>
+              <Title order={2} className={classes.title}>
+                {movie.name}
+              </Title>
+              {tagline && (
+                <Text fs="italic" c="dimmed">
+                  {tagline}
+                </Text>
+              )}
+            </Stack>
+
+            <Group gap="md" align="center">
+              <Text size="sm">{releaseDate?.toFormat(DateFormat.DMY) ?? 'Unknown release date'}</Text>
+              {movie.runtime ? <Text size="sm">{formatDuration(movie.runtime)}</Text> : null}
+              {details?.rating != null && (
+                <Badge variant="light" color="yellow" leftSection={<Star size={12} aria-hidden />}>
+                  <VisuallyHidden>TMDB rating </VisuallyHidden>
+                  {details.rating.toFixed(1)}
+                  <VisuallyHidden> out of 10</VisuallyHidden>
+                </Badge>
+              )}
+            </Group>
+
+            {genres.length > 0 && (
+              <Group gap="xs" aria-label="Genres">
+                {genres.map((genre) => (
+                  <Badge key={genre} variant="light" color="signal">
+                    {genre}
+                  </Badge>
+                ))}
+              </Group>
             )}
           </Stack>
+        </Group>
 
-          <Group gap="md" align="center">
-            <Text size="sm">{releaseDate?.toFormat(DateFormat.DMY) ?? 'Unknown release date'}</Text>
-            {movie.runtime ? <Text size="sm">{formatDuration(movie.runtime)}</Text> : null}
-            {details?.rating != null && (
-              <Badge variant="light" color="yellow" leftSection={<Star size={12} aria-hidden />}>
-                <VisuallyHidden>TMDB rating </VisuallyHidden>
-                {details.rating.toFixed(1)}
-                <VisuallyHidden> out of 10</VisuallyHidden>
-              </Badge>
-            )}
-          </Group>
-
-          {genres.length > 0 && (
-            <Group gap="xs" aria-label="Genres">
-              {genres.map((genre) => (
-                <Badge key={genre} variant="light" color="signal">
-                  {genre}
-                </Badge>
-              ))}
-            </Group>
+        <Group gap="xs" className={classes.actions}>
+          {details?.trailer && (
+            <Button variant="white" color="dark" leftSection={<Play size={16} aria-hidden />} onClick={onPlayTrailer}>
+              Watch trailer
+            </Button>
           )}
-
-          <Group gap="xs">
-            {details?.trailer && (
-              <Button variant="white" color="dark" leftSection={<Play size={16} aria-hidden />} onClick={onPlayTrailer}>
-                Watch trailer
-              </Button>
-            )}
-            {subscription.watched ? (
-              <Badge size="lg" color="afterglow" variant="filled">
-                Watched{watchedAt?.isValid ? ` ${watchedAt.toFormat(DateFormat.DMY)}` : ''}
-              </Badge>
-            ) : (
-              <Button
-                variant="filled"
-                loading={markingWatched}
-                leftSection={<Check size={16} aria-hidden />}
-                onClick={onMarkWatched}
-              >
-                Mark watched
-              </Button>
-            )}
-          </Group>
-        </Stack>
-      </Group>
+          {subscription.watched ? (
+            <Badge size="lg" color="afterglow" variant="filled">
+              Watched{watchedAt?.isValid ? ` ${watchedAt.toFormat(DateFormat.DMY)}` : ''}
+            </Badge>
+          ) : (
+            <Button
+              variant="filled"
+              loading={markingWatched}
+              leftSection={<Check size={16} aria-hidden />}
+              onClick={onMarkWatched}
+            >
+              Mark watched
+            </Button>
+          )}
+        </Group>
+      </div>
     </header>
   );
 };

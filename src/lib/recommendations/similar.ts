@@ -15,6 +15,7 @@ export async function listSimilarMovies(userId: string, movieId: string): Promis
     .select({
       moviedb_id: movie_recommendations.moviedb_id,
       name: movie_recommendations.name,
+      description: movie_recommendations.description,
       releasedate: movie_recommendations.releasedate,
       poster_slug: movie_recommendations.poster_slug,
     })

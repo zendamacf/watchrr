@@ -83,7 +83,13 @@ describe('/api/movie/[movie_id]', () => {
       const response = await GET(nextGet(apiRoutes.movieById(movieId)), routeParams({ movie_id: movieId }));
       const body = await response.json();
       expect(body.similar).toEqual([
-        { moviedb_id: 998_313, name: 'Alike', releasedate: '2021-06-01', poster_slug: '/rec-poster.jpg' },
+        {
+          moviedb_id: 998_313,
+          name: 'Alike',
+          description: 'A recommended movie',
+          releasedate: '2021-06-01',
+          poster_slug: '/rec-poster.jpg',
+        },
       ]);
     });
   });

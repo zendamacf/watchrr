@@ -39,6 +39,7 @@ describe('listSimilarMovies', () => {
     expect(similar[1]).toEqual({
       moviedb_id: base + 11,
       name: 'Bravo',
+      description: 'A recommended movie',
       releasedate: '2020-02-02',
       poster_slug: '/rec-poster.jpg',
     });
