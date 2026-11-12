@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionIcon, Text } from '@mantine/core';
+import { ActionIcon, Text, Tooltip } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
@@ -91,18 +91,22 @@ export const MovieCard = ({ movie }: Props) => {
       titleHref={routes.movieById(movie.id)}
       actions={
         <>
-          <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>
-            <Check size={'20'} />
-          </ActionIcon>
-          <ActionIcon
-            aria-label="Unsubscribe"
-            variant="white"
-            color={'red'}
-            loading={pendingRemove}
-            onClick={() => confirmUnsubscribe(movie.id)}
-          >
-            <X size={'20'} />
-          </ActionIcon>
+          <Tooltip label="Mark watched">
+            <ActionIcon aria-label="Mark watched" loading={pendingWatched} onClick={() => watched(movie.id)}>
+              <Check size={'20'} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Unsubscribe">
+            <ActionIcon
+              aria-label="Unsubscribe"
+              variant="white"
+              color={'red'}
+              loading={pendingRemove}
+              onClick={() => confirmUnsubscribe(movie.id)}
+            >
+              <X size={'20'} />
+            </ActionIcon>
+          </Tooltip>
         </>
       }
     />

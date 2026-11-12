@@ -1,6 +1,6 @@
 'use client';
 
-import { ActionIcon, Text } from '@mantine/core';
+import { ActionIcon, Text, Tooltip } from '@mantine/core';
 import { openConfirmModal } from '@mantine/modals';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RefreshCcw, X } from 'lucide-react';
@@ -64,24 +64,28 @@ export const ShowCard = ({ show }: Props) => {
       titleHref={routes.showById(show.id)}
       actions={
         <>
-          <ActionIcon
-            aria-label="Refresh metadata"
-            variant="white"
-            color={'gray'}
-            loading={refreshPending}
-            onClick={() => refresh({ tvshowId: show.id, name: show.name })}
-          >
-            <RefreshCcw size={'20'} />
-          </ActionIcon>
-          <ActionIcon
-            aria-label="Unsubscribe"
-            variant="white"
-            color={'red'}
-            loading={removePending}
-            onClick={() => confirmUnsubscribe(show.id)}
-          >
-            <X size={'20'} />
-          </ActionIcon>
+          <Tooltip label="Refresh metadata">
+            <ActionIcon
+              aria-label="Refresh metadata"
+              variant="white"
+              color={'gray'}
+              loading={refreshPending}
+              onClick={() => refresh({ tvshowId: show.id, name: show.name })}
+            >
+              <RefreshCcw size={'20'} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Unsubscribe">
+            <ActionIcon
+              aria-label="Unsubscribe"
+              variant="white"
+              color={'red'}
+              loading={removePending}
+              onClick={() => confirmUnsubscribe(show.id)}
+            >
+              <X size={'20'} />
+            </ActionIcon>
+          </Tooltip>
         </>
       }
     />
