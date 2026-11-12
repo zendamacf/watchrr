@@ -2,12 +2,15 @@ import { and, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { not_interested_movies, not_interested_tvshows } from '@/lib/db/schema';
 import { FINISHED_BONUS, SOURCE_WEIGHT } from './score';
-import type { Recommendation, RecommendationType } from './types';
+import { BECAUSE_LIMIT, type Recommendation, type RecommendationType } from './types';
 
 const sourceWeightSql = (finished: ReturnType<typeof sql>) =>
   sql`(${sql.raw(String(SOURCE_WEIGHT))} + CASE WHEN ${finished} THEN ${sql.raw(String(FINISHED_BONUS))} ELSE 0 END)`;
 
-/** Aggregates one row per candidate, from per-source rows exposing `w` (weight) and `source_name`. */
+/**
+ * Aggregates one row per candidate, from per-source rows exposing `w` (weight) and `source_name`.
+ * Each source appears once per candidate, so `count(*)` is the number of recommending sources.
+ */
 const aggregate = (type: RecommendationType, rows: ReturnType<typeof sql>) => sql`
   SELECT ${type}::text AS type,
     moviedb_id,
@@ -18,7 +21,8 @@ const aggregate = (type: RecommendationType, rows: ReturnType<typeof sql>) => sq
     (array_agg(releasedate ORDER BY w DESC, source_name))[1] AS releasedate,
     (array_agg(country ORDER BY w DESC, source_name))[1] AS country,
     sum(w)::int AS score,
-    (array_agg(source_name ORDER BY w DESC, source_name))[1] AS because
+    (array_agg(source_name ORDER BY w DESC, source_name))[1:${sql.raw(String(BECAUSE_LIMIT))}] AS because,
+    greatest(count(*) - ${sql.raw(String(BECAUSE_LIMIT))}, 0)::int AS because_more
   FROM (${rows}) AS rows
   GROUP BY moviedb_id
 `;

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
 import { subscribed_movies, watched_episodes } from '@/lib/db/schema';
 import { seedPassword } from '@/test/fixtures/user';
+import { uniqueTmdbBase } from '@/test/ids';
 import {
   seedEpisode,
   seedMovieRecommendation,
@@ -16,11 +17,9 @@ import {
 import { listRecommendations, markNotInterested, unmarkNotInterested } from './list';
 import { scoreRecommendation } from './score';
 
-// Each test uses its own user and TMDB id range so shared, uncleaned data cannot interfere.
-let counter = 0;
+// Each test uses its own user and TMDB id block so shared, uncleaned data cannot interfere.
 async function setup() {
-  counter += 1;
-  const base = 950_000 + counter * 100;
+  const base = uniqueTmdbBase();
   const user = await seedUser({ email: `vitest-recs-list-${base}-${Date.now()}@example.com`, password: seedPassword });
   return { base, userId: user.id };
 }
@@ -66,7 +65,8 @@ describe('listRecommendations', () => {
         name: 'Rec M',
         releasedate: '2021-06-01',
         country: null,
-        because: 'Source M',
+        because: ['Source M'],
+        because_more: 0,
         score: 1,
       }),
       expect.objectContaining({
@@ -75,7 +75,8 @@ describe('listRecommendations', () => {
         name: 'Rec S',
         releasedate: null,
         country: 'US',
-        because: 'Source S',
+        because: ['Source S'],
+        because_more: 0,
         score: 1,
       }),
     ]);
@@ -134,10 +135,34 @@ describe('listRecommendations', () => {
     const byName = Object.fromEntries(data.map((r) => [r.name, r]));
 
     expect(byName.Both?.score).toBe(scoreRecommendation([{ finished: false }, { finished: true }]));
-    expect(byName.Both?.because).toBe('Zzz Finished');
+    expect(byName.Both?.because).toEqual(['Zzz Finished', 'Aaa Unwatched']);
     expect(byName['Only Finished']?.score).toBe(scoreRecommendation([{ finished: true }]));
     expect(byName['Only Unwatched']?.score).toBe(scoreRecommendation([{ finished: false }]));
     expect(data.map((r) => r.name)).toEqual(['Both', 'Only Finished', 'Only Unwatched']);
+  });
+
+  it('names up to three sources, strongest first, and counts the rest', async () => {
+    const { base, userId } = await setup();
+    const finished = (
+      await seedSubscribedMovie({ watcherId: userId, movie: { moviedb_id: base + 1, name: 'Finished' }, watched: true })
+    ).movie;
+    const track = async (offset: number, name: string) =>
+      (await seedSubscribedMovie({ watcherId: userId, movie: { moviedb_id: base + offset, name } })).movie;
+    const delta = await track(2, 'Delta');
+    const sources = [finished, delta, await track(3, 'Alpha'), await track(4, 'Charlie'), await track(5, 'Bravo')];
+    for (const source of sources) {
+      await seedMovieRecommendation({ sourceMovieId: source.id, moviedb_id: base + 10, name: 'Popular' });
+    }
+    await seedMovieRecommendation({ sourceMovieId: delta.id, moviedb_id: base + 11, name: 'Niche' });
+
+    const { data } = await listRecommendations(opts(userId));
+    const byName = Object.fromEntries(data.map((r) => [r.name, r]));
+
+    // The finished source weighs most; ties fall back to name.
+    expect(byName.Popular?.because).toEqual(['Finished', 'Alpha', 'Bravo']);
+    expect(byName.Popular?.because_more).toBe(2);
+    expect(byName.Niche?.because).toEqual(['Delta']);
+    expect(byName.Niche?.because_more).toBe(0);
   });
 
   it('treats a show as finished only when every aired episode is watched', async () => {

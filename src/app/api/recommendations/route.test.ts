@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { apiRoutes } from '@/lib/routes';
 import { seedPassword } from '@/test/fixtures/user';
 import { nextGet } from '@/test/helpers/api-request';
+import { uniqueTmdbBase } from '@/test/ids';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import {
   seedMovieRecommendation,
@@ -14,7 +15,7 @@ import {
 } from '@/test/seeds';
 import { GET } from './route';
 
-const BASE = 963_000;
+const BASE = uniqueTmdbBase();
 
 describe('GET /api/recommendations', () => {
   beforeEach(() => {
@@ -56,10 +57,10 @@ describe('GET /api/recommendations', () => {
     const response = await GET(nextGet(apiRoutes.recommendations()));
 
     expect(response.status).toBe(200);
-    const body = (await response.json()) as { name: string; type: string; because: string }[];
+    const body = (await response.json()) as { name: string; type: string; because: string[] }[];
     expect(body.map((r) => [r.type, r.name, r.because])).toEqual([
-      ['movie', 'Shown', 'Source'],
-      ['tvshow', 'Shown Show', 'Source Show'],
+      ['movie', 'Shown', ['Source']],
+      ['tvshow', 'Shown Show', ['Source Show']],
     ]);
     expect(response.headers.get('X-Total-Count')).toBe('2');
   });

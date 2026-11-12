@@ -11,6 +11,7 @@ import { DateTime } from 'luxon';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '@/lib/db';
 import { movie_recommendations, movies, tvshow_recommendations, tvshows } from '@/lib/db/schema';
+import { uniqueTmdbBase } from '@/test/ids';
 import {
   mockGetMovieRecommendations,
   mockGetTvShowRecommendations,
@@ -28,8 +29,8 @@ import {
   refreshTvShowRecommendations,
 } from './recommendations';
 
-const MOVIE_BASE = 961_000;
-const SHOW_BASE = 962_000;
+const MOVIE_BASE = uniqueTmdbBase();
+const SHOW_BASE = uniqueTmdbBase();
 
 const tmdbMovie = (id: number, name = `Rec ${id}`) => ({
   id,

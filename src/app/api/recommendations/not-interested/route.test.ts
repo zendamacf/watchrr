@@ -5,11 +5,12 @@ import { listRecommendations } from '@/lib/recommendations/list';
 import { apiRoutes } from '@/lib/routes';
 import { seedPassword } from '@/test/fixtures/user';
 import { nextDelete, nextPost } from '@/test/helpers/api-request';
+import { uniqueTmdbBase } from '@/test/ids';
 import { mockGuardUser, resetAuthGuardMocks } from '@/test/mocks/auth';
 import { seedMovieRecommendation, seedSubscribedMovie, seedUser } from '@/test/seeds';
 import { DELETE, POST } from './route';
 
-const BASE = 964_000;
+const BASE = uniqueTmdbBase();
 
 describe('/api/recommendations/not-interested', () => {
   let userId: string;

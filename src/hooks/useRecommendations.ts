@@ -19,9 +19,9 @@ import { apiRoutes } from '@/lib/routes';
 export const recommendationId = (row: Pick<Recommendation, 'type' | 'moviedb_id'>) => `${row.type}-${row.moviedb_id}`;
 
 /** The user's recommendations, loaded page by page. Omit `type` for movies and shows together. */
-export function useRecommendationsQuery({ type }: { type?: RecommendationType } = {}) {
+export function useRecommendationsQuery({ type, pageSize }: { type?: RecommendationType; pageSize?: number } = {}) {
   const query = useInfiniteQuery({
-    ...pagedQueryOptions<Recommendation>(QueryKey.getRecommendations, apiRoutes.recommendations(), { type }),
+    ...pagedQueryOptions<Recommendation>(QueryKey.getRecommendations, apiRoutes.recommendations(), { type }, pageSize),
     placeholderData: keepPreviousData,
   });
 

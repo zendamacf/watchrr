@@ -10,7 +10,8 @@ export const testRecommendation: Recommendation = {
   releasedate: '1994-09-10',
   country: null,
   score: 2,
-  because: 'Fight Club',
+  because: ['Fight Club'],
+  because_more: 0,
 };
 
 export const testShowRecommendation: Recommendation = {
@@ -20,5 +21,5 @@ export const testShowRecommendation: Recommendation = {
   name: 'Breaking Bad',
   releasedate: null,
   country: 'US',
-  because: 'The Wire',
+  because: ['The Wire'],
 };

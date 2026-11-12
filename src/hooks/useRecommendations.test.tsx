@@ -40,6 +40,16 @@ describe('useRecommendationsQuery', () => {
     expect(result.current.total).toBe(5);
   });
 
+  it('sends the page size', async () => {
+    stubFetch(mockPagedResponse([]));
+    renderHookWithProviders(() => useRecommendationsQuery({ type: 'tvshow', pageSize: 6 }));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalled());
+    const url = fetchRequestUrl(vi.mocked(fetch).mock.calls[0]?.[0] as string);
+    expect(url).toContain('limit=6');
+    expect(url).toContain('type=tvshow');
+  });
+
   it('sends the type filter', async () => {
     stubFetch(mockPagedResponse([]));
     renderHookWithProviders(() => useRecommendationsQuery({ type: 'movie' }));

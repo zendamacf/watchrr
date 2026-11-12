@@ -15,6 +15,11 @@ export type Recommendation = {
   /** Shows only. */
   country: string | null;
   score: number;
-  /** Name of the highest-weighted tracked item that led to this recommendation. */
-  because: string;
+  /** Tracked items that led to this recommendation, strongest first, at most `BECAUSE_LIMIT`. */
+  because: string[];
+  /** How many more tracked items recommend it beyond those in `because`. */
+  because_more: number;
 };
+
+/** How many tracked items a recommendation names as its reason. */
+export const BECAUSE_LIMIT = 3;

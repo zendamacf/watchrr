@@ -11,7 +11,49 @@ describe('RecommendationCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Pulp Fiction' })).toBeInTheDocument();
     expect(screen.getByText('1994')).toBeInTheDocument();
-    expect(screen.getByText('Because you watch Fight Club')).toBeInTheDocument();
+    expect(screen.getByText(/Because you watch/)).toBeInTheDocument();
+    expect(screen.getByText('Fight Club').tagName).toBe('STRONG');
+  });
+
+  describe('reasons', () => {
+    const reasons = (because: string[], because_more = 0) =>
+      renderWithProviders(
+        <RecommendationCard
+          recommendation={{ ...testRecommendation, because, because_more }}
+          onAdd={vi.fn()}
+          onHide={vi.fn()}
+        />,
+      );
+    const sentence = () => screen.getByText(/Because you watch/).textContent;
+
+    it('emphasises each source and joins two with "and"', () => {
+      reasons(['Fight Club', 'Se7en']);
+      expect(screen.getByText('Fight Club').tagName).toBe('STRONG');
+      expect(screen.getByText('Se7en').tagName).toBe('STRONG');
+      expect(sentence()).toBe('Because you watch Fight Club and Se7en');
+    });
+
+    it('uses commas, then "and", for three sources', () => {
+      reasons(['Fight Club', 'Se7en', 'Zodiac']);
+      expect(sentence()).toBe('Because you watch Fight Club, Se7en and Zodiac');
+    });
+
+    it('ends with the number of further sources, not highlighted', () => {
+      reasons(['Fight Club', 'Se7en', 'Zodiac'], 4);
+      expect(sentence()).toBe('Because you watch Fight Club, Se7en, Zodiac and 4 more');
+      expect(screen.getByText('4 more').tagName).not.toBe('STRONG');
+    });
+
+    it('works with one source and further ones', () => {
+      reasons(['Fight Club'], 1);
+      expect(sentence()).toBe('Because you watch Fight Club and 1 more');
+    });
+
+    it('names a repeated title once', () => {
+      reasons(['Dune', 'Dune', 'Arrival']);
+      expect(screen.getAllByText('Dune')).toHaveLength(1);
+      expect(sentence()).toBe('Because you watch Dune and Arrival');
+    });
   });
 
   it('falls back to a plain label when a movie has no release date', () => {
