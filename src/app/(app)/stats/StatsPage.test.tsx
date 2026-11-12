@@ -82,6 +82,14 @@ describe('StatsPage', () => {
     expect(screen.getByText('Activity by week')).toBeInTheDocument();
   });
 
+  it('hides the Unknown genre bucket', async () => {
+    stubFetch(mockFetchResponse(stats));
+    renderWithProviders(<StatsPage />);
+    await screen.findByText('Genres');
+    expect(screen.getAllByTestId('bar-chart').some((el) => el.textContent?.includes('Unknown'))).toBe(false);
+    expect(screen.queryByText(/Unknown(,|$)/)).not.toBeInTheDocument();
+  });
+
   it('shows a placeholder when there is no genre data', async () => {
     stubFetch(mockFetchResponse({ ...stats, genres: [] }));
     renderWithProviders(<StatsPage />);
