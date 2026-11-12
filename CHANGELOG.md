@@ -1,5 +1,15 @@
 # watchrr
 
+## 3.5.0
+
+### Minor Changes
+
+- d4c66cc: Add a Discover page with recommendations based on the movies and shows you follow, using TMDB. Each card says which of your titles led to it, and you can add it with one tap or hide it with "Not interested". Recommendations are cached and refreshed by the daily cron job.
+
+### Patch Changes
+
+- a8dc9b2: Hide the "Unknown" bucket from the stats page genre chart. It was mostly items whose genres were never fetched, such as shows you no longer follow.
+
 ## 3.4.1
 
 ### Patch Changes
