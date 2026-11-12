@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  formatTvShowStatusLabel,
-  isKnownTmdbTvShowStatus,
-  TV_SHOW_STATUS_FILTER_ALL,
-  TV_SHOW_STATUS_FILTER_UNKNOWN,
-} from './tvshowStatus';
+import { formatTvShowStatusLabel, isKnownTmdbTvShowStatus } from './tvshowStatus';
 
 describe('tvshowStatus', () => {
   it('recognizes TMDB status values', () => {
