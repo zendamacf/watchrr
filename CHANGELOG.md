@@ -1,5 +1,12 @@
 # watchrr
 
+## 3.4.1
+
+### Patch Changes
+
+- 61b066b: Use the Alpine base image to make the Docker image smaller.
+- 57b2140: Make the Docker image smaller. Run migrations with a bundled script instead of drizzle-kit.
+
 ## 3.4.0
 
 ### Minor Changes
